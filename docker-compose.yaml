@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  php-apache:
+    container_name: LEA-2.0-PHP
+    build:
+      context: .
+    ports:
+      - 2020:80
+    volumes:
+      # CURRENT__WORKING_DIRECTORY:CONTAINER_PATH_TO_WORKING_DIRECTORY
+      - .:/var/www/html
+  mariadb:
+    image: mariadb
+    restart: always
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      TZ: "Europe/Warsaw"
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "root"
+      MYSQL_DATABASE: "lea24"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+volumes:
+  mariadb:
