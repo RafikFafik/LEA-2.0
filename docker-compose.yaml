@@ -21,10 +21,11 @@ services:
       MYSQL_PASSWORD: "root"
       MYSQL_DATABASE: "lea24"
 
-  adminer:
-    image: adminer
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin
     restart: always
     ports:
-      - 8080:8080
+      - 8888:80
 volumes:
   mariadb:

@@ -3,14 +3,18 @@ RUN apt-get update -y \
     && apt-get install -y libxml2-dev \
     && apt-get clean -y \
     && pecl install xdebug \
+    && apt-get install -y libyaml-dev \
+    && pecl install yamL \
+    && docker-php-ext-enable yaml \
     && apt-get install vim -y \
     && docker-php-ext-install mysqli soap\
     && a2enmod rewrite \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_host=192.168.11.189" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.log_level=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_discovery_header=true" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=192.168.69.183" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.idekey=VSCODE" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.log_level=7" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_discovery_header=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "file_uploads = On" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "memory_limit = 64M" >> /usr/local/etc/php/conf.d/uploads.ini \
