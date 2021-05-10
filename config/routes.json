@@ -1,0 +1,9 @@
+{
+    "index_page": {
+        "prefix": "/",
+        "controller": "Lea\/Bundle\/HomepageBundle\/Controller\/HomepageController",
+        "methods": [
+            "GET"
+        ]
+    }
+}
