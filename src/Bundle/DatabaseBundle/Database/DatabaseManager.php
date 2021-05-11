@@ -1,16 +1,10 @@
 <?php
-  namespace Lea\DatabaseBundle\Magager\DatabaseManager;
+  namespace Lea\Database\DatabaseManager;
 
   class DatabaseManager
     {
     public $user_id = 0;
 
-    #######################################
-    ##    Połączenie                     ##
-    #######################################
-    /**
-     * [__construct konstruktor classy odpowiedzialnej za zapytania do bazy]
-     */
     function __construct()
       {
       if (!isset($this->connection)) {

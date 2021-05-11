@@ -1,9 +1,16 @@
 {
     "index_page": {
         "prefix": "/",
-        "controller": "Lea\/Bundle\/HomepageBundle\/Controller\/HomepageController",
+        "controller": "Lea\/HomepageBundle\/Controller\/HomepageController",
         "methods": [
             "GET"
+        ]
+    },
+    "offers": {
+        "prefix": "/",
+        "controller": "Lea\\OfferBundle\\Controller\\OfferController",
+        "methods": [
+            "GET", "POST"
         ]
     }
 }

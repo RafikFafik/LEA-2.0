@@ -1,9 +1,7 @@
 <?php
-
 namespace Lea\Entity;
-
-class Offer {
-    private $id;
+use Lea\Entity\EntityRepository;
+class Offer extends EntityRepository {
     private $offer_number;
     private $issue_date;
     private $expiration_date;

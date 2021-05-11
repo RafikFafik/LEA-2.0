@@ -4,10 +4,13 @@ namespace Lea;
 
 class ServiceLoader {
     public static function load() {
-        $path = __DIR__ . "/**/**/**/*.php";
-        foreach (glob($path) as $filename) {
+        $src = __DIR__ . "/**/**/**/*.php";
+        foreach (glob($src) as $filename) {
             include $filename;
         }
-        include glob(__DIR__ . '/**/*.php')[0];
+        $additional = __DIR__ . '/**/*.php';
+        foreach (glob($additional) as $filename) {
+            include $filename;
+        }
     }
 }
