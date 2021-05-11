@@ -1,7 +1,9 @@
 <?php
-  namespace Lea\Database\DatabaseManager;
+  namespace Lea\Core\Database;
 
-  class DatabaseManager
+use ReflectionClass;
+
+class DatabaseManager
     {
     public $user_id = 0;
 
@@ -24,6 +26,31 @@
     public function setUser($user_id){
       $this->user_id = $user_id;
     }
+
+    public function convertToColumn(string $field) {
+      $field = ucwords(str_replace('_', ' ', $field));
+      return sprintf('fld_%s', $field);
+    }
+
+    public function convertToTable(string $table) {
+      return sprintf('tbl_%ss', strtolower($table));
+    }
+
+    public function convertToField(string $tableField) {
+      $tableField = str_replace('fld_','', $tableField);
+      return $tableField;
+    }
+
+    public function getObjectSetters($object): array {
+      $setters = [];
+      foreach(get_class_methods($object) as $key) {
+        if (strpos($key, 'set') !== false) {
+          $setters[] = $key;
+        }
+      }
+
+      return $setters;
+    }
     #######################################
     ##    Operacje na rekordach danych   ##
     #######################################
@@ -35,11 +62,18 @@
      * @param  boolean $debug     [jeśli true - wyświetla zapytanie wysylane do bazy]
      * @return [type]             [jeśli zapytanie się powiedzie to tabela z danymi, jeśli nie to false]
      */
-    function getRecordData($tableName, $fldVal, $fldName = "id", $debug = false)
+    function getRecordData($object, $fldVal, $fldName = "id", $debug = false)
       {
+        $tableName = $this->convertToTable(end(explode('\\', get_class($object))));
+        // die(json_encode($object));
+        foreach(get_class_methods($object) as $key) {
+          if (strpos($key, 'get') !== false) {
+            $key = str_replace('get', '', $key);
+          }
+        }
       $query = "SELECT * ";
-      $query .= "FROM ".$this->cfgArrDatabaseTables[$tableName]." ";
-      $query .= "WHERE ".$this->cfgArrDatabaseInterface[$tableName][$fldName]."='".$this->_stringtodb($fldVal)."'";
+      $query .= "FROM ".$tableName." ";
+      $query .= "WHERE ".$fldName."='".$this->_stringtodb($fldVal)."'";
       if ($debug) return $query;
       $result = mysqli_query($this->connection, $query);
       if(mysqli_error($this->connection)) {
@@ -50,11 +84,17 @@
       {
         if ($row = mysqli_fetch_assoc($result))
           {
-          $retval = array();
-          foreach ($row as $key=>$val)
-            {
-            $retval[array_search($key, $this->cfgArrDatabaseInterface[$tableName])] = stripslashes($val);
+          // die(json_encode($row));
+            $className = get_class($object);
+            $object = new $className();
+            // die(json_encode());
+            foreach ($this->getObjectSetters($object) as $setter) {
+              $object->$setter(1);
             }
+
+            die(json_encode($object->getNumber()));
+            // die(json_encode($object));
+            return $row;
           }
         else
           $retval = false;
@@ -499,33 +539,34 @@
 
       /* Funkcje do uzupełniania bazy o brakujące pola */
     private function fixDbState($tableName, $payload): void {
-      die("KIERWA: $tableName");
-      $cfg_columns = $this->getCfgColumnList($tableName);
-      $db_columns = $this->getDbColumnList($tableName);
-      $diff = array_diff($cfg_columns, $db_columns);
+      // die("KIERWA: $tableName");
+      // $cfg_columns = $this->getCfgColumnList($tableName);
+      // $db_columns = $this->getDbColumnList($tableName);
+      // $diff = array_diff($cfg_columns, $db_columns);
       
-      $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
-      $message .= json_encode(array_values($diff));
-      $this->alterTableAddColumns($tableName, $diff, $payload);
-      $message .= "\nMożna powtórzyć request";
+      // $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
+      // $message .= json_encode(array_values($diff));
+      // $this->alterTableAddColumns($tableName, $diff, $payload);
+      // $message .= "\nMożna powtórzyć request";
 
-      die($message);
+      // die($message);
       
     }
 
     private function fixDbStateAndGetColumnList($tableName, $payload): string {
-      $cfg_columns = $this->getCfgColumnList($tableName);
-      $db_columns = $this->getDbColumnList($tableName);
-      $diff = array_diff($cfg_columns, $db_columns);
-      if(empty($diff))
-        return "";
+      // $cfg_columns = $this->getCfgColumnList($tableName);
+      // $db_columns = $this->getDbColumnList($tableName);
+      // $diff = array_diff($cfg_columns, $db_columns);
+      // if(empty($diff))
+      //   return "";
       
-      $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
-      $message .= json_encode(array_values($diff));
-      $this->alterTableAddColumns($tableName, $diff, $payload);
-      $message .= "\nMożna powtórzyć request";
+      // $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
+      // $message .= json_encode(array_values($diff));
+      // $this->alterTableAddColumns($tableName, $diff, $payload);
+      // $message .= "\nMożna powtórzyć request";
 
-      return $message;
+      // return $message;
+      return '';
     }
 
     private function alterTableAddColumns($tableName, $columns, $payload): void {

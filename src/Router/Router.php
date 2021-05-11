@@ -4,16 +4,16 @@ namespace Lea\Router;
 
 use Lea\Request\Request;
 use Lea\Response\Response;
-
+use Symfony\Component\Yaml\Yaml;
 class Router {
 
     private $routes = [];
 
     function __construct() {
-        $this->routes = json_decode(file_get_contents(__DIR__.'/../../config/routes.json'), TRUE);
+        $this->routes = Yaml::parseFile(__DIR__.'/../../config/routes.yaml');
         $request = new Request();
-        $url = ltrim($request->url(), '/');
-        $route = $this->routes[$url] ?? Response::notFound();
+        $url = $request->url();
+        $route = $this->routes[$url] ?? Response::forbidden();
         $Controller = $route['controller'];
         
         $controller = new $Controller($request);

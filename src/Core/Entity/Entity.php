@@ -1,12 +1,12 @@
 <?php
 
-namespace Lea\Entity;
+namespace Lea\Core\Entity;
 
 use Exception;
 use Error;
-use Lea\Database\DatabaseManager\DatabaseManager;
+use Lea\Core\Database\DatabaseManager;
 
-class EntityRepository {
+class Entity  {
     protected $id;
     protected $active;
     protected $deleted;
@@ -15,10 +15,6 @@ class EntityRepository {
      */
     private $db;
     private $tblName;
-
-    // private $id;
-
-    // private $require = [];
 
     public function __construct($db) {
         $this->db = $db;

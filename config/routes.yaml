@@ -1,0 +1,11 @@
+index:
+  prefix: "/"
+  controller: Lea\Module\HomepageModule\Controller\HomepageController
+  methods:
+  - GET
+offers:
+  prefix: "/offers"
+  controller: Lea\Module\OfferModule\Controller\OfferController
+  methods:
+  - GET
+  - POST

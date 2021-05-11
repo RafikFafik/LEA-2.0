@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Entity;
+namespace Lea\Core\Entity;
 
 interface EntityInterface {
     public function set(array $action, bool $safe = false);

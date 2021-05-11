@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Controller;
+namespace Lea\Core\Controller;
 
 interface ControllerInterface {
     public function init();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Repository;
+namespace Lea\Core\Repository;
 
 interface RepositoryInterface {
 
