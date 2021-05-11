@@ -11,7 +11,7 @@ RUN apt-get update -y \
     && a2enmod rewrite \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_host=192.168.69.183" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=192.168.11.189" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.idekey=VSCODE" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.log_level=7" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.client_discovery_header=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -22,4 +22,5 @@ RUN apt-get update -y \
     && echo "max_file_uploads = 50" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "max_execution_time = 600"  >> /usr/local/etc/php/conf.d/uploads.ini \
-    && echo '[PHP]\ndate.timezone = "Europe/Warsaw"\n' >> /usr/local/etc/php/conf.d/tzone.ini
+    && echo '[PHP]\ndate.timezone = "Europe/Warsaw"\n' >> /usr/local/etc/php/conf.d/tzone.ini \
+    && echo 'alias dbg="vim /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"' >> ~/.bashrc

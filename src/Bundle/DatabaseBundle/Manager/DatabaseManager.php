@@ -14,9 +14,8 @@
     function __construct()
       {
       if (!isset($this->connection)) {
-        include SCRIPTPATH."incs/dbconfig.php";
-
-        $this->connection = mysqli_connect($dbHost, $dbUser, $dbPassword, $dbName);
+        $this->connection = mysqli_connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], $_ENV['DB_DATABASE']);
+        // mysqli_connect(host, user, pass, db);
         if (!$this->connection) {
           echo "Error: Unable to connect to MySQL." . PHP_EOL;
           echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
@@ -26,7 +25,7 @@
         mysqli_set_charset($this->connection, "utf8");
       }
 
-      include SCRIPTPATH."incs/config.php";
+      // include SCRIPTPATH."incs/config.php";
       }
     public function setUser($user_id){
       $this->user_id = $user_id;

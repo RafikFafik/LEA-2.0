@@ -12,6 +12,7 @@ services:
       # CURRENT__WORKING_DIRECTORY:CONTAINER_PATH_TO_WORKING_DIRECTORY
       - .:/var/www/html
   db:
+    # container_name == DB_HOST in .env
     container_name: LEA-2.0-DB
     image: mariadb
     restart: always
