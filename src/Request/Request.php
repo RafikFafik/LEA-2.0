@@ -44,4 +44,8 @@ final class Request
     public function action(): string {
         return explode("/", $this->url())[0];
     }
+
+    public function getURLTokens() {
+        return "";
+    }
 }

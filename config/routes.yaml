@@ -1,11 +1,32 @@
 index:
   prefix: "/"
-  controller: Lea\Module\HomepageModule\Controller\HomepageController
-  methods:
-  - GET
-offers:
+  endpoints:
+    homepage:
+      url: "/"
+      controller: HomepageController
+      methods:
+        - GET
+
+#modules
+OfferModule:
   prefix: "/offers"
-  controller: Lea\Module\OfferModule\Controller\OfferController
-  methods:
-  - GET
-  - POST
+  endpoints:
+    by-id:
+      url: "/offers/{id}"
+      params:
+        id: int
+      controller: OfferController
+      methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+    collection:
+      url: "/offers"
+      controller: OfferCollectionController
+      methods:
+        - GET
+        - POST
+    submit:
+      url: "/offers/confirm"
+      controller: OfferConfirm

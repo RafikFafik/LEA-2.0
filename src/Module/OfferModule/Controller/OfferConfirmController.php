@@ -5,7 +5,7 @@ namespace Lea\Module\OfferModule\Controller;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Request\Request;
 
-class OfferController implements ControllerInterface {
+class OfferConfirmController implements ControllerInterface {
 
     private $request;
     private $methods;
@@ -17,6 +17,6 @@ class OfferController implements ControllerInterface {
     }
 
     public function init() {
-        die(json_encode($this->params));
+        die("Tutaj mamy inny endpoint bez parametrów");
     }
 }
