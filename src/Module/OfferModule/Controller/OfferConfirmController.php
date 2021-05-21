@@ -4,6 +4,7 @@ namespace Lea\Module\OfferModule\Controller;
 
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Request\Request;
+use Lea\Response\Response;
 
 class OfferConfirmController implements ControllerInterface {
 
@@ -16,6 +17,13 @@ class OfferConfirmController implements ControllerInterface {
     }
 
     public function init() {
-        die("Tutaj mamy na CONFIRM");
+        switch($this->request->method()) {
+            case "GET":
+                exit;
+            case "POST":
+                exit;
+            default:
+                Response::methodNotAllowed();
+        }
     }
 }

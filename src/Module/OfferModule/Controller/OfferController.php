@@ -2,8 +2,10 @@
 
 namespace Lea\Module\OfferModule\Controller;
 
-use Lea\Core\Controller\ControllerInterface;
 use Lea\Request\Request;
+use Lea\Response\Response;
+use Lea\Core\Controller\ControllerInterface;
+use Lea\Module\OfferModule\Repository\OfferRepository;
 
 class OfferController implements ControllerInterface {
 
@@ -16,6 +18,15 @@ class OfferController implements ControllerInterface {
     }
 
     public function init() {
-        die(json_encode($this->params));
+        switch ($this->request->method()) {
+            case "GET":
+                $offerRepository = new OfferRepository();
+                $res = $offerRepository->getById();
+                Response::ok($res);
+            case "POST":
+                exit;
+            default:
+                Response::methodNotAllowed();
+        }
     }
 }

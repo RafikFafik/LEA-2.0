@@ -43,7 +43,7 @@ class Response {
         self::m_die($message);
     }
 
-    public static function response($data = null): void {
+    public static function ok($data = null): void {
         http_response_code(200);
         self::m_die($data);
     }

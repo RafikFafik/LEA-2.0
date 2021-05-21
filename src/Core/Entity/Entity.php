@@ -6,7 +6,7 @@ use Exception;
 use Error;
 use Lea\Core\Database\DatabaseManager;
 
-class Entity  {
+abstract class Entity  {
     protected $id;
     protected $active;
     protected $deleted;
