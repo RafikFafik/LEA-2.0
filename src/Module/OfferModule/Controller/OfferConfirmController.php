@@ -10,13 +10,12 @@ class OfferConfirmController implements ControllerInterface {
     private $request;
     private $methods;
 
-    function __construct(Request $request, array $methods, array $params = NULL) {
+    function __construct(Request $request, array $params = NULL) {
         $this->request = $request;
-        $this->methods = $methods;
         $this->params = $params;
     }
 
     public function init() {
-        die("Tutaj mamy inny endpoint bez parametrów");
+        die("Tutaj mamy na CONFIRM");
     }
 }

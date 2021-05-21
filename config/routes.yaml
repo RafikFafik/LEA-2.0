@@ -13,20 +13,10 @@ OfferModule:
   endpoints:
     by-id:
       url: "/offers/{id}"
-      params:
-        id: int
       controller: OfferController
-      methods:
-        - GET
-        - POST
-        - PUT
-        - DELETE
     collection:
       url: "/offers"
       controller: OfferCollectionController
-      methods:
-        - GET
-        - POST
     submit:
       url: "/offers/confirm"
-      controller: OfferConfirm
+      controller: OfferConfirmController

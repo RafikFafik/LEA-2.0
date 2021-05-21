@@ -9,7 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class HomepageController implements ControllerInterface {
 
-    function __construct(Request $request) {
+    function __construct(Request $request, $params = NULL) {
         $this->request = $request;
     }
 

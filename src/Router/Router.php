@@ -18,8 +18,7 @@ final class Router {
         $request = new Request();
         $endpoint = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($endpoint['module_name'], $endpoint['controller']);
-        $methods = $endpoint['methods'];
-        $controller = new $Controller($request, $methods, $endpoint['params']);
+        $controller = new $Controller($request, $endpoint['params']);
         $controller->init();
     }
     
@@ -60,7 +59,7 @@ final class Router {
             return FALSE;
 
         foreach($iterator as $i) {
-            if($i[0] === NULL && $i[0] !== $i[1] && !preg_match($this->word_regex, $i[1]) && !is_numeric($i[0]))
+            if(($i[0] === NULL) || ($i[0] !== $i[1] && preg_match($this->word_regex, $i[1]) && !is_numeric($i[0])))
                 return FALSE;
         }
 
