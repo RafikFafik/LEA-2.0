@@ -7,17 +7,20 @@ use Lea\Response\Response;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Module\OfferModule\Repository\OfferRepository;
 
-class OfferController implements ControllerInterface {
+class OfferController implements ControllerInterface
+{
 
     private $request;
     private $methods;
 
-    function __construct(Request $request, array $params = NULL) {
+    function __construct(Request $request, array $params = NULL)
+    {
         $this->request = $request;
         $this->params = $params;
     }
 
-    public function init() {
+    public function init()
+    {
         switch ($this->request->method()) {
             case "GET":
                 $offerRepository = new OfferRepository();

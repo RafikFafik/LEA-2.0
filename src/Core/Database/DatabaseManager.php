@@ -2,594 +2,622 @@
 
 namespace Lea\Core\Database;
 
-use ReflectionClass;
+class DatabaseManager
+{
+    public $uid = 0;
 
-class DatabaseManager {
-  public $uid = 0;
-
-  function __construct() {
-    if (!isset($this->connection)) {
-      $this->connection = mysqli_connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], $_ENV['DB_DATABASE']);
-      // mysqli_connect(host, user, pass, db);
-      if (!$this->connection) {
-        echo "Error: Unable to connect to MySQL." . PHP_EOL;
-        echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
-        echo "Debugging error: " . mysqli_connect_error() . PHP_EOL;
-        exit;
-      }
-      mysqli_set_charset($this->connection, "utf8");
+    function __construct()
+    {
+        if (!isset($this->connection)) {
+            $this->connection = mysqli_connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], $_ENV['DB_DATABASE']);
+            // mysqli_connect(host, user, pass, db);
+            if (!$this->connection) {
+                echo "Error: Unable to connect to MySQL." . PHP_EOL;
+                echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
+                echo "Debugging error: " . mysqli_connect_error() . PHP_EOL;
+                exit;
+            }
+            mysqli_set_charset($this->connection, "utf8");
+        }
     }
-  }
-  public function setUser($uid) {
-    $this->uid = $uid;
-  }
-
-  public function convertToColumn(string $field) {
-    $field = ucwords(str_replace('_', ' ', $field));
-    return sprintf('fld_%s', $field);
-  }
-
-  public function convertToTable(string $table) {
-    return sprintf('tbl_%ss', strtolower($table));
-  }
-
-  public function convertToField(string $tableField) {
-    $tableField = str_replace('fld_', '', $tableField);
-    return $tableField;
-  }
-
-  public function getObjectSetters($object): array {
-    $setters = [];
-    foreach (get_class_methods($object) as $key) {
-      if (strpos($key, 'set') !== false) {
-        $setters[] = $key;
-      }
+    public function setUser($uid)
+    {
+        $this->uid = $uid;
     }
 
-    return $setters;
-  }
-  #######################################
-  ##    Operacje na rekordach danych   ##
-  #######################################
-  /**
-   * [getRecordData pobiera dane na podstawie jednego pola np: Pobierz uzytkownikow o imieniu Franek]
-   * @param  [type]  $tableName [nazwa tabeli z class/incs/config]
-   * @param  [type]  $fldVal    [wartość fldName]
-   * @param  string  $fldName   [pole z tabeli np.: imię]
-   * @param  boolean $debug     [jeśli true - wyświetla zapytanie wysylane do bazy]
-   * @return [type]             [jeśli zapytanie się powiedzie to tabela z danymi, jeśli nie to false]
-   */
-  function getRecordData($object, $fldVal, $fldName = "id", $debug = false) {
-    $tableName = $this->convertToTable(end(explode('\\', get_class($object))));
-    // die(json_encode($object));
-    foreach (get_class_methods($object) as $key) {
-      if (strpos($key, 'get') !== false) {
-        $key = str_replace('get', '', $key);
-      }
+    public function convertToColumn(string $field)
+    {
+        $field = ucwords(str_replace('_', ' ', $field));
+        return sprintf('fld_%s', $field);
     }
-    $query = "SELECT * ";
-    $query .= "FROM " . $tableName . " ";
-    $query .= "WHERE " . $fldName . "='" . $this->_stringtodb($fldVal) . "'";
-    if ($debug) return $query;
-    $result = mysqli_query($this->connection, $query);
-    if (mysqli_error($this->connection)) {
 
-      $this->handleError($tableName, $query, $fldVal);
+    public function getTableNameFromObject(object $object)
+    {
+        $tokens = explode('\\', get_class($object));
+        $table = end($tokens);
+
+        return sprintf('tbl_%ss', strtolower($table));
     }
-    if ($result) {
-      if ($row = mysqli_fetch_assoc($result)) {
-        // die(json_encode($row));
-        $className = get_class($object);
-        $object = new $className();
-        // die(json_encode());
-        foreach ($this->getObjectSetters($object) as $setter) {
-          $object->$setter(1);
+
+    public function convertToField(string $tableField)
+    {
+        $tableField = str_replace('fld_', '', $tableField);
+        return $tableField;
+    }
+
+    public function getObjectSetters($object): array
+    {
+        $setters = [];
+        foreach (get_class_methods($object) as $key) {
+            if (strpos($key, 'set') !== false) {
+                $setters[] = $key;
+            }
         }
 
-        die(json_encode($object->getNumber()));
-        // die(json_encode($object));
-        return $row;
-      } else
-        $retval = false;
-    } else {
-      $retval = false;
+        return $setters;
     }
-
-    return $retval;
-  }
-
-
-  function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = false, $sortOrder = false, $debug = false) {
-    $strToQuery = "";
-    foreach ($arr as $key => $val) {
-      if (strstr($key, "_IN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)] . " IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_INOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)] . " IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_INOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)] . " IN ('" . join("','", $val) . "'))";
-      elseif (strstr($key, "_NOTIN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)])) {
-
-        $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)] . " NOT IN ('" . join("','", $val) . "')";
-        //  var_dump($val);
-      } elseif (strstr($key, "_LIKE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_LIKEOR-ARR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)])) {
-        //wymagana tablica elementów ! podajemy tablice jako arrCriterias, zapytanie robi nam dowolną ilość or'ów w kwerendzie
-        if (sizeof($val) == 1) {
-          $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%')";
-        } else if (sizeof($val) > 1) {
-          $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%'";
-          for ($i = 1; $i < sizeof($val) - 1; $i++) {
-            $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[$i]) . "%'";
-          }
-          $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[sizeof($val) - 1]) . "%')";
+    #######################################
+    ##    Operacje na rekordach danych   ##
+    #######################################
+    /**
+     * [getRecordData pobiera dane na podstawie jednego pola np: Pobierz uzytkownikow o imieniu Franek]
+     * @param  [type]  $tableName [nazwa tabeli z class/incs/config]
+     * @param  [type]  $fldVal    [wartość fldName]
+     * @param  string  $fldName   [pole z tabeli np.: imię]
+     * @param  boolean $debug     [jeśli true - wyświetla zapytanie wysylane do bazy]
+     * @return [type]             [jeśli zapytanie się powiedzie to tabela z danymi, jeśli nie to false]
+     */
+    function getRecordData(object $object, $fldVal, $fldName = "id", $debug = false)
+    {
+        $tableName = $this->getTableNameFromObject($object);
+        foreach (get_class_methods($object) as $key) {
+            if (strpos($key, 'get') !== false) {
+                $key = str_replace('get', '', $key);
+            }
         }
-      } elseif (strstr($key, "_<=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)] . "<='" . $val . "'";
-      elseif (strstr($key, "_>=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)] . ">='" . $val . "'";
-      elseif (strstr($key, "_LIKEOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_LIKEOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%')";
-      elseif (strstr($key, "_LIKEOR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_<=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)] . "<=" . $val . "";
-      elseif (strstr($key, "_>=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)] . ">=" . $val . "";
-      elseif (strstr($key, "_>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)] . ">" . $val . "";
-      elseif (strstr($key, "_<") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)] . "<" . $val . "";
-      elseif (strstr($key, "_>DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)] . ">'" . $val . "'";
-      elseif (strstr($key, "_<DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)] . "<'" . $val . "'";
-      elseif (strstr($key, "_=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)] . "=" . $val . "";
-      elseif (strstr($key, "_<>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)] . "<>" . $val . "";
-      elseif (strstr($key, "_NULL") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)] . " IS NULL";
-      elseif (strlen($this->cfgArrDatabaseInterface[$tableName][$key])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $val . "'";
-    }
+        $query = "SELECT * ";
+        $query .= "FROM " . $tableName . " ";
+        $query .= "WHERE " . $fldName . "='" . $this->_stringtodb($fldVal) . "'";
+        if ($debug) return $query;
+        $result = mysqli_query($this->connection, $query);
+        if (mysqli_error($this->connection)) {
 
-    if (is_array($sortBy) && count($sortBy)) {
-      $sortString = " ORDER BY ";
-      foreach ($sortBy as $key => $val) {
-        $sortString .= " " . $this->cfgArrDatabaseInterface[$tableName][$key] . " " . $val . ",";
-      }
-      $sortString = substr($sortString, 0, -1);
-    } else
-      $sortString = (strlen($sortBy) ? " ORDER BY " . $this->cfgArrDatabaseInterface[$tableName][$sortBy] . (strlen($sortOrder) ? " " . $sortOrder : " ASC") : "");
-
-    $query = "SELECT * ";
-    $query .= "FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    if (strlen($strToQuery)) $query .= "WHERE " . substr($strToQuery, 5);
-    $query .= $sortString;
-    $query .= ($limit > 0 ? " LIMIT " . $start . "," . $limit : "");
-    if ($debug) return $query;
-    $result = mysqli_query($this->connection, $query);
-    if (mysqli_error($this->connection)) {
-
-      $this->handleError($tableName, $query, $arr);
-    }
-    $i = 0;
-    $returnArr = array();
-    if ($result == false)
-      return $result;
-    while ($row = mysqli_fetch_assoc($result)) {
-      foreach ($row as $key => $val) {
-        $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
-        if ($strTempKey !== false)
-          $returnArr[$i][$strTempKey] = stripslashes($val);
-      }
-
-      $i++;
-    }
-
-    return $returnArr;
-  }
-
-  function getFieldsDataMultiCondition($tableName, $arr = array(), $fields = array(),  $start = 0, $limit = 0, $sortBy = false, $sortOrder = false, $debug = false) {
-    $strToQuery = "";
-    foreach ($arr as $key => $val) {
-      if (strstr($key, "_IN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)] . " IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_INOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)] . " IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_INOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)] . " IN ('" . join("','", $val) . "'))";
-      elseif (strstr($key, "_NOTIN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)] . " NOT IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_LIKE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_LIKEOR-ARR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)])) {
-        //wymagana tablica elementów ! podajemy tablice jako arrCriterias, zapytanie robi nam dowolną ilość or'ów w kwerendzie
-        if (sizeof($val) == 1) {
-          $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%')";
-        } else if (sizeof($val) > 1) {
-          $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%'";
-          for ($i = 1; $i < sizeof($val) - 1; $i++) {
-            $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[$i]) . "%'";
-          }
-          $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[sizeof($val) - 1]) . "%')";
+            $this->handleError($tableName, $query, $fldVal);
         }
-      } elseif (strstr($key, "_<=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)] . "<='" . $val . "'";
-      elseif (strstr($key, "_>=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)] . ">='" . $val . "'";
-      elseif (strstr($key, "_LIKEOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_LIKEOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%')";
-      elseif (strstr($key, "_LIKEOR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_<=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)] . "<=" . $val . "";
-      elseif (strstr($key, "_>=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)] . ">=" . $val . "";
-      elseif (strstr($key, "_>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)] . ">" . $val . "";
-      elseif (strstr($key, "_<") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)] . "<" . $val . "";
-      elseif (strstr($key, "_>DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)] . ">'" . $val . "'";
-      elseif (strstr($key, "_<DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)] . "<'" . $val . "'";
-      elseif (strstr($key, "_=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)] . "=" . $val . "";
-      elseif (strstr($key, "_<>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)] . "<>" . $val . "";
-      elseif (strstr($key, "_NULL") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)] . " IS NULL";
-      elseif (strlen($this->cfgArrDatabaseInterface[$tableName][$key])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $val . "'";
-    }
+        if ($result) {
+            if ($row = mysqli_fetch_assoc($result)) {
+                // die(json_encode($row));
+                $className = get_class($object);
+                $object = new $className();
+                // die(json_encode());
+                foreach ($this->getObjectSetters($object) as $setter) {
+                    $object->$setter(1);
+                }
 
-    if (is_array($sortBy) && count($sortBy)) {
-      $sortString = " ORDER BY ";
-      foreach ($sortBy as $key => $val) {
-        $sortString .= " " . $this->cfgArrDatabaseInterface[$tableName][$key] . " " . $val . ",";
-      }
-      $sortString = substr($sortString, 0, -1);
-    } else
-      $sortString = (strlen($sortBy) ? " ORDER BY " . $this->cfgArrDatabaseInterface[$tableName][$sortBy] . (strlen($sortOrder) ? " " . $sortOrder : " ASC") : "");
-
-    if (sizeof($fields)) {
-      $query = "SELECT ";
-      foreach ($fields as $f) {
-        $query .= ($this->cfgArrDatabaseInterface[$tableName][$f] . ', ');
-      }
-      $query = rtrim($query, ', ');
-      $query .= ' ';
-    } else {
-
-      $query = "SELECT * ";
-    }
-    $query .= "FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    if (strlen($strToQuery)) $query .= "WHERE " . substr($strToQuery, 5);
-    $query .= $sortString;
-    $query .= ($limit > 0 ? " LIMIT " . $start . "," . $limit : "");
-    if ($debug) return $query;
-    $result = mysqli_query($this->connection, $query);
-    if (mysqli_error($this->connection)) {
-
-      $this->handleError($tableName, $query, $arr);
-    }
-    $i = 0;
-    $returnArr = array();
-    while ($row = mysqli_fetch_assoc($result)) {
-      foreach ($row as $key => $val) {
-        $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
-        if ($strTempKey !== false)
-          $returnArr[$i][$strTempKey] = stripslashes($val);
-      }
-
-      $i++;
-    }
-
-    return $returnArr;
-  }
-
-
-
-  function insertLog($query_str, $id = 0, $type, $table) {
-
-    if ($table == "opers_sessions" || $table == "keys" || $table == "drives") return 0;
-
-    if (isset($_POST['password']) || isset($_POST['password2'])) {
-      $_POST['password'] = 'HIDDEN';
-      $_POST['password2'] = 'HIDDEN_ALSO';
-    }
-
-    $query = "INSERT INTO tbl_logs ";
-
-    $query .= "(fld_Table, fld_Data, fld_Uri, fld_RequestId, fld_Type, fld_Query , fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
-    $query .= "VALUES ('" . $table . "','" . http_build_query($_POST) . "','" . $_SERVER['REQUEST_URI'] . "','" . $id . "', '" . $type . "', '(" . str_replace("'", "\"", $query_str) . ")','" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
-
-    mysqli_query($this->connection, $query);
-    //  return $query;
-  }
-  function insertRecordData($tableName, $arr, $retId = false, $debug = false) {
-    $_query1 = "";
-    $_query2 = "";
-
-    if (is_array($arr)) {
-      foreach ($arr as $key => $val) {
-        if (isset($this->cfgArrDatabaseInterface[$tableName][$key])) {
-          $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . ",";
-          if (is_null($val))
-            $_query2 .= "NULL,";
-          else if (is_array($val))
-            $_query2 .= "'" . json_encode($val, JSON_UNESCAPED_UNICODE) . "',";
-          else
-            $_query2 .= "'" . $this->_stringtodb($val) . "',";
+                die(json_encode($object->getNumber()));
+                // die(json_encode($object));
+                return $row;
+            } else
+                $retval = false;
+        } else {
+            $retval = false;
         }
-      }
+
+        return $retval;
     }
 
-    $query = "INSERT INTO " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    $query .= "(" . $_query1 . "fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
-    $query .= "VALUES (" . $_query2 . "'" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
 
-    mysqli_query($this->connection, $query);
-    //if ($debug) echo mysql_error($this->connection);
-    if (mysqli_error($this->connection)) {
-      $this->handleError($tableName, $query, $arr);
-    }
-    if (!$retId)
-      $feedback = mysqli_affected_rows($this->connection);
-    else
-      $feedback = mysqli_insert_id($this->connection);
+    function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = false, $sortOrder = false, $debug = false)
+    {
+        $strToQuery = "";
+        foreach ($arr as $key => $val) {
+            if (strstr($key, "_IN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)] . " IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_INOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)] . " IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_INOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)] . " IN ('" . join("','", $val) . "'))";
+            elseif (strstr($key, "_NOTIN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)])) {
 
-    if ($feedback) {
-      $this->insertLog($query, mysqli_insert_id($this->connection), 1, $tableName);
-    }
-    if ($debug) return $query;
-    return $feedback;
-  }
-  function getAllUniqueMonthsYears($tableName, $fld, $mindate = "2019-05-01", $debug = false) {
+                $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)] . " NOT IN ('" . join("','", $val) . "')";
+                //  var_dump($val);
+            } elseif (strstr($key, "_LIKE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_LIKEOR-ARR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)])) {
+                //wymagana tablica elementów ! podajemy tablice jako arrCriterias, zapytanie robi nam dowolną ilość or'ów w kwerendzie
+                if (sizeof($val) == 1) {
+                    $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%')";
+                } else if (sizeof($val) > 1) {
+                    $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%'";
+                    for ($i = 1; $i < sizeof($val) - 1; $i++) {
+                        $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[$i]) . "%'";
+                    }
+                    $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[sizeof($val) - 1]) . "%')";
+                }
+            } elseif (strstr($key, "_<=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)] . "<='" . $val . "'";
+            elseif (strstr($key, "_>=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)] . ">='" . $val . "'";
+            elseif (strstr($key, "_LIKEOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_LIKEOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%')";
+            elseif (strstr($key, "_LIKEOR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_<=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)] . "<=" . $val . "";
+            elseif (strstr($key, "_>=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)] . ">=" . $val . "";
+            elseif (strstr($key, "_>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)] . ">" . $val . "";
+            elseif (strstr($key, "_<") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)] . "<" . $val . "";
+            elseif (strstr($key, "_>DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)] . ">'" . $val . "'";
+            elseif (strstr($key, "_<DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)] . "<'" . $val . "'";
+            elseif (strstr($key, "_=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)] . "=" . $val . "";
+            elseif (strstr($key, "_<>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)] . "<>" . $val . "";
+            elseif (strstr($key, "_NULL") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)] . " IS NULL";
+            elseif (strlen($this->cfgArrDatabaseInterface[$tableName][$key])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $val . "'";
+        }
 
-    $tableIndex = "";
-    if (gettype($tableName) == "array") {
-      $tableIndex = $tableName[1];
-      $tableName = $tableName[0];
-    }
-    $query = "SELECT DISTINCT YEAR(" . $this->cfgArrDatabaseInterface[$tableName][$fld] . ") as 'year', ";
-    $query .= "MONTH(" . $this->cfgArrDatabaseInterface[$tableName][$fld] . ") as month FROM " . $this->cfgArrDatabaseTables[$tableName] . $tableIndex . " WHERE `fld_Deleted` = '0' AND `fld_OrderDate` >= '$mindate'";
-    $result = mysqli_query($this->connection, $query);
-    $resArr = array();
-    $resArr["months"] = array();
-    $resArr["years"] = array();
-    if ($debug) return $query;
-    foreach ($result as $v) {
-      if ($v["year"])
-        $resArr["years"][] = $v["year"];
-      if ($v["month"])
-        $resArr["months"][] = $v["month"];
-    }
+        if (is_array($sortBy) && count($sortBy)) {
+            $sortString = " ORDER BY ";
+            foreach ($sortBy as $key => $val) {
+                $sortString .= " " . $this->cfgArrDatabaseInterface[$tableName][$key] . " " . $val . ",";
+            }
+            $sortString = substr($sortString, 0, -1);
+        } else
+            $sortString = (strlen($sortBy) ? " ORDER BY " . $this->cfgArrDatabaseInterface[$tableName][$sortBy] . (strlen($sortOrder) ? " " . $sortOrder : " ASC") : "");
 
-    $resArr["years"] = array_unique($resArr["years"]);
-    $resArr["months"] = array_unique($resArr["months"]);
-    sort($resArr["years"]);
-    sort($resArr["months"]);
+        $query = "SELECT * ";
+        $query .= "FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        if (strlen($strToQuery)) $query .= "WHERE " . substr($strToQuery, 5);
+        $query .= $sortString;
+        $query .= ($limit > 0 ? " LIMIT " . $start . "," . $limit : "");
+        if ($debug) return $query;
+        $result = mysqli_query($this->connection, $query);
+        if (mysqli_error($this->connection)) {
 
-    return $resArr;
-  }
+            $this->handleError($tableName, $query, $arr);
+        }
+        $i = 0;
+        $returnArr = array();
+        if ($result == false)
+            return $result;
+        while ($row = mysqli_fetch_assoc($result)) {
+            foreach ($row as $key => $val) {
+                $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
+                if ($strTempKey !== false)
+                    $returnArr[$i][$strTempKey] = stripslashes($val);
+            }
 
-  function updateData($tableName, $arr, $fldId = "id", $debug = false) {
-    $query = '';
-    $_query1 = "";
-    $_query2 = "";
-    foreach ($arr as $key => $val) {
-      if (!isset($this->cfgArrDatabaseInterface[$tableName][$key]))
-        continue;
-      if ($val === NULL) /* Wymuszone === w momencie próby zapisania statusu = 0, okazuje się, że 0 == NULL ? prawda */
-        $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "=NULL,";
-      elseif ($key == $fldId)
-        $_query2 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $this->_stringtodb($val) . "'";
-      elseif (isset($this->cfgArrDatabaseInterface[$tableName][$key]))
-        $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $this->_stringtodb($val) . "',";
-    }
+            $i++;
+        }
 
-    if (strlen($_query1) && strlen($_query2)) {
-      $query = "UPDATE " . $this->cfgArrDatabaseTables[$tableName] . " ";
-      $query .= "SET " . $_query1 . "fld_ModifyDate=" . "'" . date("Y-m-d H-i-s") . "'" . ",fld_ModifyIP='" . $_SERVER["REMOTE_ADDR"] . "',fld_ModifyUId=" . $this->user_id . " ";
-      $query .= "WHERE " . $_query2;
-      if ($debug) return $query;
-      mysqli_query($this->connection, $query);
-      if (mysqli_error($this->connection) || mysqli_affected_rows($this->connection) == "-1") {
-
-        $this->handleError($tableName, $query, $arr);
-      }
-      $feedback = mysqli_affected_rows($this->connection);
-    } else
-      $feedback = false;
-
-
-
-    $tmp_id = 0;
-    if (isset($arr['id'])) {
-      $tmp_id = $arr["id"];
-    }
-    $this->insertLog($query, $tmp_id, 2, $tableName);
-
-    return $feedback;
-  }
-
-
-  function removeRecordData($tableName, $fldVal, $fldName = "id", $debug = false) {
-    $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    $query .= "WHERE " . $this->cfgArrDatabaseInterface[$tableName][$fldName] . "='" . $this->_stringtodb($fldVal) . "'";
-    if ($debug) return $query;
-    mysqli_query($this->connection, $query);
-    if (mysqli_error($this->connection)) {
-
-      $this->handleError($tableName, $query, $fldVal);
-    }
-    $feedback = mysqli_affected_rows($this->connection);
-
-    return $feedback;
-  }
-
-
-  function removeRecordDataMultiCondition($tableName, $arr, $debug = false) {
-    $strToQuery = "";
-    foreach ($arr as $key => $val) {
-      if (strstr($key, "_IN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)] . " IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_NOTIN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)] . " NOT IN ('" . join("','", $val) . "')";
-      elseif (strstr($key, "_LIKE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
-      elseif (strstr($key, "_<=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)] . "<=" . $val . "";
-      elseif (strstr($key, "_>=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)] . ">=" . $val . "";
-      elseif (strstr($key, "_>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)] . ">" . $val . "";
-      elseif (strstr($key, "_<") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)] . "<" . $val . "";
-      elseif (strstr($key, "_=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)] . "=" . $val . "";
-      elseif (strstr($key, "_<>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)] . "<>" . $val . "";
-      elseif (strstr($key, "_NULL") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)] . " IS NULL";
-      elseif (strlen($this->cfgArrDatabaseInterface[$tableName][$key])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $val . "'";
+        return $returnArr;
     }
 
-    $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    $query .= "WHERE " . substr($strToQuery, 5);
-    if ($debug) return $query;
-    mysqli_query($this->connection, $query);
-    if (mysqli_error($this->connection)) {
+    function getFieldsDataMultiCondition($tableName, $arr = array(), $fields = array(),  $start = 0, $limit = 0, $sortBy = false, $sortOrder = false, $debug = false)
+    {
+        $strToQuery = "";
+        foreach ($arr as $key => $val) {
+            if (strstr($key, "_IN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)] . " IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_INOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-START", "", $key)] . " IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_INOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_INOR-END", "", $key)] . " IN ('" . join("','", $val) . "'))";
+            elseif (strstr($key, "_NOTIN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)] . " NOT IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_LIKE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_LIKEOR-ARR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)])) {
+                //wymagana tablica elementów ! podajemy tablice jako arrCriterias, zapytanie robi nam dowolną ilość or'ów w kwerendzie
+                if (sizeof($val) == 1) {
+                    $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%')";
+                } else if (sizeof($val) > 1) {
+                    $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[0]) . "%'";
+                    for ($i = 1; $i < sizeof($val) - 1; $i++) {
+                        $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[$i]) . "%'";
+                    }
+                    $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-ARR", "", $key)] . " LIKE '%" . $this->_stringtodb($val[sizeof($val) - 1]) . "%')";
+                }
+            } elseif (strstr($key, "_<=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=DATE", "", $key)] . "<='" . $val . "'";
+            elseif (strstr($key, "_>=DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=DATE", "", $key)] . ">='" . $val . "'";
+            elseif (strstr($key, "_LIKEOR-START") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)])) $strToQuery .= " AND (" . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-START", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_LIKEOR-END") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR-END", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%')";
+            elseif (strstr($key, "_LIKEOR") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)])) $strToQuery .= " OR " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKEOR", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_<=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)] . "<=" . $val . "";
+            elseif (strstr($key, "_>=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)] . ">=" . $val . "";
+            elseif (strstr($key, "_>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)] . ">" . $val . "";
+            elseif (strstr($key, "_<") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)] . "<" . $val . "";
+            elseif (strstr($key, "_>DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>DATE", "", $key)] . ">'" . $val . "'";
+            elseif (strstr($key, "_<DATE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<DATE", "", $key)] . "<'" . $val . "'";
+            elseif (strstr($key, "_=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)] . "=" . $val . "";
+            elseif (strstr($key, "_<>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)] . "<>" . $val . "";
+            elseif (strstr($key, "_NULL") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)] . " IS NULL";
+            elseif (strlen($this->cfgArrDatabaseInterface[$tableName][$key])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $val . "'";
+        }
 
-      $this->handleError($tableName, $query, $arr);
-    }
-    $feedback = mysqli_affected_rows($this->connection);
+        if (is_array($sortBy) && count($sortBy)) {
+            $sortString = " ORDER BY ";
+            foreach ($sortBy as $key => $val) {
+                $sortString .= " " . $this->cfgArrDatabaseInterface[$tableName][$key] . " " . $val . ",";
+            }
+            $sortString = substr($sortString, 0, -1);
+        } else
+            $sortString = (strlen($sortBy) ? " ORDER BY " . $this->cfgArrDatabaseInterface[$tableName][$sortBy] . (strlen($sortOrder) ? " " . $sortOrder : " ASC") : "");
 
-    return $feedback;
-  }
-  function clearTable($tableName) {
-    $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName];
-    //  mysqli_query($this->connection, $query);
-  }
+        if (sizeof($fields)) {
+            $query = "SELECT ";
+            foreach ($fields as $f) {
+                $query .= ($this->cfgArrDatabaseInterface[$tableName][$f] . ', ');
+            }
+            $query = rtrim($query, ', ');
+            $query .= ' ';
+        } else {
 
-  function getCustomQueryList($query) {
-    $result = mysqli_query($this->connection, $query);
-    $returnArr = array();
-    while ($row = mysqli_fetch_assoc($result)) {
-      $returnArr[] = $row;
-    }
-    return $returnArr;
-  }
+            $query = "SELECT * ";
+        }
+        $query .= "FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        if (strlen($strToQuery)) $query .= "WHERE " . substr($strToQuery, 5);
+        $query .= $sortString;
+        $query .= ($limit > 0 ? " LIMIT " . $start . "," . $limit : "");
+        if ($debug) return $query;
+        $result = mysqli_query($this->connection, $query);
+        if (mysqli_error($this->connection)) {
 
-  function getMostOccuredData($tableName, $fldName, $limit = 0, $debug = false) {
-    $query = "SELECT " . $this->cfgArrDatabaseInterface[$tableName][$fldName];
-    $query .= "," . "count(" . $this->cfgArrDatabaseInterface[$tableName][$fldName] . ") ";
-    $query .= "FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    $query .= "GROUP BY " . $this->cfgArrDatabaseInterface[$tableName][$fldName] . " ";
-    $query .= "ORDER BY " . "count(" . $this->cfgArrDatabaseInterface[$tableName][$fldName] . ") ";
-    $query .= ($limit > 0 ? " LIMIT " . $limit : "");
-    if ($debug) return $query;
-    $result = mysqli_query($this->connection, $query);
-    $result = mysqli_query($this->connection, $query);
+            $this->handleError($tableName, $query, $arr);
+        }
+        $i = 0;
+        $returnArr = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            foreach ($row as $key => $val) {
+                $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
+                if ($strTempKey !== false)
+                    $returnArr[$i][$strTempKey] = stripslashes($val);
+            }
 
-    $i = 0;
-    $returnArr = array();
-    while ($row = mysqli_fetch_assoc($result)) {
-      foreach ($row as $key => $val) {
-        if ($val == "")
-          $val = "NULL";
-        $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
-        if ($strTempKey == false)
-          $strTempKey = "number_of";
-        $returnArr[$i][$strTempKey] = stripslashes($val);
-      }
+            $i++;
+        }
 
-      $i++;
-    }
-
-    return $returnArr;
-  }
-  function getUniqueData($tableName, $fldName, $limit = 0, $debug = false) {
-    $query = "SELECT  DISTINCT " . $this->cfgArrDatabaseInterface[$tableName][$fldName];
-    $query .= " FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-    if ($debug) return $query;
-    $result = mysqli_query($this->connection, $query);
-    $i = 0;
-    $returnArr = array();
-    while ($row = mysqli_fetch_assoc($result)) {
-      foreach ($row as $key => $val) {
-        if ($val == "")
-          $val = "NULL";
-        $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
-        if ($strTempKey == false)
-          $strTempKey = "number_of";
-        $returnArr[$i][$strTempKey] = stripslashes($val);
-      }
-
-      $i++;
-    }
-
-    return $returnArr;
-  }
-  function _stringtodb($strParamString) {
-    return addslashes($strParamString);
-  }
-
-  /* Funkcje do uzupełniania bazy o brakujące pola */
-  private function fixDbState($tableName, $payload): void {
-    // die("KIERWA: $tableName");
-    // $cfg_columns = $this->getCfgColumnList($tableName);
-    // $db_columns = $this->getDbColumnList($tableName);
-    // $diff = array_diff($cfg_columns, $db_columns);
-
-    // $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
-    // $message .= json_encode(array_values($diff));
-    // $this->alterTableAddColumns($tableName, $diff, $payload);
-    // $message .= "\nMożna powtórzyć request";
-
-    // die($message);
-
-  }
-
-  private function fixDbStateAndGetColumnList($tableName, $payload): string {
-    // $cfg_columns = $this->getCfgColumnList($tableName);
-    // $db_columns = $this->getDbColumnList($tableName);
-    // $diff = array_diff($cfg_columns, $db_columns);
-    // if(empty($diff))
-    //   return "";
-
-    // $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
-    // $message .= json_encode(array_values($diff));
-    // $this->alterTableAddColumns($tableName, $diff, $payload);
-    // $message .= "\nMożna powtórzyć request";
-
-    // return $message;
-    return '';
-  }
-
-  private function alterTableAddColumns($tableName, $columns, $payload): void {
-    $query = null;
-    foreach ($columns as $column) {
-      $query .= "ALTER TABLE `" . $this->cfgArrDatabaseTables[$tableName] . "` ADD COLUMN `$column` ";
-      $query .= $this->getColumnType($tableName, $column, $payload);
-    }
-    if (empty($query))
-      return;
-    mysqli_multi_query($this->connection, $query);
-    if (mysqli_error($this->connection))
-
-      die(json_encode(mysqli_error($this->connection)));
-  }
-
-  private function getColumnType($tableName, $column, $payload) {
-    $cfg_key = array_search($column, $this->cfgArrDatabaseInterface[$tableName]);
-    $val = isset($payload[$cfg_key]) ? $payload[$cfg_key] : NULL;
-    switch ($cfg_key) {
-      case is_a(\DateTime::createFromFormat('Y-m-d', $val), 'DateTime'):
-        $ret = "DATETIME; ";
-        break;
-      case gettype((int)$val) == "integer" && strlen($val) == strlen((int)$val);
-        $ret = "INT; ";
-        break;
-      default:
-        $ret = "VARCHAR(150); ";
-        break;
+        return $returnArr;
     }
 
-    return $ret;
-  }
 
-  private function getCfgColumnList(string $tableName): array {
-    $class_database_correspondence_default_columns = [
-      'fld_CreateDate',
-      'fld_CreateIP',
-      'fld_CreateUId',
-      'fld_ModifyDate',
-      'fld_ModifyIP',
-      'fld_ModifyUId',
-      'fld_Deleted'
-    ];
-    $cfg_columns = array_merge(array_values($this->cfgArrDatabaseInterface[$tableName]), $class_database_correspondence_default_columns);
 
-    return $cfg_columns;
-  }
+    function insertLog($query_str, $id = 0, $type, $table)
+    {
 
-  private function getDbColumnList(string $tableName): array {
-    $query = "DESCRIBE ";
-    $query .= $this->cfgArrDatabaseTables[$tableName];
-    $result = mysqli_query($this->connection, $query);
-    while ($row = mysqli_fetch_assoc($result)) {
-      $list[] = $row['Field'];
+        if ($table == "opers_sessions" || $table == "keys" || $table == "drives") return 0;
+
+        if (isset($_POST['password']) || isset($_POST['password2'])) {
+            $_POST['password'] = 'HIDDEN';
+            $_POST['password2'] = 'HIDDEN_ALSO';
+        }
+
+        $query = "INSERT INTO tbl_logs ";
+
+        $query .= "(fld_Table, fld_Data, fld_Uri, fld_RequestId, fld_Type, fld_Query , fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
+        $query .= "VALUES ('" . $table . "','" . http_build_query($_POST) . "','" . $_SERVER['REQUEST_URI'] . "','" . $id . "', '" . $type . "', '(" . str_replace("'", "\"", $query_str) . ")','" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
+
+        mysqli_query($this->connection, $query);
+        //  return $query;
+    }
+    function insertRecordData($tableName, $arr, $retId = false, $debug = false)
+    {
+        $_query1 = "";
+        $_query2 = "";
+
+        if (is_array($arr)) {
+            foreach ($arr as $key => $val) {
+                if (isset($this->cfgArrDatabaseInterface[$tableName][$key])) {
+                    $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . ",";
+                    if (is_null($val))
+                        $_query2 .= "NULL,";
+                    else if (is_array($val))
+                        $_query2 .= "'" . json_encode($val, JSON_UNESCAPED_UNICODE) . "',";
+                    else
+                        $_query2 .= "'" . $this->_stringtodb($val) . "',";
+                }
+            }
+        }
+
+        $query = "INSERT INTO " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        $query .= "(" . $_query1 . "fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
+        $query .= "VALUES (" . $_query2 . "'" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
+
+        mysqli_query($this->connection, $query);
+        //if ($debug) echo mysql_error($this->connection);
+        if (mysqli_error($this->connection)) {
+            $this->handleError($tableName, $query, $arr);
+        }
+        if (!$retId)
+            $feedback = mysqli_affected_rows($this->connection);
+        else
+            $feedback = mysqli_insert_id($this->connection);
+
+        if ($feedback) {
+            $this->insertLog($query, mysqli_insert_id($this->connection), 1, $tableName);
+        }
+        if ($debug) return $query;
+        return $feedback;
+    }
+    function getAllUniqueMonthsYears($tableName, $fld, $mindate = "2019-05-01", $debug = false)
+    {
+
+        $tableIndex = "";
+        if (gettype($tableName) == "array") {
+            $tableIndex = $tableName[1];
+            $tableName = $tableName[0];
+        }
+        $query = "SELECT DISTINCT YEAR(" . $this->cfgArrDatabaseInterface[$tableName][$fld] . ") as 'year', ";
+        $query .= "MONTH(" . $this->cfgArrDatabaseInterface[$tableName][$fld] . ") as month FROM " . $this->cfgArrDatabaseTables[$tableName] . $tableIndex . " WHERE `fld_Deleted` = '0' AND `fld_OrderDate` >= '$mindate'";
+        $result = mysqli_query($this->connection, $query);
+        $resArr = array();
+        $resArr["months"] = array();
+        $resArr["years"] = array();
+        if ($debug) return $query;
+        foreach ($result as $v) {
+            if ($v["year"])
+                $resArr["years"][] = $v["year"];
+            if ($v["month"])
+                $resArr["months"][] = $v["month"];
+        }
+
+        $resArr["years"] = array_unique($resArr["years"]);
+        $resArr["months"] = array_unique($resArr["months"]);
+        sort($resArr["years"]);
+        sort($resArr["months"]);
+
+        return $resArr;
     }
 
-    return $list;
-  }
+    function updateData($tableName, $arr, $fldId = "id", $debug = false)
+    {
+        $query = '';
+        $_query1 = "";
+        $_query2 = "";
+        foreach ($arr as $key => $val) {
+            if (!isset($this->cfgArrDatabaseInterface[$tableName][$key]))
+                continue;
+            if ($val === NULL) /* Wymuszone === w momencie próby zapisania statusu = 0, okazuje się, że 0 == NULL ? prawda */
+                $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "=NULL,";
+            elseif ($key == $fldId)
+                $_query2 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $this->_stringtodb($val) . "'";
+            elseif (isset($this->cfgArrDatabaseInterface[$tableName][$key]))
+                $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $this->_stringtodb($val) . "',";
+        }
 
-  private function handleError($tableName, $query, $arr = []): void {
-    http_response_code(500);
-    $err['db'] = mysqli_error($this->connection);
-    $err['query'] = $query;
-    $err['api'] = $this->fixDbStateAndGetColumnList($tableName, $arr);
+        if (strlen($_query1) && strlen($_query2)) {
+            $query = "UPDATE " . $this->cfgArrDatabaseTables[$tableName] . " ";
+            $query .= "SET " . $_query1 . "fld_ModifyDate=" . "'" . date("Y-m-d H-i-s") . "'" . ",fld_ModifyIP='" . $_SERVER["REMOTE_ADDR"] . "',fld_ModifyUId=" . $this->user_id . " ";
+            $query .= "WHERE " . $_query2;
+            if ($debug) return $query;
+            mysqli_query($this->connection, $query);
+            if (mysqli_error($this->connection) || mysqli_affected_rows($this->connection) == "-1") {
 
-    die(json_encode($err));
-  }
+                $this->handleError($tableName, $query, $arr);
+            }
+            $feedback = mysqli_affected_rows($this->connection);
+        } else
+            $feedback = false;
+
+
+
+        $tmp_id = 0;
+        if (isset($arr['id'])) {
+            $tmp_id = $arr["id"];
+        }
+        $this->insertLog($query, $tmp_id, 2, $tableName);
+
+        return $feedback;
+    }
+
+
+    function removeRecordData($tableName, $fldVal, $fldName = "id", $debug = false)
+    {
+        $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        $query .= "WHERE " . $this->cfgArrDatabaseInterface[$tableName][$fldName] . "='" . $this->_stringtodb($fldVal) . "'";
+        if ($debug) return $query;
+        mysqli_query($this->connection, $query);
+        if (mysqli_error($this->connection)) {
+
+            $this->handleError($tableName, $query, $fldVal);
+        }
+        $feedback = mysqli_affected_rows($this->connection);
+
+        return $feedback;
+    }
+
+
+    function removeRecordDataMultiCondition($tableName, $arr, $debug = false)
+    {
+        $strToQuery = "";
+        foreach ($arr as $key => $val) {
+            if (strstr($key, "_IN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_IN", "", $key)] . " IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_NOTIN") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NOTIN", "", $key)] . " NOT IN ('" . join("','", $val) . "')";
+            elseif (strstr($key, "_LIKE") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_LIKE", "", $key)] . " LIKE '%" . $this->_stringtodb($val) . "%'";
+            elseif (strstr($key, "_<=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<=", "", $key)] . "<=" . $val . "";
+            elseif (strstr($key, "_>=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>=", "", $key)] . ">=" . $val . "";
+            elseif (strstr($key, "_>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_>", "", $key)] . ">" . $val . "";
+            elseif (strstr($key, "_<") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<", "", $key)] . "<" . $val . "";
+            elseif (strstr($key, "_=") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_=", "", $key)] . "=" . $val . "";
+            elseif (strstr($key, "_<>") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_<>", "", $key)] . "<>" . $val . "";
+            elseif (strstr($key, "_NULL") && strlen($this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][str_replace("_NULL", "", $key)] . " IS NULL";
+            elseif (strlen($this->cfgArrDatabaseInterface[$tableName][$key])) $strToQuery .= " AND " . $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $val . "'";
+        }
+
+        $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        $query .= "WHERE " . substr($strToQuery, 5);
+        if ($debug) return $query;
+        mysqli_query($this->connection, $query);
+        if (mysqli_error($this->connection)) {
+
+            $this->handleError($tableName, $query, $arr);
+        }
+        $feedback = mysqli_affected_rows($this->connection);
+
+        return $feedback;
+    }
+    function clearTable($tableName)
+    {
+        $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName];
+        //  mysqli_query($this->connection, $query);
+    }
+
+    function getCustomQueryList($query)
+    {
+        $result = mysqli_query($this->connection, $query);
+        $returnArr = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            $returnArr[] = $row;
+        }
+        return $returnArr;
+    }
+
+    function getMostOccuredData($tableName, $fldName, $limit = 0, $debug = false)
+    {
+        $query = "SELECT " . $this->cfgArrDatabaseInterface[$tableName][$fldName];
+        $query .= "," . "count(" . $this->cfgArrDatabaseInterface[$tableName][$fldName] . ") ";
+        $query .= "FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        $query .= "GROUP BY " . $this->cfgArrDatabaseInterface[$tableName][$fldName] . " ";
+        $query .= "ORDER BY " . "count(" . $this->cfgArrDatabaseInterface[$tableName][$fldName] . ") ";
+        $query .= ($limit > 0 ? " LIMIT " . $limit : "");
+        if ($debug) return $query;
+        $result = mysqli_query($this->connection, $query);
+        $result = mysqli_query($this->connection, $query);
+
+        $i = 0;
+        $returnArr = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            foreach ($row as $key => $val) {
+                if ($val == "")
+                    $val = "NULL";
+                $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
+                if ($strTempKey == false)
+                    $strTempKey = "number_of";
+                $returnArr[$i][$strTempKey] = stripslashes($val);
+            }
+
+            $i++;
+        }
+
+        return $returnArr;
+    }
+    function getUniqueData($tableName, $fldName, $limit = 0, $debug = false)
+    {
+        $query = "SELECT  DISTINCT " . $this->cfgArrDatabaseInterface[$tableName][$fldName];
+        $query .= " FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        if ($debug) return $query;
+        $result = mysqli_query($this->connection, $query);
+        $i = 0;
+        $returnArr = array();
+        while ($row = mysqli_fetch_assoc($result)) {
+            foreach ($row as $key => $val) {
+                if ($val == "")
+                    $val = "NULL";
+                $strTempKey = array_search($key, $this->cfgArrDatabaseInterface[$tableName]);
+                if ($strTempKey == false)
+                    $strTempKey = "number_of";
+                $returnArr[$i][$strTempKey] = stripslashes($val);
+            }
+
+            $i++;
+        }
+
+        return $returnArr;
+    }
+    function _stringtodb($strParamString)
+    {
+        return addslashes($strParamString);
+    }
+
+    /* Funkcje do uzupełniania bazy o brakujące pola */
+    private function fixDbState($tableName, $payload): void
+    {
+        // die("KIERWA: $tableName");
+        // $cfg_columns = $this->getCfgColumnList($tableName);
+        // $db_columns = $this->getDbColumnList($tableName);
+        // $diff = array_diff($cfg_columns, $db_columns);
+
+        // $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
+        // $message .= json_encode(array_values($diff));
+        // $this->alterTableAddColumns($tableName, $diff, $payload);
+        // $message .= "\nMożna powtórzyć request";
+
+        // die($message);
+
+    }
+
+    private function fixDbStateAndGetColumnList($tableName, $payload): string
+    {
+        // $cfg_columns = $this->getCfgColumnList($tableName);
+        // $db_columns = $this->getDbColumnList($tableName);
+        // $diff = array_diff($cfg_columns, $db_columns);
+        // if(empty($diff))
+        //   return "";
+
+        // $message = "Rozbieżnośc configu z bazą. Dodano następujące kolumny:";
+        // $message .= json_encode(array_values($diff));
+        // $this->alterTableAddColumns($tableName, $diff, $payload);
+        // $message .= "\nMożna powtórzyć request";
+
+        // return $message;
+        return '';
+    }
+
+    private function alterTableAddColumns($tableName, $columns, $payload): void
+    {
+        $query = null;
+        foreach ($columns as $column) {
+            $query .= "ALTER TABLE `" . $this->cfgArrDatabaseTables[$tableName] . "` ADD COLUMN `$column` ";
+            $query .= $this->getColumnType($tableName, $column, $payload);
+        }
+        if (empty($query))
+            return;
+        mysqli_multi_query($this->connection, $query);
+        if (mysqli_error($this->connection))
+
+            die(json_encode(mysqli_error($this->connection)));
+    }
+
+    private function getColumnType($tableName, $column, $payload)
+    {
+        $cfg_key = array_search($column, $this->cfgArrDatabaseInterface[$tableName]);
+        $val = isset($payload[$cfg_key]) ? $payload[$cfg_key] : NULL;
+        switch ($cfg_key) {
+            case is_a(\DateTime::createFromFormat('Y-m-d', $val), 'DateTime'):
+                $ret = "DATETIME; ";
+                break;
+            case gettype((int)$val) == "integer" && strlen($val) == strlen((int)$val);
+                $ret = "INT; ";
+                break;
+            default:
+                $ret = "VARCHAR(150); ";
+                break;
+        }
+
+        return $ret;
+    }
+
+    private function getCfgColumnList(string $tableName): array
+    {
+        $class_database_correspondence_default_columns = [
+            'fld_CreateDate',
+            'fld_CreateIP',
+            'fld_CreateUId',
+            'fld_ModifyDate',
+            'fld_ModifyIP',
+            'fld_ModifyUId',
+            'fld_Deleted'
+        ];
+        $cfg_columns = array_merge(array_values($this->cfgArrDatabaseInterface[$tableName]), $class_database_correspondence_default_columns);
+
+        return $cfg_columns;
+    }
+
+    private function getDbColumnList(string $tableName): array
+    {
+        $query = "DESCRIBE ";
+        $query .= $this->cfgArrDatabaseTables[$tableName];
+        $result = mysqli_query($this->connection, $query);
+        while ($row = mysqli_fetch_assoc($result)) {
+            $list[] = $row['Field'];
+        }
+
+        return $list;
+    }
+
+    private function handleError($tableName, $query, $arr = []): void
+    {
+        http_response_code(500);
+        $err['db'] = mysqli_error($this->connection);
+        $err['query'] = $query;
+        $err['api'] = $this->fixDbStateAndGetColumnList($tableName, $arr);
+
+        die(json_encode($err));
+    }
 }
