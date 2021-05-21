@@ -20,23 +20,39 @@ class DatabaseManager
             mysqli_set_charset($this->connection, "utf8");
         }
     }
+
     public function setUser($uid)
     {
         $this->uid = $uid;
     }
 
-    public function convertToColumn(string $field)
+    public function convertKeyToColumn(string $field)
     {
         $field = ucwords(str_replace('_', ' ', $field));
-        return sprintf('fld_%s', $field);
+        return sprintf('`fld_%s`', $field);
     }
 
-    public function getTableNameFromObject(object $object)
+    public function getTableNameByObject(object $object): string
     {
         $tokens = explode('\\', get_class($object));
         $table = end($tokens);
 
-        return sprintf('tbl_%ss', strtolower($table));
+        return sprintf('`tbl_%ss`', strtolower($table));
+    }
+
+    private function getTableColumnsByObject(object $object): string
+    {
+        $res = "";
+        foreach (get_class_methods($object) as $key) {
+            if (strpos($key, 'get') !== false) {
+                $key = str_replace('get', '', $key);
+                $fld_Key = $this->convertKeyToColumn($key);
+                $res .= $fld_Key . ", ";
+            }
+        }
+        $res = rtrim($res, ', ');
+
+        return $res;
     }
 
     public function convertToField(string $tableField)
@@ -69,21 +85,16 @@ class DatabaseManager
      */
     function getRecordData(object $object, $fldVal, $fldName = "id", $debug = false)
     {
-        $tableName = $this->getTableNameFromObject($object);
-        foreach (get_class_methods($object) as $key) {
-            if (strpos($key, 'get') !== false) {
-                $key = str_replace('get', '', $key);
-            }
-        }
-        $query = "SELECT * ";
+        $tableName = $this->getTableNameByObject($object);
+        $columns = $this->getTableColumnsByObject($object);
+        $query = "SELECT $columns ";
         $query .= "FROM " . $tableName . " ";
-        $query .= "WHERE " . $fldName . "='" . $this->_stringtodb($fldVal) . "'";
-        if ($debug) return $query;
+        $query .= "WHERE " . $this->convertKeyToColumn($fldName) . "='" . $fldVal . "' AND `fld_Deleted` = 0";
+        if ($debug)
+            return $query;
         $result = mysqli_query($this->connection, $query);
-        if (mysqli_error($this->connection)) {
-
-            $this->handleError($tableName, $query, $fldVal);
-        }
+        if (mysqli_error($this->connection))
+            die("TODO log / error handling");
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
                 // die(json_encode($row));
