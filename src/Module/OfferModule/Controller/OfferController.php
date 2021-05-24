@@ -24,7 +24,7 @@ class OfferController implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 $offerRepository = new OfferRepository();
-                $res = $offerRepository->getById();
+                $res = $offerRepository->getById($this->params['id']);
                 Response::ok($res);
             case "POST":
                 exit;

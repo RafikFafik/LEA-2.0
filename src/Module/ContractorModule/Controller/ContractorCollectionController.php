@@ -9,7 +9,7 @@ use Lea\Response\Response;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
-class ContractorController implements ControllerInterface
+class ContractorCollectionController implements ControllerInterface
 {
     private $request;
 
@@ -29,7 +29,6 @@ class ContractorController implements ControllerInterface
             case "POST":
                 $contractor = new ContractorRepository();
                 $contractor->post($_POST);
-                Response::noContent();
             case "DELETE":
                 Response::ok("Not implemented yet");
             default:

@@ -16,7 +16,8 @@ class OfferCollectionController implements ControllerInterface {
     public function init() {
         switch($this->request->method()) {
             case "GET":
-                // OfferRepository::getById()
+                $offer = new OfferRepository();
+                $offer->getById($this->params['id']);
             case "POST":
                 exit;
             default:

@@ -19,7 +19,7 @@ class DatabaseException
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::insertTable($object);
             default:
-                die("Error not handled yet");
+                die("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }
     }
 
@@ -67,6 +67,8 @@ class DatabaseException
 
     private static function getVarTypeFromComment($comment): string
     {
+        if($comment === FALSE)
+            return "VARCHAR(150)";
         $lines = explode("\n", $comment);
         $strictType = self::getStrictTypeFromTokenArray($lines);
         switch ($strictType) {
