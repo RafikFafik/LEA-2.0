@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lea\Core\Database;
+
+use Exception;
+use mysqli_result;
+use mysqli_sql_exception;
+use Lea\Core\Database\DatabaseException;
 
 class DatabaseManager
 {
     public $uid = 0;
+    const SQL_TABLE_NOT_EXISTS = 1146;
 
     function __construct()
     {
@@ -21,18 +29,33 @@ class DatabaseManager
         }
     }
 
+    protected function executeQuery(string $query, string $tableName, string $columns) // PHP8: mysqli_result|bool
+    {
+        try {
+            $mysqli_result = mysqli_query($this->connection, $query);
+        } catch (mysqli_sql_exception $e) {
+            $ddl = DatabaseException::handleSqlException($e, $this->connection, $this->object);
+            $this->executeQuery($ddl, $tableName, $columns);
+            $this->executeQuery($query, $tableName, $columns);
+        } catch (Exception $e) {
+            die("Other non-sql exception");
+        }
+
+        return $mysqli_result;
+    }
+
     public function setUser($uid)
     {
         $this->uid = $uid;
     }
 
-    public function convertKeyToColumn(string $field)
+    public static function convertKeyToColumn(string $field)
     {
         $field = ucwords(str_replace('_', ' ', $field));
         return sprintf('`fld_%s`', $field);
     }
 
-    public function getTableNameByObject(object $object): string
+    public static function getTableNameByObject(object $object): string
     {
         $tokens = explode('\\', get_class($object));
         $table = end($tokens);
@@ -83,16 +106,17 @@ class DatabaseManager
      * @param  boolean $debug     [jeśli true - wyświetla zapytanie wysylane do bazy]
      * @return [type]             [jeśli zapytanie się powiedzie to tabela z danymi, jeśli nie to false]
      */
-    function getRecordData(object $object, $fldVal, $fldName = "id", $debug = false)
+    protected function getRecordData(object $object, $fldVal, $fldName = "id", $debug = false)
     {
-        $tableName = $this->getTableNameByObject($object);
+        $this->object = $object;
+        $tableName = self::getTableNameByObject($object);
         $columns = $this->getTableColumnsByObject($object);
         $query = "SELECT $columns ";
         $query .= "FROM " . $tableName . " ";
         $query .= "WHERE " . $this->convertKeyToColumn($fldName) . "='" . $fldVal . "' AND `fld_Deleted` = 0";
         if ($debug)
             return $query;
-        $result = mysqli_query($this->connection, $query);
+        $result = $this->executeQuery($query, $tableName, $columns);
         if (mysqli_error($this->connection))
             die("TODO log / error handling");
         if ($result) {
@@ -118,7 +142,7 @@ class DatabaseManager
     }
 
 
-    function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = false, $sortOrder = false, $debug = false)
+    protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
     {
         $strToQuery = "";
         foreach ($arr as $key => $val) {
@@ -195,7 +219,7 @@ class DatabaseManager
         return $returnArr;
     }
 
-    function getFieldsDataMultiCondition($tableName, $arr = array(), $fields = array(),  $start = 0, $limit = 0, $sortBy = false, $sortOrder = false, $debug = false)
+    function getFieldsDataMultiCondition($tableName, $arr = array(), $fields = array(),  $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
     {
         $strToQuery = "";
         foreach ($arr as $key => $val) {
@@ -583,7 +607,7 @@ class DatabaseManager
             case is_a(\DateTime::createFromFormat('Y-m-d', $val), 'DateTime'):
                 $ret = "DATETIME; ";
                 break;
-            case gettype((int)$val) == "integer" && strlen($val) == strlen((int)$val);
+            case gettype((int)$val) == "integer" && strlen($val) == strlen($val);
                 $ret = "INT; ";
                 break;
             default:

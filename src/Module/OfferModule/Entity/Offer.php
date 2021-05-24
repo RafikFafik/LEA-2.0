@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lea\Module\OfferModule\Entity;
 
 use Lea\Core\Entity\Entity;
+
 
 class Offer extends Entity
 {

@@ -3,8 +3,19 @@
 namespace Lea\Core\Entity;
 
 abstract class Entity  {
+    /**
+     * @var int
+     */
     protected $id;
+
+    /**
+     * @var bool
+     */
     protected $active = 1;
+
+    /**
+     * @var bool
+     */
     protected $deleted = 0;
 
     /**

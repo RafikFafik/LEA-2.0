@@ -20,3 +20,13 @@ OfferModule:
     submit:
       url: "/offers/confirm"
       controller: OfferConfirmController
+
+ContractorModule:
+  prefix: "/contractors"
+  endpoints:
+    by-id:
+      url: "/contractors/{id}"
+      controller: ContractorController
+    collection:
+      url: "/contractors"
+      controller: ContractorCollectionController
