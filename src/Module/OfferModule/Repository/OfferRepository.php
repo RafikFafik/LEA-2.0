@@ -21,7 +21,7 @@ final class OfferRepository extends DatabaseManager implements RepositoryInterfa
         return $res;
     }
 
-    public function post()
+    public function post(object $object)
     {
 
     }

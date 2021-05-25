@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Module\ContractorModule\Entity;
 
-
 use Lea\Core\Entity\Entity;
 use Lea\Module\ContractorModule\Entity\Address;
 use Lea\Module\ContractorModule\Entity\Employee;
@@ -33,7 +32,7 @@ class Contractor extends Entity
     /**
      * @var iterable<Address>
      */
-    protected $address;
+    protected $addresses;
 
     /**
      * @var iterable<Employee>

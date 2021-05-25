@@ -8,26 +8,22 @@ use Lea\Core\Repository\RepositoryInterface;
 use Lea\Core\Database\DatabaseManager;
 use Lea\Module\ContractorModule\Entity\Contractor;
 
-
 final class ContractorRepository extends DatabaseManager implements RepositoryInterface
 {
-    private $db;
-
     public function __construct()
     {
-        $this->db = new DatabaseManager();
     }
 
     public function getById(int $id)
     {
-        $res = $this->db->getRecordData(new Contractor, $id);
+        // $res = $this->db->getRecordData(new Contractor, $id);
 
-        return $res;
+        // return $res;
     }
 
-    public function post()
+    public function post(object $data)
     {
-        // $this->db->insertRecordData()
+
     }
 
     public function update(): void

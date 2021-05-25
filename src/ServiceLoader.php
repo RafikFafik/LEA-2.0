@@ -6,8 +6,11 @@ use Dotenv;
 class ServiceLoader {
     public static function load() {
         $core = __DIR__ . "/Core/**/*.php";
-        foreach (glob($core) as $filename) {
-            include $filename;
+        $list = glob($core);
+        $index = array_search("/var/www/html/src/Core/Database/DatabaseUtil.php", $list); /* Workaround */
+        include $list[$index]; /* Workaround */
+        foreach ($list as $filename) {
+            require_once $filename;
         }
         $module = __DIR__ . "/**/**/**/*.php";
         foreach (glob($module) as $filename) {

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use mysqli_sql_exception;
 use ReflectionClass;
+use mysqli_sql_exception;
+use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Database\DatabaseManager;
 
-class DatabaseException
+class DatabaseException extends DatabaseUtil
 {
     public $uid = 0;
     const SQL_TABLE_NOT_EXISTS = 1146;

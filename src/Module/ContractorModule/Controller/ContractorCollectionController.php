@@ -8,6 +8,8 @@ use Lea\Request\Request;
 use Lea\Response\Response;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
+use Lea\Core\Serializer\Normalizer;
+use Lea\Module\ContractorModule\Entity\Contractor;
 
 class ContractorCollectionController implements ControllerInterface
 {
@@ -27,10 +29,12 @@ class ContractorCollectionController implements ControllerInterface
                 $res = $contractorRepository->getById($this->params['id']);
                 Response::ok($res);
             case "POST":
+                $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
                 $contractor = new ContractorRepository();
-                $contractor->post($this->request->getPayload());
+                $contractor->post($data);
+                Response::noContent();
             case "DELETE":
-                Response::ok("Not implemented yet");
+                Response::ok("Deleteing not implemented yet");
             default:
                 Response::methodNotAllowed();
         }

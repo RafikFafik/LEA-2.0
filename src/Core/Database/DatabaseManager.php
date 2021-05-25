@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use Exception;
-use mysqli_sql_exception;
+use Lea\Core\Database\DatabaseUtil;
 
-class DatabaseManager
+
+abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
 {
     public $uid = 0;
     const SQL_TABLE_NOT_EXISTS = 1146;
@@ -27,72 +27,11 @@ class DatabaseManager
         }
     }
 
-    protected function executeQuery(string $query, string $tableName, string $columns) // PHP8: mysqli_result|bool
-    {
-        try {
-            $mysqli_result = mysqli_query($this->connection, $query);
-        } catch (mysqli_sql_exception $e) {
-            $ddl = DatabaseException::handleSqlException($e, $this->connection, $this->object);
-            $this->executeQuery($ddl, $tableName, $columns);
-            $this->executeQuery($query, $tableName, $columns);
-        } catch (Exception $e) {
-            die("Other non-sql exception");
-        }
-
-        return $mysqli_result;
-    }
-
     public function setUser($uid)
     {
         $this->uid = $uid;
     }
 
-    public static function convertKeyToColumn(string $field)
-    {
-        $field = str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
-        return sprintf('`fld_%s`', $field);
-    }
-
-    public static function getTableNameByObject(object $object): string
-    {
-        $tokens = explode('\\', get_class($object));
-        $table = end($tokens);
-
-        return sprintf('`tbl_%ss`', strtolower($table));
-    }
-
-    private function getTableColumnsByObject(object $object): string
-    {
-        $res = "";
-        foreach (get_class_methods($object) as $key) {
-            if (strpos($key, 'get') !== false) {
-                $key = str_replace('get', '', $key);
-                $fld_Key = $this->convertKeyToColumn($key);
-                $res .= $fld_Key . ", ";
-            }
-        }
-        $res = rtrim($res, ', ');
-
-        return $res;
-    }
-
-    public function convertToField(string $tableField)
-    {
-        $tableField = str_replace('fld_', '', $tableField);
-        return $tableField;
-    }
-
-    public function getObjectSetters($object): array
-    {
-        $setters = [];
-        foreach (get_class_methods($object) as $key) {
-            if (strpos($key, 'set') !== false) {
-                $setters[] = $key;
-            }
-        }
-
-        return $setters;
-    }
     #######################################
     ##    Operacje na rekordach danych   ##
     #######################################
@@ -138,8 +77,6 @@ class DatabaseManager
 
         return $retval;
     }
-
-
     protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
     {
         $strToQuery = "";
@@ -319,7 +256,7 @@ class DatabaseManager
         mysqli_query($this->connection, $query);
         //  return $query;
     }
-    function insertRecordData($tableName, $arr, $retId = false, $debug = false)
+    protected function insertRecordData($tableName, $arr, $retId = false, $debug = false)
     {
         $_query1 = "";
         $_query2 = "";
