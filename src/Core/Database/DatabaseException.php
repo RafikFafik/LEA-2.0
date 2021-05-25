@@ -12,15 +12,23 @@ class DatabaseException
 {
     public $uid = 0;
     const SQL_TABLE_NOT_EXISTS = 1146;
+    const SQL_UNKNOWN_COLUMN = 1054;
 
     public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object): string
     {
         switch ($e->getCode()) {
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::insertTable($object);
+            case self::SQL_UNKNOWN_COLUMN:
+                return self::alterTable($object);
             default:
                 die("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }
+    }
+
+    private static function alterTable(object $object): string
+    {
+        return "";
     }
 
     private static function insertTable(object $object): string
@@ -67,7 +75,7 @@ class DatabaseException
 
     private static function getVarTypeFromComment($comment): string
     {
-        if($comment === FALSE)
+        if ($comment === FALSE)
             return "VARCHAR(150)";
         $lines = explode("\n", $comment);
         $strictType = self::getStrictTypeFromTokenArray($lines);

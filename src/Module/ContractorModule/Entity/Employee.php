@@ -8,8 +8,23 @@ use Lea\Core\Entity\Entity;
 
 class Employee extends Entity
 {
+    /**
+     * @var string
+     */
     protected $name;
+
+    /**
+     * @var string
+     */
     protected $surname;
+
+    /**
+     * @var string
+     */
     protected $email;
+
+    /**
+     * @var string
+     */
     protected $phone;
 }

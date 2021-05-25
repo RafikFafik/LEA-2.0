@@ -28,7 +28,7 @@ class ContractorCollectionController implements ControllerInterface
                 Response::ok($res);
             case "POST":
                 $contractor = new ContractorRepository();
-                $contractor->post($_POST);
+                $contractor->post($this->request->getPayload());
             case "DELETE":
                 Response::ok("Not implemented yet");
             default:

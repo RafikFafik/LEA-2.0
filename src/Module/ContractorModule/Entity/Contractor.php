@@ -31,12 +31,12 @@ class Contractor extends Entity
     protected $email;
 
     /**
-     * @var Address
+     * @var iterable<Address>
      */
     protected $address;
 
     /**
-     * @var Employee
+     * @var iterable<Employee>
      */
     protected $employees;
 }

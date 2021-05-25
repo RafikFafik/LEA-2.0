@@ -27,7 +27,7 @@ final class ContractorRepository extends DatabaseManager implements RepositoryIn
 
     public function post()
     {
-
+        // $this->db->insertRecordData()
     }
 
     public function update(): void

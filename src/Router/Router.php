@@ -7,7 +7,6 @@ use Lea\Request\Request;
 use Lea\Response\Response;
 use MultipleIterator;
 use Symfony\Component\Yaml\Yaml;
-use ReflectionClass;
 final class Router {
 
     private $word_regex = "/{(\w+)}/";

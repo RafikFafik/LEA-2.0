@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Exception;
-use mysqli_result;
 use mysqli_sql_exception;
-use Lea\Core\Database\DatabaseException;
 
 class DatabaseManager
 {
@@ -51,7 +49,7 @@ class DatabaseManager
 
     public static function convertKeyToColumn(string $field)
     {
-        $field = ucwords(str_replace('_', ' ', $field));
+        $field = str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
         return sprintf('`fld_%s`', $field);
     }
 
