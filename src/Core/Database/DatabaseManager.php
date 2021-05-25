@@ -32,17 +32,6 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $this->uid = $uid;
     }
 
-    #######################################
-    ##    Operacje na rekordach danych   ##
-    #######################################
-    /**
-     * [getRecordData pobiera dane na podstawie jednego pola np: Pobierz uzytkownikow o imieniu Franek]
-     * @param  [type]  $tableName [nazwa tabeli z class/incs/config]
-     * @param  [type]  $fldVal    [wartość fldName]
-     * @param  string  $fldName   [pole z tabeli np.: imię]
-     * @param  boolean $debug     [jeśli true - wyświetla zapytanie wysylane do bazy]
-     * @return [type]             [jeśli zapytanie się powiedzie to tabela z danymi, jeśli nie to false]
-     */
     protected function getRecordData(object $object, $fldVal, $fldName = "id", $debug = false)
     {
         $this->object = $object;
@@ -54,20 +43,14 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         if ($debug)
             return $query;
         $result = $this->executeQuery($query, $tableName, $columns);
-        if (mysqli_error($this->connection))
-            die("TODO log / error handling");
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
-                // die(json_encode($row));
                 $className = get_class($object);
                 $object = new $className();
-                // die(json_encode());
                 foreach ($this->getObjectSetters($object) as $setter) {
                     $object->$setter(1);
                 }
-
                 die(json_encode($object->getNumber()));
-                // die(json_encode($object));
                 return $row;
             } else
                 $retval = false;
@@ -77,6 +60,33 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
         return $retval;
     }
+
+    protected function insertRecordData(object $object, $retId = TRUE)
+    {
+        $query_insert = DatabaseQuery::getInsertIntoQueryPart($object);
+        $query_values = DatabaseQuery::getInsertValuesQueryPart($object);
+        $this->executeQuery($query, )
+
+        $query = "INSERT INTO " . $this->cfgArrDatabaseTables[$tableName] . " ";
+        $query .= "(" . $_query1 . "fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
+        $query .= "VALUES (" . $_query2 . "'" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
+
+        mysqli_query($this->connection, $query);
+        //if ($debug) echo mysql_error($this->connection);
+        if (mysqli_error($this->connection)) {
+            $this->handleError($tableName, $query, $arr);
+        }
+        if (!$retId)
+            $feedback = mysqli_affected_rows($this->connection);
+        else
+            $feedback = mysqli_insert_id($this->connection);
+
+        if ($feedback) {
+            $this->insertLog($query, mysqli_insert_id($this->connection), 1, $tableName);
+        }
+        return $feedback;
+    }
+
     protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
     {
         $strToQuery = "";
@@ -255,45 +265,6 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
         mysqli_query($this->connection, $query);
         //  return $query;
-    }
-    protected function insertRecordData($tableName, $arr, $retId = false, $debug = false)
-    {
-        $_query1 = "";
-        $_query2 = "";
-
-        if (is_array($arr)) {
-            foreach ($arr as $key => $val) {
-                if (isset($this->cfgArrDatabaseInterface[$tableName][$key])) {
-                    $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . ",";
-                    if (is_null($val))
-                        $_query2 .= "NULL,";
-                    else if (is_array($val))
-                        $_query2 .= "'" . json_encode($val, JSON_UNESCAPED_UNICODE) . "',";
-                    else
-                        $_query2 .= "'" . $this->_stringtodb($val) . "',";
-                }
-            }
-        }
-
-        $query = "INSERT INTO " . $this->cfgArrDatabaseTables[$tableName] . " ";
-        $query .= "(" . $_query1 . "fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
-        $query .= "VALUES (" . $_query2 . "'" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
-
-        mysqli_query($this->connection, $query);
-        //if ($debug) echo mysql_error($this->connection);
-        if (mysqli_error($this->connection)) {
-            $this->handleError($tableName, $query, $arr);
-        }
-        if (!$retId)
-            $feedback = mysqli_affected_rows($this->connection);
-        else
-            $feedback = mysqli_insert_id($this->connection);
-
-        if ($feedback) {
-            $this->insertLog($query, mysqli_insert_id($this->connection), 1, $tableName);
-        }
-        if ($debug) return $query;
-        return $feedback;
     }
     function getAllUniqueMonthsYears($tableName, $fld, $mindate = "2019-05-01", $debug = false)
     {

@@ -2,7 +2,6 @@
 
 namespace Lea\Core\Entity;
 
-use Exception;
 use Lea\Core\Reflection\Reflection;
 
 abstract class Entity
@@ -22,9 +21,10 @@ abstract class Entity
      */
     protected $deleted = 0;
 
-    public function __construct(array $data)
+    public function __construct(array $data = NULL)
     {
-        $this->set($data);
+        if ($data !== NULL)
+            $this->set($data);
     }
 
     public function set(array $data): void
@@ -38,7 +38,7 @@ abstract class Entity
             if ($reflection->isObject()) {
                 if (is_iterable($val)) {
                     $children = [];
-                    foreach($val as $obj) {
+                    foreach ($val as $obj) {
                         $ChildClass = $reflection->getClassName();
                         $children[] = new $ChildClass($obj);
                     }
@@ -108,27 +108,6 @@ abstract class Entity
         $this->deleted = $deleted;
 
         return $this;
-    }
-
-    public static function __set_state(array $state)
-    {
-        $class = get_called_class();
-        // Assumption: Constructor can be invoked without parameters!
-        $object = new $class();
-        foreach (get_class_vars($class) as $member) {
-            if (!isset($state[$member])) {
-                // Member was not provided, you can choose to ignore this case
-                throw new Exception("$class::$member was not provided");
-            } else {
-                // Set member directly
-                // Assumption: members are all public or protected
-                $object->$member = $state[$member];
-                // Or use the setter-approach given by Chaos.
-                $setter = 'set' . ucfirst($member);
-                $object->setter($state[$member]);
-            }
-        }
-        return $object;
     }
 
     public static function getNamespace(): string

@@ -6,7 +6,6 @@ namespace Lea\Module\ContractorModule\Repository;
 
 use Lea\Core\Repository\RepositoryInterface;
 use Lea\Core\Database\DatabaseManager;
-use Lea\Module\ContractorModule\Entity\Contractor;
 
 final class ContractorRepository extends DatabaseManager implements RepositoryInterface
 {
@@ -21,9 +20,9 @@ final class ContractorRepository extends DatabaseManager implements RepositoryIn
         // return $res;
     }
 
-    public function post(object $data)
+    public function post(object $obj)
     {
-
+        $id = $this->insertRecordData($obj);
     }
 
     public function update(): void

@@ -1,8 +1,6 @@
 <?php
 
 namespace Lea;
-
-use Dotenv;
 class ServiceLoader {
     public static function load() {
         $core = __DIR__ . "/Core/**/*.php";
