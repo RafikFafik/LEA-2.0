@@ -11,30 +11,104 @@ class Address extends Entity
     /**
      * @var bool
      */
-    protected $is_default;
+    private $is_default;
 
     /**
      * @var string
      */
-    protected $address;
+    private $address;
 
     /**
      * @var string
      */
-    protected $city;
+    private $city;
 
     /**
      * @var string
      */
-    protected $citycode;
+    private $citycode;
 
     /**
      * @var string
      */
-    protected $voivodeship;
+    private $voivodeship;
 
     /**
      * @var string
      */
-    protected $country;
+    private $country;
+
+
+    public function getIsDefault()
+    {
+        return $this->is_default;
+    }
+
+
+    public function setIsDefault(bool $is_default)
+    {
+        $this->is_default = $is_default;
+
+        return $this;
+    }
+
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city)
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getCitycode()
+    {
+        return $this->citycode;
+    }
+
+    public function setCitycode(string $citycode)
+    {
+        $this->citycode = $citycode;
+
+        return $this;
+    }
+
+    public function getVoivodeship()
+    {
+        return $this->voivodeship;
+    }
+
+    public function setVoivodeship(string $voivodeship)
+    {
+        $this->voivodeship = $voivodeship;
+
+        return $this;
+    }
+
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    public function setCountry(string $country)
+    {
+        $this->country = $country;
+
+        return $this;
+    }
 }

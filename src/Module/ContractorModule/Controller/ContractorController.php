@@ -6,7 +6,9 @@ namespace Lea\Module\ContractorModule\Controller;
 
 use Lea\Request\Request;
 use Lea\Response\Response;
+use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Controller\ControllerInterface;
+use Lea\Module\ContractorModule\Entity\Contractor;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
 class ContractorController implements ControllerInterface
@@ -28,7 +30,8 @@ class ContractorController implements ControllerInterface
                 Response::ok($res);
             case "POST":
                 $contractor = new ContractorRepository();
-                $contractor->post($_POST);
+                $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
+                $contractor->post($data);
                 Response::noContent();
             case "DELETE":
                 Response::ok("Not implemented yet");

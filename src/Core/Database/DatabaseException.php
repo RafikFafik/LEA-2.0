@@ -14,14 +14,17 @@ class DatabaseException extends DatabaseUtil
     public $uid = 0;
     const SQL_TABLE_NOT_EXISTS = 1146;
     const SQL_UNKNOWN_COLUMN = 1054;
+    const SQL_SYMTAMX_ERRORM = 1064;
 
-    public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object): string
+    public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query): string
     {
         switch ($e->getCode()) {
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::insertTable($object);
             case self::SQL_UNKNOWN_COLUMN:
                 return self::alterTable($object);
+            case self::SQL_SYMTAMX_ERRORM:
+                die("Symtamx error \n $query");
             default:
                 die("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }

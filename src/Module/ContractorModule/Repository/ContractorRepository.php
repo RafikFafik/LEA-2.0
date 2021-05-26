@@ -11,6 +11,7 @@ final class ContractorRepository extends DatabaseManager implements RepositoryIn
 {
     public function __construct()
     {
+        $this->db = new DatabaseManager();
     }
 
     public function getById(int $id)
@@ -22,7 +23,7 @@ final class ContractorRepository extends DatabaseManager implements RepositoryIn
 
     public function post(object $obj)
     {
-        $id = $this->insertRecordData($obj);
+        $id = $this->db->insertRecordData($obj);
     }
 
     public function update(): void

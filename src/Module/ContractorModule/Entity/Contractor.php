@@ -13,29 +13,102 @@ class Contractor extends Entity
     /**
      * @var string
      */
-    protected $shortname;
+    private $shortname;
     /**
      * @var string
      */
-    protected $fullname;
+    private $fullname;
 
     /**
      * @var string
      */
-    protected $nip;
+    private $nip;
 
     /**
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
      * @var iterable<Address>
      */
-    protected $addresses;
+    private $addresses;
 
     /**
      * @var iterable<Employee>
      */
-    protected $employees;
+    private $employees;
+
+
+    public function getShortname()
+    {
+        return $this->shortname;
+    }
+
+    public function setShortname(string $shortname)
+    {
+        $this->shortname = $shortname;
+
+        return $this;
+    }
+
+    public function getFullname()
+    {
+        return $this->fullname;
+    }
+
+    public function setFullname(string $fullname)
+    {
+        $this->fullname = $fullname;
+
+        return $this;
+    }
+
+    public function getNip()
+    {
+        return $this->nip;
+    }
+
+    public function setNip(string $nip)
+    {
+        $this->nip = $nip;
+
+        return $this;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getAddresses()
+    {
+        return $this->addresses;
+    }
+
+    public function setAddresses(iterable $addresses)
+    {
+        $this->addresses = $addresses;
+
+        return $this;
+    }
+
+    public function getEmployees()
+    {
+        return $this->employees;
+    }
+
+    public function setEmployees(iterable $employees)
+    {
+        $this->employees = $employees;
+
+        return $this;
+    }
 }

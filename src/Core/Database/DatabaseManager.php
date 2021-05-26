@@ -7,10 +7,10 @@ namespace Lea\Core\Database;
 use Lea\Core\Database\DatabaseUtil;
 
 
-abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
+class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
 {
     public $uid = 0;
-    const SQL_TABLE_NOT_EXISTS = 1146;
+
 
     function __construct()
     {
@@ -42,7 +42,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query .= "WHERE " . $this->convertKeyToColumn($fldName) . "='" . $fldVal . "' AND `fld_Deleted` = 0";
         if ($debug)
             return $query;
-        $result = $this->executeQuery($query, $tableName, $columns);
+        $result = $this->executeQuery($query, $tableName, $columns, $object);
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
                 $className = get_class($object);
@@ -63,28 +63,29 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
     protected function insertRecordData(object $object, $retId = TRUE)
     {
-        $query_insert = DatabaseQuery::getInsertIntoQueryPart($object);
-        $query_values = DatabaseQuery::getInsertValuesQueryPart($object);
-        $this->executeQuery($query, )
+        $query = DatabaseQuery::getInsertIntoQuery($object);
+        $tableName = self::getTableNameByObject($object);
+        $columns = self::getTableColumnsByObject($object);
+        $this->executeQuery($query, $tableName, $columns, $object);
 
-        $query = "INSERT INTO " . $this->cfgArrDatabaseTables[$tableName] . " ";
-        $query .= "(" . $_query1 . "fld_CreateDate, fld_CreateIP, fld_CreateUId) ";
-        $query .= "VALUES (" . $_query2 . "'" . date("Y-m-d H-i-s") . "'" . ",'" . $_SERVER["REMOTE_ADDR"] . "'," . $this->user_id . ")";
+        $child_objects = $object->getChildObjects();
+        $this->insertIterablyObjects($child_objects);
 
-        mysqli_query($this->connection, $query);
-        //if ($debug) echo mysql_error($this->connection);
-        if (mysqli_error($this->connection)) {
-            $this->handleError($tableName, $query, $arr);
-        }
         if (!$retId)
             $feedback = mysqli_affected_rows($this->connection);
         else
             $feedback = mysqli_insert_id($this->connection);
 
-        if ($feedback) {
-            $this->insertLog($query, mysqli_insert_id($this->connection), 1, $tableName);
-        }
         return $feedback;
+    }
+
+    private function insertIterablyObjects(iterable $iterables)
+    {
+        foreach($iterables as $iterable) {
+            foreach($iterable as $obj) {
+                $this->insertRecordData($obj);
+            }
+        }
     }
 
     protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
