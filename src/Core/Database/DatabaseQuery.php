@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use ReflectionClass;
-use ReflectionProperty;
+use Lea\Core\Reflection\Reflection;
 
 final class DatabaseQuery extends DatabaseUtil
 {
@@ -14,20 +14,25 @@ final class DatabaseQuery extends DatabaseUtil
         $table_name = self::getTableNameByObject($object);
         $columns = "";
         $values = "";
-        $reflection = new ReflectionClass(get_class($object));
-        $protected_properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
-        $private_properties = $reflection->getProperties(ReflectionProperty::IS_PRIVATE);
-        foreach ($object->getGetters() as $getValue) {
+        $class = get_class($object);
+        $reflection = new ReflectionClass($class);
+        $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
+        $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
+        $properties = array_merge($protected_properties, $private_properties);
+        foreach ($properties as $var) {
+            $var = $var->getName();
+            $getValue = 'get' . self::processSnakeToPascal($var);
+            $reflection = new Reflection($class, $var);
             $value = $object->$getValue();
             if (is_iterable($value))
                 continue;
-            $key = str_replace('get', '', $getValue);
             if ($value === NULL)
                 continue;
-            $columns .= self::convertKeyToColumn($key) . ', ';
+            $columns .= self::convertKeyToColumn($var) . ', ';
+
             if (gettype($value) == "string")
                 $value = "'" . $value . "'";
-            elseif(gettype($value) == "bool")
+            elseif(gettype($value) == "boolean")
                 $value = (int)$value;
                 
             $values .= $value . ', ';
@@ -37,5 +42,11 @@ final class DatabaseQuery extends DatabaseUtil
         $query = 'INSERT INTO ' . $table_name . ' (' . $columns . ') VALUES (' . $values . ');';
 
         return $query;
+    }
+
+    private static function processSnakeToPascal(string $text): string {
+        $result = str_replace('_', '', ucwords($text, '_'));
+
+        return $result;
     }
 }
