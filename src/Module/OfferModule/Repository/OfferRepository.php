@@ -8,22 +8,26 @@ use Lea\Core\Repository\RepositoryInterface;
 use Lea\Core\Database\DatabaseManager;
 use Lea\Module\OfferModule\Entity\Offer;
 use Lea\Core\Entity\Entity;
-final class OfferRepository extends DatabaseManager implements RepositoryInterface {
+
+final class OfferRepository extends DatabaseManager implements RepositoryInterface
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = new DatabaseManager();
     }
 
-    public function getById(int $id) {
+    public function getById(int $id)
+    {
         $res = $this->db->getRecordData(new Offer, $id);
 
         return $res;
     }
 
-    public function post(object $object)
+    public function save(object $object)
     {
-
+        $this->db->insertRecordData($object);
     }
 
     public function update(): void

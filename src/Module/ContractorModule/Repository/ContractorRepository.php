@@ -22,12 +22,7 @@ final class ContractorRepository extends DatabaseManager implements RepositoryIn
         return $res;
     }
 
-    public function post(object $obj)
-    {
-        $id = $this->db->insertRecordData($obj);
-    }
-
-    public function update(): void
+    public function save(object $object)
     {
     }
 }

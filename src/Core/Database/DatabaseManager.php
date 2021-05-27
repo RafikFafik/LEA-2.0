@@ -8,7 +8,7 @@ use ReflectionClass;
 use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Reflection\Reflection;
 
-class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
+abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
 {
     public $uid = 0;
 

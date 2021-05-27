@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lea\Core\Reflection;
 
+use Exception;
+use Lea\Response\Response;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -35,6 +37,8 @@ final class Reflection extends ReflectionProperty
     private function getTypePHP7()
     {
         $comment = $this->getDocComment();
+        if (!$comment)
+            throw new Exception("TODO - DocComment exception support", 500);
         if (!(int)strpos($comment, "@var"))
             return null;
         $tokens = explode(" ", $comment);

@@ -32,7 +32,7 @@ class ContractorController implements ControllerInterface
             case "POST":
                 $contractor = new ContractorRepository();
                 $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
-                $contractor->post($data);
+                $contractor->save($data);
                 Response::noContent();
             case "DELETE":
                 Response::ok("Not implemented yet");

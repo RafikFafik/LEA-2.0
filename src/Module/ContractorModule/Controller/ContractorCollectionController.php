@@ -31,7 +31,7 @@ class ContractorCollectionController implements ControllerInterface
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
                 $contractor = new ContractorRepository();
-                $contractor->post($data);
+                $contractor->save($data);
                 Response::noContent();
             case "DELETE":
                 Response::ok("Deleteing not implemented yet");
