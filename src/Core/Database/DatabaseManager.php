@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
+use ReflectionClass;
 use Lea\Core\Database\DatabaseUtil;
-
+use Lea\Core\Reflection\Reflection;
 
 class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
 {
@@ -32,33 +33,36 @@ class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterfac
         $this->uid = $uid;
     }
 
-    protected function getRecordData(object $object, $fldVal, $fldName = "id", $debug = false)
+    protected function getRecordData(object $object, $where_value, $where_column = "id", $debug = false)
     {
         $this->object = $object;
         $tableName = self::getTableNameByObject($object);
         $columns = $this->getTableColumnsByObject($object);
-        $query = "SELECT $columns ";
-        $query .= "FROM " . $tableName . " ";
-        $query .= "WHERE " . $this->convertKeyToColumn($fldName) . "='" . $fldVal . "' AND `fld_Deleted` = 0";
-        if ($debug)
-            return $query;
+        $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
+
         $result = $this->executeQuery($query, $tableName, $columns, $object);
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
                 $className = get_class($object);
                 $object = new $className();
-                foreach ($this->getObjectSetters($object) as $setter) {
-                    $object->$setter(1);
+                $class = get_class($object);
+                $reflection = new ReflectionClass($class);
+                $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
+                $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
+                $properties = array_merge($private_properties, $protected_properties);
+                $mi = $this->getMultipleIterator($row, $object->getSetters(), $properties);
+                foreach ($mi as $triple) {
+                    $key = self::processSnakeToPascal($triple[1]);
+                    $reflection = new Reflection(get_class($object), $triple[2]->getName());
+                    if($reflection->isObject())
+                        continue;
+                    $setValue = $triple[1];
+                    $object->$setValue($triple[0]);
                 }
-                die(json_encode($object->getNumber()));
-                return $row;
-            } else
-                $retval = false;
-        } else {
-            $retval = false;
+            }
         }
 
-        return $retval;
+        return $object;
     }
 
     protected function insertRecordData(object $object, $retId = TRUE)
@@ -81,8 +85,8 @@ class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterfac
 
     private function insertIterablyObjects(iterable $iterables)
     {
-        foreach($iterables as $iterable) {
-            foreach($iterable as $obj) {
+        foreach ($iterables as $iterable) {
+            foreach ($iterable as $obj) {
                 $this->insertRecordData($obj);
             }
         }

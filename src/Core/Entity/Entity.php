@@ -54,6 +54,38 @@ abstract class Entity
         }
     }
 
+    public function get(): array
+    {
+        $res = [];
+        $class = get_called_class();
+        $reflection = new ReflectionClass($class);
+        $protected_properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
+        $private_properties = $reflection->getProperties(ReflectionProperty::IS_PRIVATE);
+        $properties = array_merge($protected_properties, $private_properties);
+        foreach ($properties as $var) {
+            $key = $var->getName();
+            if (!property_exists($class, $key))
+                continue;
+            $reflection = new Reflection($class, $key);
+            $getValue = 'get' . $this->processSnakeToPascal($key);
+            $val = $this->$getValue();
+            if ($reflection->isObject()) {
+                if (is_iterable($val)) {
+                    $children = [];
+                    foreach ($val as $obj) {
+                        $ChildClass = $reflection->getClassName();
+                        $children[] = new $ChildClass($obj);
+                    }
+                    $res[$key] = $this->$getValue($children);
+                }
+            } else {
+                $res[$key] = $val;
+            }
+        }
+
+        return $res;
+    }
+
     public function getGetters(): array
     {
         $getters = [];
@@ -63,6 +95,17 @@ abstract class Entity
         }
 
         return $getters;
+    }
+
+    public function getSetters(): array
+    {
+        $setters = [];
+        foreach (get_class_methods($this) as $method) {
+            if ($this->hasPropertyCorrespondingToMethod($method, TRUE))
+                $setters[] = $method;
+        }
+
+        return $setters;
     }
 
     public function getChildObjects(): iterable
@@ -92,9 +135,11 @@ abstract class Entity
         return $objs ?? [];
     }
 
-    public function hasPropertyCorrespondingToMethod(string $method_name): bool
+    public function hasPropertyCorrespondingToMethod(string $method_name, bool $is_setter = FALSE): bool
     {
-        if (substr($method_name, 0, 3) != 'get')
+        $prefix = substr($method_name, 0, 3);
+        $type = $is_setter ? 'set' : 'get';
+        if ($prefix != $type)
             return FALSE;
         $VarName = substr($method_name, 3);
         $varName = lcfirst($VarName);

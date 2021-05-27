@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Exception;
+use ArrayIterator;
+use MultipleIterator;
 use mysqli_sql_exception;
 
 abstract class DatabaseUtil
@@ -74,5 +76,22 @@ abstract class DatabaseUtil
         }
 
         return $setters;
+    }
+
+    protected function getMultipleIterator(array $row, array $setters, array $reflections): ?MultipleIterator {
+
+        $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
+        $mi->attachIterator(new ArrayIterator($row), "ROW");
+        $mi->attachIterator(new ArrayIterator($setters), "SETTERS");
+        $mi->attachIterator(new ArrayIterator($reflections), "PROPERTIES");
+
+        return $mi;
+    }
+
+    protected static function processSnakeToPascal(string $text): string
+    {
+        $result = str_replace('_', '', ucwords($text, '_'));
+
+        return $result;
     }
 }

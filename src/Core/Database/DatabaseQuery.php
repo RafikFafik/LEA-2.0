@@ -9,6 +9,15 @@ use Lea\Core\Reflection\Reflection;
 
 final class DatabaseQuery extends DatabaseUtil
 {
+    public static function getSelectRecordDataQuery(object $object, string $tableName, string $columns, $fldVal, $fldName = "id"): string
+    {
+        $query = "SELECT $columns ";
+        $query .= "FROM " . $tableName . " ";
+        $query .= "WHERE " . self::convertKeyToColumn($fldName) . "='" . $fldVal . "' AND `fld_Deleted` = 0";
+
+        return $query;
+    }
+
     public static function getInsertIntoQuery(object $object): string
     {
         $table_name = self::getTableNameByObject($object);
@@ -32,9 +41,9 @@ final class DatabaseQuery extends DatabaseUtil
 
             if (gettype($value) == "string")
                 $value = "'" . $value . "'";
-            elseif(gettype($value) == "boolean")
+            elseif (gettype($value) == "boolean")
                 $value = (int)$value;
-                
+
             $values .= $value . ', ';
         }
         $columns = rtrim($columns, ', ');
@@ -42,11 +51,5 @@ final class DatabaseQuery extends DatabaseUtil
         $query = 'INSERT INTO ' . $table_name . ' (' . $columns . ') VALUES (' . $values . ');';
 
         return $query;
-    }
-
-    private static function processSnakeToPascal(string $text): string {
-        $result = str_replace('_', '', ucwords($text, '_'));
-
-        return $result;
     }
 }

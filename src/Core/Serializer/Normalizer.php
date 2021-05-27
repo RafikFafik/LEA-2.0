@@ -14,6 +14,13 @@ class Normalizer
 
         return $object;
     }
+
+    public static function denormalize(object $object): array 
+    {
+        $res = $object->get();
+        
+        return $res;
+    }
     // public static function normalize(array $data, object $namespace): object
     // {
     //     $ret = [];

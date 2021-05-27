@@ -71,7 +71,7 @@ final class Router {
         $params = [];
         foreach($iterator as $i) {
             if($i[0] != $i[1] && preg_match($this->word_regex, $i[1]))
-                $params[str_replace(["{", "}"], "", $i[1])] = $i[0];
+                $params[str_replace(["{", "}"], "", $i[1])] = (int)$i[0];
         }
 
         return $params;

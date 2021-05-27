@@ -26,7 +26,8 @@ class ContractorController implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 $contractorRepository = new ContractorRepository();
-                $res = $contractorRepository->getById($this->params['id']);
+                $object = $contractorRepository->getById($this->params['id']);
+                $res = Normalizer::denormalize($object);
                 Response::ok($res);
             case "POST":
                 $contractor = new ContractorRepository();
