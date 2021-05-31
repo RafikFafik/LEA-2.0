@@ -35,7 +35,10 @@ final class ContractorRepository extends DatabaseManager implements RepositoryIn
 
     public function save(object $object)
     {
-        $id = $this->updateData($object, $object->getId());
+        if($object->hasId())
+            $id = $this->updateData($object, $object->getId());
+        else
+            $id = $this->insertRecordData($object);
 
         return $id;
     }

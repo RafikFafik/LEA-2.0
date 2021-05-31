@@ -7,6 +7,7 @@ namespace Lea\Core\Database;
 use ReflectionClass;
 use mysqli_sql_exception;
 use Lea\Core\Database\DatabaseUtil;
+use Lea\Core\Reflection\Reflection;
 use Lea\Core\Database\DatabaseManager;
 
 class DatabaseException extends DatabaseUtil
@@ -40,6 +41,7 @@ class DatabaseException extends DatabaseUtil
         $tablename = DatabaseManager::getTableNameByObject($object);
         $ddl = 'CREATE TABLE ' . $tablename . ' (';
         $class = new ReflectionClass($object);
+        $customclass = new Reflection($object);
         $properties = $class->getProperties();
         $columns = self::parseReflectProperties($properties);
         $ddl .= $columns;

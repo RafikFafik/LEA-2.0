@@ -5,23 +5,31 @@ declare(strict_types=1);
 namespace Lea\Core\Reflection;
 
 use Exception;
-use Lea\Response\Response;
 use ReflectionClass;
 use ReflectionProperty;
 
-final class Reflection extends ReflectionProperty
+final class Reflection extends ReflectionClass
 {
-    private $is_object;
-    private $type;
     private $namespace;
+    private $properties = [];
 
-    public function __construct(string $class, string $key)
+    public function __construct(object $object)
     {
-        parent::__construct($class, $key);
-        $reflaction_class = new ReflectionClass($class);
-        $this->namespace = $reflaction_class->getNamespaceName();
-        $this->type = $this->getTypePHP7();
-        $this->is_object = $this->type == NULL ? FALSE : TRUE;
+        parent::__construct($object);
+        $protected_properties = $this->getProperties(ReflectionProperty::IS_PROTECTED);
+        $private_properties = $this->getProperties(ReflectionProperty::IS_PRIVATE);
+        $properties = array_merge($protected_properties, $private_properties);
+        foreach ($properties as $property) {
+            $property->type = $this->getTypePHP7($property);
+            $property->is_object = $property->type == NULL ? FALSE : TRUE;
+            $this->properties[] = $property;
+        }
+        $this->namespace = $this->getNamespaceName();
+    }
+
+    public function getProperties($filter = null)
+    {
+        return $filter ? parent::getProperties($filter) : $this->properties;
     }
 
     public function isObject(): bool
@@ -34,9 +42,9 @@ final class Reflection extends ReflectionProperty
         return $this->namespace . "\\" . $this->type;
     }
 
-    private function getTypePHP7()
+    private function getTypePHP7(ReflectionProperty $property)
     {
-        $comment = $this->getDocComment();
+        $comment = $property->getDocComment();
         if (!$comment)
             throw new Exception("TODO - DocComment exception support", 500);
         if (!(int)strpos($comment, "@var"))

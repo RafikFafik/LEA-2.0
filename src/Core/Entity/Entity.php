@@ -3,9 +3,12 @@
 namespace Lea\Core\Entity;
 
 use Generator;
-use Lea\Core\Reflection\Reflection;
+use ArrayIterator;
 use ReflectionClass;
+use MultipleIterator;
 use ReflectionProperty;
+use Lea\Core\Reflection\Reflection;
+use Lea\Module\ContractorModule\Entity\Address;
 
 abstract class Entity
 {
@@ -33,25 +36,35 @@ abstract class Entity
     public function set(array $data): void
     {
         $class = get_called_class();
-
-        foreach ($data as $key => $val) {
-            if (!property_exists($class, $key))
+        $reflection = new Reflection($this);
+        // $mi = $this->getMultipleIterator($reflection->getProperties(), $data);
+        foreach ($reflection->getProperties() as $property) {
+            $key = $property->getName();
+            if(!array_key_exists($key, $data))
                 continue;
-            $reflection = new Reflection($class, $key);
             $setValue = 'set' . $this->processSnakeToPascal($key);
-            if ($reflection->isObject()) {
-                if (is_iterable($val)) {
+            if ($property->is_object) {
+                if (is_iterable($data[$key])) {
                     $children = [];
-                    foreach ($val as $obj) {
-                        $ChildClass = $reflection->getClassName();
+                    foreach ($data[$key] as $obj) {
+                        $ChildClass = $reflection->getNamespaceName() . '\\' . $property->type;
                         $children[] = new $ChildClass($obj);
                     }
                     $this->$setValue($children);
                 }
             } else {
-                $this->$setValue($val);
+                $this->$setValue($data[$key]);
             }
         }
+    }
+
+    private function getMultipleIterator(array $data, array $properties): ?MultipleIterator
+    {
+        $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
+        $mi->attachIterator(new ArrayIterator($data), "REQUEST");
+        $mi->attachIterator(new ArrayIterator($properties), "REFLECTOR");
+
+        return $mi;
     }
 
     public function get(): array
@@ -66,7 +79,7 @@ abstract class Entity
             $key = $var->getName();
             if (!property_exists($class, $key))
                 continue;
-            $reflection = new Reflection($class, $key);
+            $reflection = new Reflection($this);
             $getValue = 'get' . $this->processSnakeToPascal($key);
             $val = $this->$getValue();
             if ($reflection->isObject()) {
@@ -118,7 +131,7 @@ abstract class Entity
         $properties = array_merge($protected_properties, $private_properties);
         foreach ($properties as $var) {
             $var = $var->getName();
-            $reflection = new Reflection($class, $var);
+            $reflection = new Reflection($this);
             if (!$reflection->isObject())
                 continue;
             if (is_iterable($var)) {
@@ -224,5 +237,10 @@ abstract class Entity
         $result = str_replace('_', '', ucwords($text, '_'));
 
         return $result;
+    }
+
+    public function hasId(): bool
+    {
+        return $this->id ? TRUE : FALSE;
     }
 }
