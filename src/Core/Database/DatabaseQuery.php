@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use ReflectionClass;
 use Lea\Core\Reflection\Reflection;
 
 final class DatabaseQuery extends DatabaseUtil
@@ -24,14 +23,10 @@ final class DatabaseQuery extends DatabaseUtil
         $columns = "";
         $values = "";
         $class = get_class($object);
-        $reflection = new ReflectionClass($class);
-        $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
-        $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
-        $properties = array_merge($protected_properties, $private_properties);
-        foreach ($properties as $var) {
-            $var = $var->getName();
+        $reflection = new Reflection($object);
+        foreach ($reflection->getProperties() as $property) {
+            $var = $property->getName();
             $getValue = 'get' . self::processSnakeToPascal($var);
-            $reflection = new Reflection($class, $var);
             $value = $object->$getValue();
             if (is_iterable($value))
                 continue;
@@ -58,14 +53,10 @@ final class DatabaseQuery extends DatabaseUtil
         $table_name = self::getTableNameByObject($object);
         $changes = "";
         $class = get_class($object);
-        $reflection = new ReflectionClass($class);
-        $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
-        $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
-        $properties = array_merge($protected_properties, $private_properties);
-        foreach ($properties as $var) {
-            $var = $var->getName();
+        $reflection = new Reflection($object);
+        foreach ($reflection->getProperties() as $property) {
+            $var = $property->getName();
             $getValue = 'get' . self::processSnakeToPascal($var);
-            $reflection = new Reflection($class, $var);
             $value = $object->$getValue();
             if (is_iterable($value))
                 continue;

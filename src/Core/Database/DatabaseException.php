@@ -40,8 +40,7 @@ class DatabaseException extends DatabaseUtil
     {
         $tablename = DatabaseManager::getTableNameByObject($object);
         $ddl = 'CREATE TABLE ' . $tablename . ' (';
-        $class = new ReflectionClass($object);
-        $customclass = new Reflection($object);
+        $class = new Reflection($object);
         $properties = $class->getProperties();
         $columns = self::parseReflectProperties($properties);
         $ddl .= $columns;

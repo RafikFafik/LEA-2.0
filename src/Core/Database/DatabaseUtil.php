@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use Exception;
 use ArrayIterator;
 use MultipleIterator;
-use mysqli_sql_exception;
 
 abstract class DatabaseUtil
 {
@@ -45,9 +43,11 @@ abstract class DatabaseUtil
         return $res;
     }
 
-    protected function convertToField(string $tableField)
+    protected static function convertToKey(string $tableField)
     {
         $tableField = str_replace('fld_', '', $tableField);
+        $tableField = self::processPascalToSnake($tableField);
+        
         return $tableField;
     }
 
@@ -78,5 +78,13 @@ abstract class DatabaseUtil
         $result = str_replace('_', '', ucwords($text, '_'));
 
         return $result;
+    }
+
+    protected static function processPascalToSnake(string $PascalCase): string
+    {
+        $cammelCase = lcfirst($PascalCase);
+        $snake_case = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $cammelCase));
+
+        return $snake_case;
     }
 }

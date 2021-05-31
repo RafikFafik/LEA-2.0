@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use ReflectionClass;
 use Lea\Core\Database\DatabaseUtil;
-use Lea\Core\Reflection\Reflection;
-use Lea\Response\Response;
+use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
 {
+    const PROPERTY = 2;
+    const METHOD = 1;
+    const VALUE = 0;
+
     public $uid = 0;
 
     function __construct(object $object)
     {
         $this->tableName = self::getTableNameByObject($object);
-        if(!isset($this->connection))
+        if (!isset($this->connection))
             $this->connection = DatabaseConnection::establishDatabaseConnection();
     }
 
@@ -35,20 +37,16 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $result = DatabaseConnection::executeQuery($connection, $query, $tableName, $columns, $object);
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
-                $className = get_class($object);
-                $object = new $className();
-                $class = get_class($object);
-                $reflection = new ReflectionClass($class);
-                $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
-                $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
-                $properties = array_merge($private_properties, $protected_properties);
-                $mi = self::getMultipleIterator($row, $object->getSetters(), $properties);
-                foreach ($mi as $triple) {
-                    $reflection = new Reflection(get_class($object), $triple[2]->getName());
-                    if($reflection->isObject())
-                        continue;
-                    $setValue = $triple[1];
-                    $object->$setValue($triple[0]);
+                foreach($row as $key => $val) {
+                    $key = self::convertToKey($key);
+                    $setVal = 'set' . self::processSnakeToPascal($key);
+                    $property = new ReflectionPropertyExtended(get_class($object), $key);
+                    if(method_exists($object, $setVal) && $property->isObject()) {
+                        $children[] = $setVal;
+                    } else if (method_exists($object, $setVal)) {
+                        $object->$setVal($val);
+                    }
+
                 }
             }
         }
@@ -65,7 +63,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $id = $this->connection->insert_id;
         $child_objects = $object->getChildObjects();
         $this->insertIterablyObjects($child_objects);
-        
+
         return $id;
     }
 
@@ -76,7 +74,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $columns = self::getTableColumnsByObject($object);
         DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
-        
+
         return $affected_rows;
     }
 

@@ -33,6 +33,11 @@ abstract class Entity
             $this->set($data);
     }
 
+    public function hasKey(string $key): bool
+    {
+        return $this->$key ? TRUE : FALSE;
+    }
+
     public function set(array $data): void
     {
         $class = get_called_class();
@@ -124,15 +129,12 @@ abstract class Entity
     public function getChildObjects(): iterable
     {
         $class = get_called_class();
+        $obj = new $class;
 
-        $reflection = new ReflectionClass($class);
-        $protected_properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
-        $private_properties = $reflection->getProperties(ReflectionProperty::IS_PRIVATE);
-        $properties = array_merge($protected_properties, $private_properties);
-        foreach ($properties as $var) {
-            $var = $var->getName();
-            $reflection = new Reflection($this);
-            if (!$reflection->isObject())
+        $reflection = new Reflection($obj);
+        foreach ($reflection->getProperties() as $property) {
+            $var = $property->getName();
+            if (!$property->is_object)
                 continue;
             if (is_iterable($var)) {
                 $recursive_objs = [];
