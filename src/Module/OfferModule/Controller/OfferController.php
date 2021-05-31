@@ -27,7 +27,7 @@ class OfferController implements ControllerInterface
                 $res = $offerRepository->getById($this->params['id']);
                 Response::ok($res);
             case "POST":
-                exit;
+                Response::notImplemented();
             default:
                 Response::methodNotAllowed();
         }

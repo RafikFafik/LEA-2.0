@@ -10,19 +10,33 @@ use Lea\Module\ContractorModule\Entity\Contractor;
 
 final class ContractorRepository extends DatabaseManager implements RepositoryInterface
 {
-    public function __construct()
+    private $entity;
+
+    public function __construct(array $params)
     {
-        $this->db = new DatabaseManager();
+        $this->entity = new Contractor();
+        parent::__construct($this->entity);
     }
 
-    public function getById(int $id)
+    public static function getById(int $id)
     {
-        $res = $this->db->getRecordData(new Contractor, $id);
+        $res = self::getRecordData(new Contractor, $id);
 
         return $res;
     }
 
+    public function updateById(object $object, int $id)
+    {
+        $object->setId($id);
+        $affected_rows = $this->save($object);
+
+        return $affected_rows;
+    }
+
     public function save(object $object)
     {
+        $id = $this->updateData($object, $object->getId());
+
+        return $id;
     }
 }

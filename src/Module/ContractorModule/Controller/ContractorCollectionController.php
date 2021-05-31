@@ -25,14 +25,20 @@ class ContractorCollectionController implements ControllerInterface
     {
         switch ($this->request->method()) {
             case "GET":
-                $contractorRepository = new ContractorRepository();
-                $res = $contractorRepository->getById($this->params['id']);
-                Response::ok($res);
+                // $contractorRepository = new ContractorRepository();
+                // $res = $contractorRepository->getById($this->params['id']);
+                Response::notImplemented();
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
-                $contractor = new ContractorRepository();
-                $contractor->save($data);
-                Response::noContent();
+                $contractor = new ContractorRepository($this->params);
+                $resource_id = $contractor->save($data);
+
+                // debug
+                $contractorRepository = new ContractorRepository($this->params);
+                $object = $contractorRepository->getById($resource_id);
+                $res = Normalizer::denormalize($object);
+                Response::ok($res);
+                // Response::noContent();
             case "DELETE":
                 Response::ok("Deleteing not implemented yet");
             default:

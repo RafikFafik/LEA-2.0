@@ -53,6 +53,11 @@ class Response {
         self::m_die($message);
     }
 
+    public static function notImplemented($message = null): void {
+        http_response_code(501);
+        self::m_die($message);
+    }
+
 
     public static function unauthorized($message = null): void {
         http_response_code(401);

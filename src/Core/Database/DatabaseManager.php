@@ -7,25 +7,17 @@ namespace Lea\Core\Database;
 use ReflectionClass;
 use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Reflection\Reflection;
+use Lea\Response\Response;
 
 abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
 {
     public $uid = 0;
 
-
-    function __construct()
+    function __construct(object $object)
     {
-        if (!isset($this->connection)) {
-            $this->connection = mysqli_connect($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], $_ENV['DB_DATABASE']);
-            // mysqli_connect(host, user, pass, db);
-            if (!$this->connection) {
-                echo "Error: Unable to connect to MySQL." . PHP_EOL;
-                echo "Debugging errno: " . mysqli_connect_errno() . PHP_EOL;
-                echo "Debugging error: " . mysqli_connect_error() . PHP_EOL;
-                exit;
-            }
-            mysqli_set_charset($this->connection, "utf8");
-        }
+        $this->tableName = self::getTableNameByObject($object);
+        if(!isset($this->connection))
+            $this->connection = DatabaseConnection::establishDatabaseConnection();
     }
 
     public function setUser($uid)
@@ -33,14 +25,14 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $this->uid = $uid;
     }
 
-    protected function getRecordData(object $object, $where_value, $where_column = "id", $debug = false)
+    protected static function getRecordData(object $object, $where_value, $where_column = "id", $debug = false)
     {
-        $this->object = $object;
+        $connection = DatabaseConnection::establishDatabaseConnection();
         $tableName = self::getTableNameByObject($object);
-        $columns = $this->getTableColumnsByObject($object);
+        $columns = self::getTableColumnsByObject($object);
         $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
 
-        $result = $this->executeQuery($query, $tableName, $columns, $object);
+        $result = DatabaseConnection::executeQuery($connection, $query, $tableName, $columns, $object);
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
                 $className = get_class($object);
@@ -50,9 +42,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                 $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
                 $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
                 $properties = array_merge($private_properties, $protected_properties);
-                $mi = $this->getMultipleIterator($row, $object->getSetters(), $properties);
+                $mi = self::getMultipleIterator($row, $object->getSetters(), $properties);
                 foreach ($mi as $triple) {
-                    $key = self::processSnakeToPascal($triple[1]);
                     $reflection = new Reflection(get_class($object), $triple[2]->getName());
                     if($reflection->isObject())
                         continue;
@@ -70,17 +61,23 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getInsertIntoQuery($object);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
-        $this->executeQuery($query, $tableName, $columns, $object);
-
+        $mysqli_result = DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        $id = $this->connection->insert_id;
         $child_objects = $object->getChildObjects();
         $this->insertIterablyObjects($child_objects);
+        
+        return $id;
+    }
 
-        if (!$retId)
-            $feedback = mysqli_affected_rows($this->connection);
-        else
-            $feedback = mysqli_insert_id($this->connection);
-
-        return $feedback;
+    protected function updateData(object $object, $where_value, $where_column = "id", $debug = false)
+    {
+        $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column);
+        $tableName = self::getTableNameByObject($object);
+        $columns = self::getTableColumnsByObject($object);
+        DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        $affected_rows = $this->connection->affected_rows;
+        
+        return $affected_rows;
     }
 
     private function insertIterablyObjects(iterable $iterables)
@@ -300,48 +297,6 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
         return $resArr;
     }
-
-    function updateData($tableName, $arr, $fldId = "id", $debug = false)
-    {
-        $query = '';
-        $_query1 = "";
-        $_query2 = "";
-        foreach ($arr as $key => $val) {
-            if (!isset($this->cfgArrDatabaseInterface[$tableName][$key]))
-                continue;
-            if ($val === NULL) /* Wymuszone === w momencie próby zapisania statusu = 0, okazuje się, że 0 == NULL ? prawda */
-                $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "=NULL,";
-            elseif ($key == $fldId)
-                $_query2 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $this->_stringtodb($val) . "'";
-            elseif (isset($this->cfgArrDatabaseInterface[$tableName][$key]))
-                $_query1 .= $this->cfgArrDatabaseInterface[$tableName][$key] . "='" . $this->_stringtodb($val) . "',";
-        }
-
-        if (strlen($_query1) && strlen($_query2)) {
-            $query = "UPDATE " . $this->cfgArrDatabaseTables[$tableName] . " ";
-            $query .= "SET " . $_query1 . "fld_ModifyDate=" . "'" . date("Y-m-d H-i-s") . "'" . ",fld_ModifyIP='" . $_SERVER["REMOTE_ADDR"] . "',fld_ModifyUId=" . $this->user_id . " ";
-            $query .= "WHERE " . $_query2;
-            if ($debug) return $query;
-            mysqli_query($this->connection, $query);
-            if (mysqli_error($this->connection) || mysqli_affected_rows($this->connection) == "-1") {
-
-                $this->handleError($tableName, $query, $arr);
-            }
-            $feedback = mysqli_affected_rows($this->connection);
-        } else
-            $feedback = false;
-
-
-
-        $tmp_id = 0;
-        if (isset($arr['id'])) {
-            $tmp_id = $arr["id"];
-        }
-        $this->insertLog($query, $tmp_id, 2, $tableName);
-
-        return $feedback;
-    }
-
 
     function removeRecordData($tableName, $fldVal, $fldName = "id", $debug = false)
     {

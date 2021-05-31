@@ -52,4 +52,35 @@ final class DatabaseQuery extends DatabaseUtil
 
         return $query;
     }
+
+    public static function getUpdateQuery(object $object, $where_val, string $where_column): string
+    {
+        $table_name = self::getTableNameByObject($object);
+        $changes = "";
+        $class = get_class($object);
+        $reflection = new ReflectionClass($class);
+        $protected_properties = $reflection->getProperties(Reflection::IS_PROTECTED);
+        $private_properties = $reflection->getProperties(Reflection::IS_PRIVATE);
+        $properties = array_merge($protected_properties, $private_properties);
+        foreach ($properties as $var) {
+            $var = $var->getName();
+            $getValue = 'get' . self::processSnakeToPascal($var);
+            $reflection = new Reflection($class, $var);
+            $value = $object->$getValue();
+            if (is_iterable($value))
+                continue;
+            if ($value === NULL)
+                continue;
+            if (gettype($value) == "string")
+                $value = "'" . $value . "'";
+            elseif (gettype($value) == "boolean")
+                $value = (int)$value;
+
+            $changes .= self::convertKeyToColumn($var) . ' = ' . $value . ', ';
+        }
+        $changes = rtrim($changes, ', ');
+        $query = 'UPDATE ' . $table_name . ' SET ' . $changes . ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
+
+        return $query;
+    }
 }

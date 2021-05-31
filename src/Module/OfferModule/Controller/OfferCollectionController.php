@@ -22,11 +22,10 @@ class OfferCollectionController implements ControllerInterface
     {
         switch ($this->request->method()) {
             case "GET":
-                $offer = new OfferRepository();
-                $offer->getById($this->params['id']);
+                Response::notImplemented();
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Offer::getNamespace());
-                $offer = new OfferRepository();
+                $offer_repository = new OfferRepository();
                 Response::noContent();
             default:
                 Response::methodNotAllowed();

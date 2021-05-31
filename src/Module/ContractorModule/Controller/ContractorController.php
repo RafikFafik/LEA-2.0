@@ -25,17 +25,22 @@ class ContractorController implements ControllerInterface
     {
         switch ($this->request->method()) {
             case "GET":
-                $contractorRepository = new ContractorRepository();
+                $contractorRepository = new ContractorRepository($this->params);
                 $object = $contractorRepository->getById($this->params['id']);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
-            case "POST":
-                $contractor = new ContractorRepository();
-                $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
-                $contractor->save($data);
-                Response::noContent();
+                case "POST":
+                    $contractorRepository = new ContractorRepository($this->params);
+                    $object = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
+                    $affected_rows = $contractorRepository->updateById($object, $this->params['id']);
+                    
+                    
+
+                    $object = $contractorRepository->getById($this->params['id']);
+                    $res = Normalizer::denormalize($object);
+                    Response::ok($res);
             case "DELETE":
-                Response::ok("Not implemented yet");
+                Response::notImplemented();
             default:
                 Response::methodNotAllowed();
         }

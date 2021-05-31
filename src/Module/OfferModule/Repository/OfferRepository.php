@@ -7,20 +7,21 @@ namespace Lea\Module\OfferModule\Repository;
 use Lea\Core\Repository\RepositoryInterface;
 use Lea\Core\Database\DatabaseManager;
 use Lea\Module\OfferModule\Entity\Offer;
-use Lea\Core\Entity\Entity;
 
 final class OfferRepository extends DatabaseManager implements RepositoryInterface
 {
-    private $db;
+    private $entity;
 
     public function __construct()
     {
-        $this->db = new DatabaseManager();
+        $this->entity = new Offer();
+        parent::__construct($this->entity);
     }
 
-    public function getById(int $id)
+    public static function getById(int $id)
     {
-        $res = $this->db->getRecordData(new Offer, $id);
+        $instance = new static(new DatabaseManager(new Offer()));
+        $res = $instance->getRecordData(new Offer, $id);
 
         return $res;
     }

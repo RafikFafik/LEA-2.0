@@ -11,21 +11,6 @@ use mysqli_sql_exception;
 
 abstract class DatabaseUtil
 {
-    protected function executeQuery(string $query, string $tableName, string $columns, object $object) // PHP8: mysqli_result|bool
-    {
-        try {
-            $mysqli_result = mysqli_query($this->connection, $query);
-        } catch (mysqli_sql_exception $e) {
-            $ddl = DatabaseException::handleSqlException($e, $this->connection, $object, $query);
-            $this->executeQuery($ddl, $tableName, $columns, $object);
-            $this->executeQuery($query, $tableName, $columns, $object);
-        } catch (Exception $e) {
-            die("Other non-sql exception");
-        }
-
-        return $mysqli_result;
-    }
-
     protected static function convertKeyToColumn(string $field)
     {
         $field = str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
@@ -78,7 +63,7 @@ abstract class DatabaseUtil
         return $setters;
     }
 
-    protected function getMultipleIterator(array $row, array $setters, array $reflections): ?MultipleIterator {
+    protected static function getMultipleIterator(array $row, array $setters, array $reflections): ?MultipleIterator {
 
         $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
         $mi->attachIterator(new ArrayIterator($row), "ROW");
