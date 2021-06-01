@@ -47,7 +47,7 @@ class DatabaseException extends DatabaseUtil
         $ddl .= $columns;
         if($child_objects) {
             foreach($child_objects as $obj) {
-                $obj = new $obj->class;
+                $obj = new $obj->type;
                 // $ddl .= self::insertTableRecursive($obj);
             }
         }
@@ -68,7 +68,7 @@ class DatabaseException extends DatabaseUtil
             $columns .= $column_name . " " . $column_properties . ", ";
         }
         $columns = $columns . 'PRIMARY KEY (`fld_Id`)';
-        $columns .= ");";
+        $columns .= "); ";
 
         return $columns;
     }
