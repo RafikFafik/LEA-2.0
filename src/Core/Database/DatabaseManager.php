@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Database\DatabaseUtil;
+use Lea\Core\Reflection\Reflection;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
@@ -31,7 +32,9 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     {
         $connection = DatabaseConnection::establishDatabaseConnection();
         $tableName = self::getTableNameByObject($object);
-        $columns = self::getTableColumnsByObject($object);
+        // $columns = self::getTableColumnsByObject($object);
+        $reflector = new Reflection($object);
+        $columns = self::getTableColumnsByReflector($reflector);
         $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
 
         $result = DatabaseConnection::executeQuery($connection, $query, $tableName, $columns, $object);
@@ -62,7 +65,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $mysqli_result = DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $id = $this->connection->insert_id;
         $child_objects = $object->getChildObjects();
-        $this->insertIterablyObjects($child_objects);
+        $this->insertIterablyObjects($child_objects, $id);
 
         return $id;
     }
@@ -78,7 +81,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         return $affected_rows;
     }
 
-    private function insertIterablyObjects(iterable $iterables)
+    private function insertIterablyObjects(iterable $iterables, int $id)
     {
         foreach ($iterables as $iterable) {
             foreach ($iterable as $obj) {

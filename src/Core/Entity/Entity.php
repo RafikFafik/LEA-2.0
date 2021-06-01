@@ -8,6 +8,7 @@ use ReflectionClass;
 use MultipleIterator;
 use ReflectionProperty;
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Module\ContractorModule\Entity\Address;
 
 abstract class Entity
@@ -77,21 +78,18 @@ abstract class Entity
         $res = [];
         $class = get_called_class();
         $reflection = new ReflectionClass($class);
-        $protected_properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
-        $private_properties = $reflection->getProperties(ReflectionProperty::IS_PRIVATE);
-        $properties = array_merge($protected_properties, $private_properties);
-        foreach ($properties as $var) {
-            $key = $var->getName();
+        foreach ($reflection->getProperties() as $property) {
+            $key = $property->getName();
+            $getValue = 'get' . $this->processSnakeToPascal($key);
             if (!property_exists($class, $key))
                 continue;
-            $reflection = new Reflection($this);
-            $getValue = 'get' . $this->processSnakeToPascal($key);
             $val = $this->$getValue();
+            $reflection = new ReflectionPropertyExtended($class, $key);
             if ($reflection->isObject()) {
                 if (is_iterable($val)) {
                     $children = [];
                     foreach ($val as $obj) {
-                        $ChildClass = $reflection->getClassName();
+                        $ChildClass = $reflection->getClassName(); #TODO raczej nie działa
                         $children[] = new $ChildClass($obj);
                     }
                     $res[$key] = $this->$getValue($children);

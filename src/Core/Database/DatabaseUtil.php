@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use ArrayIterator;
+use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionPropertyExtended;
 use MultipleIterator;
 
 abstract class DatabaseUtil
@@ -33,6 +35,22 @@ abstract class DatabaseUtil
         $res = "";
         foreach (get_class_methods($object) as $method) {
             if ($object->hasPropertyCorrespondingToMethod($method)) {
+                $key = str_replace('get', '', $method);
+                $fld_Key = self::convertKeyToColumn($key);
+                $res .= $fld_Key . ", ";
+            }
+        }
+        $res = rtrim($res, ', ');
+
+        return $res;
+    }
+
+    protected static function getTableColumnsByReflector(Reflection $reflection): string
+    {
+        $res = "";
+        foreach ($reflection->getPrimitiveProperties() as $property) {
+            $method = 'get' . self::processSnakeToPascal($property->getName());
+            if (method_exists($reflection->getName(), $method)) {
                 $key = str_replace('get', '', $method);
                 $fld_Key = self::convertKeyToColumn($key);
                 $res .= $fld_Key . ", ";

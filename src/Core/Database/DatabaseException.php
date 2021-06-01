@@ -33,7 +33,7 @@ class DatabaseException extends DatabaseUtil
 
     private static function alterTable(object $object): string
     {
-        return "";
+        return die("alter table not handled");
     }
 
     private static function insertTable(object $object): string
@@ -41,7 +41,7 @@ class DatabaseException extends DatabaseUtil
         $tablename = DatabaseManager::getTableNameByObject($object);
         $ddl = 'CREATE TABLE ' . $tablename . ' (';
         $class = new Reflection($object);
-        $properties = $class->getProperties();
+        $properties = $class->getPrimitiveProperties();
         $columns = self::parseReflectProperties($properties);
         $ddl .= $columns;
 

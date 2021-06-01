@@ -28,9 +28,18 @@ final class Reflection extends ReflectionClass
         $this->namespace = $this->getNamespaceName();
     }
 
-    public function getProperties($filter = null)
+    public function getProperties($filter = null): array
     {
         return $filter ? parent::getProperties($filter) : $this->properties;
+    }
+
+    public function getPrimitiveProperties(): array {
+        foreach($this->properties as $property) {
+            if(!$property->is_object)
+                $res[] = $property;
+        }
+
+        return $res ?? [];
     }
 
     public function isObject(): bool
