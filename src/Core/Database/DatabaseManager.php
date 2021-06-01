@@ -43,7 +43,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                 foreach($row as $key => $val) {
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key);
+                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
                     if(method_exists($object, $setVal) && $property->isObject()) {
                         $children[] = $setVal;
                     } else if (method_exists($object, $setVal)) {
@@ -52,6 +52,14 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
                 }
             }
+        }
+        foreach($reflector->getObjectProperties() as $property) {
+            $key = $property->getName();
+            $setVal = 'set' . self::processSnakeToPascal($key);
+            $child_object_name = $property->type;
+            $child_object = new $child_object_name;
+            $val = self::getRecordData($child_object, 1);
+            $object->$setVal([$val]);
         }
 
         return $object;

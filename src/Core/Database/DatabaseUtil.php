@@ -6,7 +6,6 @@ namespace Lea\Core\Database;
 
 use ArrayIterator;
 use Lea\Core\Reflection\Reflection;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
 use MultipleIterator;
 
 abstract class DatabaseUtil

@@ -21,7 +21,7 @@ class DatabaseException extends DatabaseUtil
     {
         switch ($e->getCode()) {
             case self::SQL_TABLE_NOT_EXISTS:
-                return self::insertTable($object);
+                return self::insertTableRecursive($object);
             case self::SQL_UNKNOWN_COLUMN:
                 return self::alterTable($object);
             case self::SQL_SYMTAMX_ERRORM:
@@ -36,14 +36,21 @@ class DatabaseException extends DatabaseUtil
         return die("alter table not handled");
     }
 
-    private static function insertTable(object $object): string
+    private static function insertTableRecursive(object $object): string
     {
         $tablename = DatabaseManager::getTableNameByObject($object);
         $ddl = 'CREATE TABLE ' . $tablename . ' (';
         $class = new Reflection($object);
-        $properties = $class->getPrimitiveProperties();
-        $columns = self::parseReflectProperties($properties);
+        $primitive = $class->getPrimitiveProperties();
+        $child_objects = $class->getObjectProperties();
+        $columns = self::parseReflectProperties($primitive);
         $ddl .= $columns;
+        if($child_objects) {
+            foreach($child_objects as $obj) {
+                $obj = new $obj->class;
+                // $ddl .= self::insertTableRecursive($obj);
+            }
+        }
 
         return $ddl;
     }

@@ -6,10 +6,8 @@ use Generator;
 use ArrayIterator;
 use ReflectionClass;
 use MultipleIterator;
-use ReflectionProperty;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
-use Lea\Module\ContractorModule\Entity\Address;
 
 abstract class Entity
 {
@@ -53,7 +51,7 @@ abstract class Entity
                 if (is_iterable($data[$key])) {
                     $children = [];
                     foreach ($data[$key] as $obj) {
-                        $ChildClass = $reflection->getNamespaceName() . '\\' . $property->type;
+                        $ChildClass = $property->type;
                         $children[] = new $ChildClass($obj);
                     }
                     $this->$setValue($children);
@@ -77,22 +75,20 @@ abstract class Entity
     {
         $res = [];
         $class = get_called_class();
-        $reflection = new ReflectionClass($class);
+        $reflection = new Reflection($class);
         foreach ($reflection->getProperties() as $property) {
             $key = $property->getName();
             $getValue = 'get' . $this->processSnakeToPascal($key);
-            if (!property_exists($class, $key))
+            if (!method_exists($class, $getValue))
                 continue;
             $val = $this->$getValue();
             $reflection = new ReflectionPropertyExtended($class, $key);
             if ($reflection->isObject()) {
                 if (is_iterable($val)) {
-                    $children = [];
                     foreach ($val as $obj) {
-                        $ChildClass = $reflection->getClassName(); #TODO raczej nie działa
-                        $children[] = new $ChildClass($obj);
+                        $recursive_res[] = $obj->get();
                     }
-                    $res[$key] = $this->$getValue($children);
+                    $res[$key] = $recursive_res;
                 }
             } else {
                 $res[$key] = $val;
