@@ -31,7 +31,13 @@ final class DatabaseConnection
             $mysqli_result = mysqli_query($connection, $query);
         } catch (mysqli_sql_exception $e) {
             $ddl = DatabaseException::handleSqlException($e, $connection, $object, $query);
-            self::executeQuery($connection, $ddl, $tableName, $columns, $object);
+            if (is_array($ddl)) {
+                foreach ($ddl as $single_query) {
+                    self::executeQuery($connection, $single_query, $tableName, $columns, $object);
+                }
+            } else {
+                self::executeQuery($connection, $ddl, $tableName, $columns, $object);
+            }
             self::executeQuery($connection, $query, $tableName, $columns, $object);
         } catch (Exception $e) {
             die("Other non-sql exception");

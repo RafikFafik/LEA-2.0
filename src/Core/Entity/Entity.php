@@ -239,4 +239,12 @@ abstract class Entity
     {
         return $this->id ? TRUE : FALSE;
     }
+
+    public function getClassName(): string
+    {
+        $tokens = explode('\\', get_class($this));
+        $class = end($tokens);
+
+        return $class;
+    }
 }

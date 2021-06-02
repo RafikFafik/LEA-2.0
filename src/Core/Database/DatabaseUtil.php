@@ -16,17 +16,33 @@ abstract class DatabaseUtil
         return sprintf('`fld_%s`', $field);
     }
 
+    protected static function convertKeyToReferencedColumn(string $field)
+    {
+        $field = self::convertKeyToColumn($field);
+
+        return rtrim($field, '`') . 'Id`';
+    }
+
     protected static function getTableNameByObject(object $object): string
     {
         $tokens = explode('\\', get_class($object));
-        $table = end($tokens);
+        $class = end($tokens);
 
+        return self::getTableNameByClass($class);
+    }
+    
+    protected static function getTableNameByClass(string $class): string
+    {
+        $tokens = explode('\\', $class);
+        $table = end($tokens);
+    
         if (substr($table, -1) == 's')
             $result = sprintf('`tbl_%ses`', strtolower($table));
         else
             $result = sprintf('`tbl_%ss`', strtolower($table));
-
+    
         return $result;
+
     }
 
     protected static function getTableColumnsByObject(object $object): string
@@ -64,7 +80,7 @@ abstract class DatabaseUtil
     {
         $tableField = str_replace('fld_', '', $tableField);
         $tableField = self::processPascalToSnake($tableField);
-        
+
         return $tableField;
     }
 
@@ -80,7 +96,8 @@ abstract class DatabaseUtil
         return $setters;
     }
 
-    protected static function getMultipleIterator(array $row, array $setters, array $reflections): ?MultipleIterator {
+    protected static function getMultipleIterator(array $row, array $setters, array $reflections): ?MultipleIterator
+    {
 
         $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
         $mi->attachIterator(new ArrayIterator($row), "ROW");

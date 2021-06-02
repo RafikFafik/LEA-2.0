@@ -65,15 +65,16 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         return $object;
     }
 
-    protected function insertRecordData(object $object, $retId = TRUE)
+    protected function insertRecordData(object $object, string $parent_class = NULL, $parent_id = NULL)
     {
-        $query = DatabaseQuery::getInsertIntoQuery($object);
+        $query = DatabaseQuery::getInsertIntoQuery($object, $parent_class, $parent_id);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
         $mysqli_result = DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $id = $this->connection->insert_id;
         $child_objects = $object->getChildObjects();
-        $this->insertIterablyObjects($child_objects, $id);
+        $class = $object->getClassName();
+        $this->insertIterablyObjects($child_objects, $class, $id);
 
         return $id;
     }
@@ -89,11 +90,11 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         return $affected_rows;
     }
 
-    private function insertIterablyObjects(iterable $iterables, int $id)
+    private function insertIterablyObjects(iterable $iterables, string $parent_class, int $parent_id)
     {
         foreach ($iterables as $iterable) {
             foreach ($iterable as $obj) {
-                $this->insertRecordData($obj);
+                $this->insertRecordData($obj, $parent_class, $parent_id);
             }
         }
     }

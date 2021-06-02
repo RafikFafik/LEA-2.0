@@ -17,7 +17,7 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getInsertIntoQuery(object $object): string
+    public static function getInsertIntoQuery(object $object, string $parent_class = NULL, int $parent_id = NULL): string
     {
         $table_name = self::getTableNameByObject($object);
         $columns = "";
@@ -41,8 +41,13 @@ final class DatabaseQuery extends DatabaseUtil
 
             $values .= $value . ', ';
         }
-        $columns = rtrim($columns, ', ');
-        $values = rtrim($values, ', ');
+        if($parent_class) {
+            $columns .= self::convertKeyToReferencedColumn($parent_class);
+            $values .= $parent_id;
+        } else {
+            $columns = rtrim($columns, ', ');
+            $values = rtrim($values, ', ');
+        }
         $query = 'INSERT INTO ' . $table_name . ' (' . $columns . ') VALUES (' . $values . ');';
 
         return $query;
