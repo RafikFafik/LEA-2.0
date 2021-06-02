@@ -41,7 +41,7 @@ final class DatabaseQuery extends DatabaseUtil
 
             $values .= $value . ', ';
         }
-        if($parent_class) {
+        if ($parent_class) {
             $columns .= self::convertKeyToReferencedColumn($parent_class);
             $values .= $parent_id;
         } else {
@@ -53,14 +53,15 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getUpdateQuery(object $object, $where_val, string $where_column): string
+    public static function getUpdateQuery(object $object, $where_val, string $where_column, $parent_where_val = NULL, string $parent_key = NULL): string
     {
         $table_name = self::getTableNameByObject($object);
         $changes = "";
-        $class = get_class($object);
         $reflection = new Reflection($object);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
+            if ($var == 'id')
+                continue;
             $getValue = 'get' . self::processSnakeToPascal($var);
             $value = $object->$getValue();
             if (is_iterable($value))
@@ -75,7 +76,11 @@ final class DatabaseQuery extends DatabaseUtil
             $changes .= self::convertKeyToColumn($var) . ' = ' . $value . ', ';
         }
         $changes = rtrim($changes, ', ');
-        $query = 'UPDATE ' . $table_name . ' SET ' . $changes . ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
+        $query = 'UPDATE ' . $table_name .
+                ' SET ' . $changes . 
+                ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
+        if($parent_where_val && $parent_key)
+            $query .= ' AND ' . self::convertKeyToColumn($parent_key). " = " . $parent_where_val;
 
         return $query;
     }

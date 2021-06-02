@@ -107,27 +107,36 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $id = $this->connection->insert_id;
         $child_objects = $object->getChildObjects();
         $class = $object->getClassName();
-        $this->insertIterablyObjects($child_objects, $class, $id);
-
+        $this->insertOrUpdateOrDeleteIterablyChildrenObjects($child_objects, $class, $id);
+        
         return $id;
     }
-
-    protected function updateData(object $object, $where_value, $where_column = "id", $debug = false)
+    
+    protected function updateData(object $object, $where_value, $where_column = "id", $parent_id = NULL, $parent_key = NULL)
     {
-        $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column);
+        $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
         DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
+        $child_objects = $object->getChildObjects();
+        if(!$child_objects)
+            return;
+        $class = $object->getClassName();
+        $id = $object->getId();
+        $this->insertOrUpdateOrDeleteIterablyChildrenObjects($child_objects, $class, $id);
 
         return $affected_rows;
     }
 
-    private function insertIterablyObjects(iterable $iterables, string $parent_class, int $parent_id)
+    private function insertOrUpdateOrDeleteIterablyChildrenObjects(iterable $iterables, string $parent_class, int $parent_id)
     {
         foreach ($iterables as $iterable) {
             foreach ($iterable as $obj) {
-                $this->insertRecordData($obj, $parent_class, $parent_id);
+                if($obj->hasId())
+                    $this->updateData($obj, $obj->getId(), "id", $parent_id, self::convertParentClassToForeignKey($parent_class));
+                else
+                    $this->insertRecordData($obj, $parent_class, $parent_id);
             }
         }
     }
