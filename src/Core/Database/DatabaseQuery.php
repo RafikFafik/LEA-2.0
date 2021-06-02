@@ -8,11 +8,11 @@ use Lea\Core\Reflection\Reflection;
 
 final class DatabaseQuery extends DatabaseUtil
 {
-    public static function getSelectRecordDataQuery(object $object, string $tableName, string $columns, $fldVal, $fldName = "id"): string
+    public static function getSelectRecordDataQuery(object $object, string $tableName, string $columns, $where_val, string $where_column = "id"): string
     {
         $query = "SELECT $columns ";
         $query .= "FROM " . $tableName . " ";
-        $query .= "WHERE " . self::convertKeyToColumn($fldName) . "='" . $fldVal . "' AND `fld_Deleted` = 0";
+        $query .= "WHERE " . self::convertKeyToColumn($where_column) . "='" . $where_val . "' AND `fld_Deleted` = 0";
 
         return $query;
     }

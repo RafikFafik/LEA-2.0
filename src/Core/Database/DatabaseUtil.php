@@ -10,13 +10,20 @@ use MultipleIterator;
 
 abstract class DatabaseUtil
 {
-    protected static function convertKeyToColumn(string $field)
+    protected static function convertKeyToColumn(string $field): string
     {
         $field = str_replace(' ', '', ucwords(str_replace('_', ' ', $field)));
         return sprintf('`fld_%s`', $field);
     }
 
-    protected static function convertKeyToReferencedColumn(string $field)
+    protected static function convertParentClassToForeignKey(string $class): string
+    {
+        $key = self::processPascalToSnake($class);
+    
+        return $key . '_id';
+    }
+
+    protected static function convertKeyToReferencedColumn(string $field): string
     {
         $field = self::convertKeyToColumn($field);
 

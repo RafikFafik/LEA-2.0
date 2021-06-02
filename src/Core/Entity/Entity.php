@@ -4,7 +4,6 @@ namespace Lea\Core\Entity;
 
 use Generator;
 use ArrayIterator;
-use ReflectionClass;
 use MultipleIterator;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
@@ -77,6 +76,7 @@ abstract class Entity
         $class = get_called_class();
         $reflection = new Reflection($class);
         foreach ($reflection->getProperties() as $property) {
+            $recursive_res = [];
             $key = $property->getName();
             $getValue = 'get' . $this->processSnakeToPascal($key);
             if (!method_exists($class, $getValue))

@@ -58,11 +58,44 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
             $setVal = 'set' . self::processSnakeToPascal($key);
             $child_object_name = $property->type;
             $child_object = new $child_object_name;
-            $val = self::getRecordData($child_object, 1);
-            $object->$setVal([$val]);
+            /* TODO - Currently - Get Record by record -> Get multiple records at once */
+            $children_objects = self::getRecordsData($child_object, $object->getId(), self::convertParentClassToForeignKey($object->getClassName()));
+            $object->$setVal($children_objects);
         }
 
         return $object;
+    }
+
+    protected static function getRecordsData(object $object, $where_value, $where_column): array
+    {
+        $connection = DatabaseConnection::establishDatabaseConnection();
+        $tableName = self::getTableNameByObject($object);
+        // $columns = self::getTableColumnsByObject($object);
+        $reflector = new Reflection($object);
+        $columns = self::getTableColumnsByReflector($reflector);
+        $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
+
+        $result = DatabaseConnection::executeQuery($connection, $query, $tableName, $columns, $object);
+        if ($result) {
+            $Class = get_class($object);
+            while ($row = mysqli_fetch_assoc($result)) {
+                $object = new $Class;
+                foreach($row as $key => $val) {
+                    $key = self::convertToKey($key);
+                    $setVal = 'set' . self::processSnakeToPascal($key);
+                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
+                    if(method_exists($object, $setVal) && $property->isObject()) {
+                        $children[] = $setVal; /* TODO - Nested Objects */
+                    } else if (method_exists($object, $setVal)) {
+                        $object->$setVal($val);
+                    }
+
+                }
+                $objects[] = $object;
+            }
+        }
+
+        return $objects ?? [];
     }
 
     protected function insertRecordData(object $object, string $parent_class = NULL, $parent_id = NULL)
