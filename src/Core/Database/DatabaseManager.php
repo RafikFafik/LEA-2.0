@@ -20,7 +20,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     {
         $this->tableName = self::getTableNameByObject($object);
         if (!isset($this->connection))
-            $this->connection = DatabaseConnection::establishDatabaseConnection();
+            $this->connection = self::establishDatabaseConnection();
     }
 
     public function setUser($uid)
@@ -30,14 +30,14 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
     protected static function getRecordData(object $object, $where_value, $where_column = "id", $debug = false)
     {
-        $connection = DatabaseConnection::establishDatabaseConnection();
+        $connection = self::establishDatabaseConnection();
         $tableName = self::getTableNameByObject($object);
         // $columns = self::getTableColumnsByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
         $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
 
-        $result = DatabaseConnection::executeQuery($connection, $query, $tableName, $columns, $object);
+        $result = self::executeQuery($connection, $query, $tableName, $columns, $object);
         if ($result) {
             if ($row = mysqli_fetch_assoc($result)) {
                 foreach($row as $key => $val) {
@@ -68,14 +68,14 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
     protected static function getRecordsData(object $object, $where_value, $where_column): array
     {
-        $connection = DatabaseConnection::establishDatabaseConnection();
+        $connection = self::establishDatabaseConnection();
         $tableName = self::getTableNameByObject($object);
         // $columns = self::getTableColumnsByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
         $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
 
-        $result = DatabaseConnection::executeQuery($connection, $query, $tableName, $columns, $object);
+        $result = self::executeQuery($connection, $query, $tableName, $columns, $object);
         if ($result) {
             $Class = get_class($object);
             while ($row = mysqli_fetch_assoc($result)) {
@@ -103,7 +103,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getInsertIntoQuery($object, $parent_class, $parent_id);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
-        $mysqli_result = DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        $mysqli_result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $id = $this->connection->insert_id;
         $child_objects = $object->getChildObjects();
         $class = $object->getClassName();
@@ -117,7 +117,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
-        DatabaseConnection::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
         $child_objects = $object->getChildObjects();
         if(!$child_objects)

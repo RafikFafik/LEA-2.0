@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use ArrayIterator;
-use Lea\Core\Reflection\Reflection;
 use MultipleIterator;
+use Lea\Core\Reflection\Reflection;
+use Lea\Core\Database\DatabaseConnection;
 
-abstract class DatabaseUtil
+abstract class DatabaseUtil extends DatabaseConnection
 {
     protected static function convertKeyToColumn(string $field): string
     {

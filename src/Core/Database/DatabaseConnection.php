@@ -8,10 +8,11 @@ use Exception;
 use mysqli;
 use mysqli_sql_exception;
 
-final class DatabaseConnection
+abstract class DatabaseConnection
 {
     public $uid = 0;
-    public static function establishDatabaseConnection(): mysqli
+
+    protected static function establishDatabaseConnection(): mysqli
     {
         $connection = new mysqli($_ENV['DB_HOST'], $_ENV['DB_USER'], $_ENV['DB_PASSWORD'], $_ENV['DB_DATABASE']);
         if (!$connection) {
@@ -25,7 +26,7 @@ final class DatabaseConnection
         return $connection;
     }
 
-    public static function executeQuery($connection, string $query, string $tableName, string $columns, object $object) // PHP8: mysqli_result|bool
+    protected static function executeQuery($connection, string $query, string $tableName, string $columns, object $object) // PHP8: mysqli_result|bool
     {
         try {
             $mysqli_result = mysqli_query($connection, $query);

@@ -6,7 +6,6 @@ namespace Lea\Module\OfferModule\Entity;
 
 use Lea\Core\Entity\Entity;
 
-
 class Offer extends Entity
 {
     protected $offer_number = 0;
