@@ -4,7 +4,9 @@ namespace Lea\Module\OfferModule\Controller;
 
 use Lea\Request\Request;
 use Lea\Response\Response;
+use Lea\Module\OfferModule\Entity\Offer;
 use Lea\Core\Controller\ControllerInterface;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Module\OfferModule\Repository\OfferRepository;
 
 class OfferController implements ControllerInterface
@@ -23,9 +25,13 @@ class OfferController implements ControllerInterface
     {
         switch ($this->request->method()) {
             case "GET":
-                $offerRepository = new OfferRepository();
-                $res = $offerRepository->getById($this->params['id']);
-                Response::ok($res);
+                try {
+                    $offerRepository = new OfferRepository();
+                    $res = $offerRepository->getById($this->params['id'], new Offer);
+                    Response::ok($res);
+                } catch (ResourceNotExistsException $e) {
+                    Response::badRequest();
+                }
             case "POST":
                 Response::notImplemented();
             default:

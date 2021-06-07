@@ -6,9 +6,10 @@ namespace Lea\Module\OfferModule\Repository;
 
 use Lea\Core\Repository\RepositoryInterface;
 use Lea\Core\Database\DatabaseManager;
+use Lea\Core\Repository\Repository;
 use Lea\Module\OfferModule\Entity\Offer;
 
-final class OfferRepository extends DatabaseManager implements RepositoryInterface
+final class OfferRepository extends Repository
 {
     private $entity;
 
@@ -17,22 +18,5 @@ final class OfferRepository extends DatabaseManager implements RepositoryInterfa
         $this->entity = new Offer();
         parent::__construct($this->entity);
         
-    }
-
-    public static function getById(int $id)
-    {
-        $instance = new static(new DatabaseManager(new Offer()));
-        $res = $instance->getRecordData(new Offer, $id);
-
-        return $res;
-    }
-
-    public function save(object $object)
-    {
-        $this->db->insertRecordData($object);
-    }
-
-    public function update(): void
-    {
     }
 }

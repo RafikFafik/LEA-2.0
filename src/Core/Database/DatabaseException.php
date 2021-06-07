@@ -18,6 +18,7 @@ class DatabaseException extends DatabaseUtil
     const SQL_SYMTAMX_ERRORM = 1064;
     const SQL_MISSING_DEFAULT_VALUE = 1364;
     const SQL_FOREIGN_KEY_COHESION = 1451;
+    const SQL_INCORRECT_DATE_VALUE = 1292;
 
     public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query)
     {
@@ -31,6 +32,8 @@ class DatabaseException extends DatabaseUtil
                 die("TODO - Default Value failure: " . $e->getCode() . "\n" . $e->getMessage());
             case self::SQL_FOREIGN_KEY_COHESION:
                 die("Trying delete or update ROW that has REFERENCES: " . $e->getCode() . "\n" . $e->getMessage());
+            case self::SQL_INCORRECT_DATE_VALUE:
+                die("Incorrect date value: " . $e->getCode() . "\n" . $e->getMessage());
             case self::SQL_SYMTAMX_ERRORM:
                 die("Symtamx error \n $query");
             default:

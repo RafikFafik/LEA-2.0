@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Lea\Module\ContractorModule\Repository;
+namespace Lea\Module\CalendarModule\Repository;
 
 use Lea\Core\Repository\Repository;
-use Lea\Module\ContractorModule\Entity\Contractor;
+use Lea\Module\CalendarModule\Entity\Event;
 
-final class ContractorRepository extends Repository
+final class CalendarRepository extends Repository
 {
     private $entity;
 
     public function __construct(array $params)
     {
-        $this->entity = new Contractor();
+        $this->entity = new Event();
         parent::__construct($this->entity);
     }
 }

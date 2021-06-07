@@ -15,12 +15,12 @@ class Offer extends Entity
     protected $offer_number = 0;
 
     /**
-     * @var Date
+     * @var date
      */
     protected $issue_date;
 
     /**
-     * @var Date
+     * @var date
      */
     protected $expiration_date;
 
@@ -43,39 +43,17 @@ class Offer extends Entity
      * @var int
      */
     protected $price_vat;
+
+    /**
+     * @var int
+     */
     protected $price_brutto;
+
+    /**
+     * @var string
+     */
     protected $offer_file;
-    protected $number = 0;
 
-    public function getNumber(): int
-    {
-        return $this->number;
-    }
-
-    public function setNumber(string $number): void
-    {
-        $this->number = $number;
-    }
-
-    /**
-     * Get the value of price_brutto
-     */
-    public function getPriceBrutto()
-    {
-        return $this->price_brutto;
-    }
-
-    /**
-     * Set the value of price_brutto
-     *
-     * @return  self
-     */
-    public function setPriceBrutto($price_brutto)
-    {
-        $this->price_brutto = $price_brutto;
-
-        return $this;
-    }
 
     /**
      * Get the value of offer_number
@@ -93,6 +71,200 @@ class Offer extends Entity
     public function setOfferNumber($offer_number)
     {
         $this->offer_number = $offer_number;
+
+        return $this;
+    }
+
+
+
+    /**
+     * Get the value of expiration_date
+     *
+     * @return  date
+     */
+    public function getExpirationDate()
+    {
+        return $this->expiration_date;
+    }
+
+    /**
+     * Set the value of expiration_date
+     *
+     * @param  date  $expiration_date
+     *
+     * @return  self
+     */
+    public function setExpirationDate($expiration_date)
+    {
+        $this->expiration_date = $expiration_date;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of issue_date
+     *
+     * @return  date
+     */
+    public function getIssueDate()
+    {
+        return $this->issue_date;
+    }
+
+    /**
+     * Set the value of issue_date
+     *
+     * @param  date  $issue_date
+     *
+     * @return  self
+     */
+    public function setIssueDate($issue_date)
+    {
+        $this->issue_date = $issue_date;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor
+     *
+     * @return  string
+     */
+    public function getContractor()
+    {
+        return $this->contractor;
+    }
+
+    /**
+     * Set the value of contractor
+     *
+     * @param  string  $contractor
+     *
+     * @return  self
+     */
+    public function setContractor(string $contractor)
+    {
+        $this->contractor = $contractor;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contact_person
+     *
+     * @return  string
+     */
+    public function getContactPerson()
+    {
+        return $this->contact_person;
+    }
+
+    /**
+     * Set the value of contact_person
+     *
+     * @param  string  $contact_person
+     *
+     * @return  self
+     */
+    public function setContactPerson(string $contact_person)
+    {
+        $this->contact_person = $contact_person;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of price_netto
+     *
+     * @return  int
+     */
+    public function getPriceNetto()
+    {
+        return $this->price_netto;
+    }
+
+    /**
+     * Set the value of price_netto
+     *
+     * @param  int  $price_netto
+     *
+     * @return  self
+     */
+    public function setPriceNetto(int $price_netto)
+    {
+        $this->price_netto = $price_netto;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of price_vat
+     *
+     * @return  int
+     */
+    public function getPriceVat()
+    {
+        return $this->price_vat;
+    }
+
+    /**
+     * Set the value of price_vat
+     *
+     * @param  int  $price_vat
+     *
+     * @return  self
+     */
+    public function setPriceVat(int $price_vat)
+    {
+        $this->price_vat = $price_vat;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of price_brutto
+     *
+     * @return  int
+     */
+    public function getPriceBrutto()
+    {
+        return $this->price_brutto;
+    }
+
+    /**
+     * Set the value of price_brutto
+     *
+     * @param  int  $price_brutto
+     *
+     * @return  self
+     */
+    public function setPriceBrutto(int $price_brutto)
+    {
+        $this->price_brutto = $price_brutto;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of offer_file
+     *
+     * @return  string
+     */
+    public function getOfferFile()
+    {
+        return $this->offer_file;
+    }
+
+    /**
+     * Set the value of offer_file
+     *
+     * @param  string  $offer_file
+     *
+     * @return  self
+     */
+    public function setOfferFile(string $offer_file)
+    {
+        $this->offer_file = $offer_file;
 
         return $this;
     }

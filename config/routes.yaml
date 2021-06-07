@@ -30,3 +30,13 @@ ContractorModule:
     collection:
       url: "/contractors"
       controller: ContractorCollectionController
+
+CalendarModule:
+  prefix: "/calendar"
+  endpoints:
+    event:
+      url: "/calendar/events/{id}"
+      controller: EventController
+    events:
+      url: "/calendar/events"
+      controller: EventCollectionController

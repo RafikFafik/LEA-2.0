@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Lea\Module\ContractorModule\Controller;
+namespace Lea\Module\CalendarModule\Controller;
 
 use Lea\Request\Request;
 use Lea\Response\Response;
 use Lea\Core\Serializer\Normalizer;
+use Lea\Module\CalendarModule\Entity\Event;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Core\Database\DatabaseException;
+use Lea\Module\CalendarModule\Entity\Calendar;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Module\ContractorModule\Entity\Contractor;
-use Lea\Module\ContractorModule\Repository\ContractorRepository;
+use Lea\Module\CalendarModule\Repository\CalendarRepository;
 
-class ContractorController implements ControllerInterface
+class EventController implements ControllerInterface
 {
     private $request;
 
@@ -28,8 +28,8 @@ class ContractorController implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 try {
-                    $contractorRepository = new ContractorRepository($this->params);
-                    $object = $contractorRepository->getById($this->params['id'], new Contractor);
+                    $CalendarRepository = new CalendarRepository($this->params);
+                    $object = $CalendarRepository->getById($this->params['id'], new Event);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -37,19 +37,19 @@ class ContractorController implements ControllerInterface
                 }
             case "POST":
                 try {
-                    $contractorRepository = new ContractorRepository($this->params);
-                    $object = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
-                    $affected_rows = $contractorRepository->updateById($object, $this->params['id']);
+                    $CalendarRepository = new CalendarRepository($this->params);
+                    $object = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
+                    $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
+                    $object = $CalendarRepository->getById($this->params['id'], new Event);
+                    $res = Normalizer::denormalize($object);
+                    Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
                 }
 
 
 
-                $object = $contractorRepository->getById($this->params['id'], new Contractor);
-                $res = Normalizer::denormalize($object);
-                Response::ok($res);
             case "DELETE":
                 Response::notImplemented();
             default:

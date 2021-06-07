@@ -11,15 +11,22 @@ class Normalizer
     {
         $object = new $class($data);
 
-
         return $object;
     }
 
-    public static function denormalize(object $object): array 
+    public static function denormalize(object $object): array
     {
         $res = $object->get();
-        
+
         return $res;
+    }
+
+    public static function denormalizeList(iterable $list): array {
+        foreach($list as $object) {
+            $res[] = $object->get();
+        }
+
+        return $res ?? [];
     }
     // public static function normalize(array $data, object $namespace): object
     // {

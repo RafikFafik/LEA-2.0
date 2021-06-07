@@ -69,7 +69,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         return $object;
     }
 
-    protected static function getRecordsData(object $object, $where_value, $where_column): array
+    protected static function getRecordsData(object $object, $where_value = null, $where_column = 'id'): array
     {
         $connection = self::establishDatabaseConnection();
         $tableName = self::getTableNameByObject($object);
