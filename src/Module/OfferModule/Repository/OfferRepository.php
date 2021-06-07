@@ -16,6 +16,7 @@ final class OfferRepository extends DatabaseManager implements RepositoryInterfa
     {
         $this->entity = new Offer();
         parent::__construct($this->entity);
+        
     }
 
     public static function getById(int $id)

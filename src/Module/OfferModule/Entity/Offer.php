@@ -4,16 +4,44 @@ declare(strict_types=1);
 
 namespace Lea\Module\OfferModule\Entity;
 
+use DateTime;
 use Lea\Core\Entity\Entity;
 
 class Offer extends Entity
 {
+    /**
+     * @var string
+     */
     protected $offer_number = 0;
+
+    /**
+     * @var Date
+     */
     protected $issue_date;
+
+    /**
+     * @var Date
+     */
     protected $expiration_date;
+
+    /**
+     * @var string
+     */
     protected $contractor;
+
+    /**
+     * @var string
+     */
     protected $contact_person;
+
+    /**
+     * @var int
+     */
     protected $price_netto;
+
+    /**
+     * @var int
+     */
     protected $price_vat;
     protected $price_brutto;
     protected $offer_file;

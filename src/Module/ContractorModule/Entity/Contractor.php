@@ -93,7 +93,7 @@ class Contractor extends Entity
         return $this->addresses;
     }
 
-    public function setAddresses(iterable $addresses)
+    public function setAddresses($addresses)
     {
         $this->addresses = $addresses;
 
@@ -105,7 +105,7 @@ class Contractor extends Entity
         return $this->employees;
     }
 
-    public function setEmployees(iterable $employees)
+    public function setEmployees($employees)
     {
         $this->employees = $employees;
 

@@ -15,6 +15,7 @@ final class Router {
     function __construct() {
         $routes = Yaml::parseFile(__DIR__.'/../../config/routes.yaml');
         $request = new Request();
+        // TODO - Baza danych
         $endpoint = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($endpoint['module_name'], $endpoint['controller']);
         $controller = new $Controller($request, $endpoint['params']);

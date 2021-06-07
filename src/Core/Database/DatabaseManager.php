@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Database\DatabaseUtil;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
@@ -38,7 +39,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
 
         $result = self::executeQuery($connection, $query, $tableName, $columns, $object);
-        if ($result) {
+        if ($result->num_rows) {
             if ($row = mysqli_fetch_assoc($result)) {
                 foreach($row as $key => $val) {
                     $key = self::convertToKey($key);
@@ -52,6 +53,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
                 }
             }
+        } else {
+            throw new ResourceNotExistsException();
         }
         foreach($reflector->getObjectProperties() as $property) {
             $key = $property->getName();
@@ -117,7 +120,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
-        self::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
         $child_objects = $object->getChildObjects();
         if(!$child_objects)
