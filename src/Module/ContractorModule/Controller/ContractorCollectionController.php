@@ -25,9 +25,11 @@ class ContractorCollectionController implements ControllerInterface
     {
         switch ($this->request->method()) {
             case "GET":
-                // $contractorRepository = new ContractorRepository();
-                // $res = $contractorRepository->getById($this->params['id']);
-                Response::notImplemented();
+                $contractorRepository = new ContractorRepository($this->params);
+                $list = $contractorRepository->getList(new Contractor);
+                $res = Normalizer::denormalizeList($list);
+
+                Response::ok($res);
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
                 $contractor = new ContractorRepository($this->params);
@@ -35,7 +37,7 @@ class ContractorCollectionController implements ControllerInterface
 
                 // debug
                 $contractorRepository = new ContractorRepository($this->params);
-                $object = $contractorRepository->getById($resource_id);
+                $object = $contractorRepository->getById($resource_id, new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
                 // Response::noContent();
