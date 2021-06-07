@@ -6,32 +6,55 @@ use ArrayIterator;
 use Lea\Request\Request;
 use Lea\Response\Response;
 use MultipleIterator;
+use mysqli_sql_exception;
 use Symfony\Component\Yaml\Yaml;
-final class Router {
+
+final class Router
+{
 
     private $word_regex = "/{(\w+)}/";
     private $number_regex = "/{(\d+)}/";
 
-    function __construct() {
-        $routes = Yaml::parseFile(__DIR__.'/../../config/routes.yaml');
+    private const SQL_ACCESS_DENIED = 1045;
+    private const SQL_UNKNOWN_DATABASE = 1049;
+    private const SQL_UNKNOWN_HOST = 2002;
+
+    function __construct()
+    {
+        $routes = Yaml::parseFile(__DIR__ . '/../../config/routes.yaml');
         $request = new Request();
         // TODO - Baza danych
         $endpoint = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($endpoint['module_name'], $endpoint['controller']);
         $controller = new $Controller($request, $endpoint['params']);
-        $controller->init();
+        try {
+            $controller->init();
+        } catch (mysqli_sql_exception $e) {
+            switch ($e->getCode()) {
+                case self::SQL_ACCESS_DENIED:
+                    Response::internalServerError("Nie można nawiązać połączenia z bazą danych - sprawdź konfigurację");
+                case self::SQL_UNKNOWN_DATABASE:
+                    Response::internalServerError("Wskazana w konfiguracji baza danych nie istnieje");
+                case self::SQL_UNKNOWN_HOST:
+                    die("Nie można połączyć się z serwerem bazy danych - sprawdź pole host w konfiguracji");
+                default:
+                    die("SQL exception not handled: " . $e);
+            }
+        }
     }
-    
-    private function getControllerNamespace($module_name, $class_name) {
+
+    private function getControllerNamespace($module_name, $class_name)
+    {
         $namespace = 'Lea\Module\\' . $module_name . '\Controller\\' . $class_name;
 
         return $namespace;
     }
 
-    private function getEndpointByUrl(array $routes, string $url): array {
-        foreach($routes as $module_name => $module) {
+    private function getEndpointByUrl(array $routes, string $url): array
+    {
+        foreach ($routes as $module_name => $module) {
             $prefix = "/" . explode("/", $url)[1];
-            if($module['prefix'] == $prefix) {
+            if ($module['prefix'] == $prefix) {
                 $endpoint = $this->matchEndpoint($module, $url);
                 $endpoint['module_name'] = $module_name;
                 $endpoint['params'] = $this->getUrlParams($url, $endpoint['url']);
@@ -42,47 +65,51 @@ final class Router {
 
         Response::notFound();
     }
-    
-    private function matchEndpoint(array $module, string $request_url): array {
+
+    private function matchEndpoint(array $module, string $request_url): array
+    {
         // $url = $this->parseUrl($url);
-        foreach($module['endpoints'] as $endpoint) {
-            if($this->bothHaveTheSameUri($request_url, $endpoint['url']))
+        foreach ($module['endpoints'] as $endpoint) {
+            if ($this->bothHaveTheSameUri($request_url, $endpoint['url']))
                 return $endpoint;
         }
 
         Response::notFound();
     }
 
-    private function bothHaveTheSameUri(string $request_url, string $config_url): bool {
+    private function bothHaveTheSameUri(string $request_url, string $config_url): bool
+    {
         $iterator = $this->getIteratorByUrlPair($request_url, $config_url);
-        if($iterator === NULL)
+        if ($iterator === NULL)
             return FALSE;
 
-        foreach($iterator as $i) {
-            if(($i[0] === NULL) || ($i[0] !== $i[1] && preg_match($this->word_regex, $i[1]) && !is_numeric($i[0])))
+        foreach ($iterator as $i) {
+            if (($i[0] === NULL) || ($i[0] !== $i[1] && preg_match($this->word_regex, $i[1]) && !is_numeric($i[0])))
                 return FALSE;
         }
 
         return TRUE;
     }
 
-    private function getUrlParams(string $request_url, string $config_url): array {
+    private function getUrlParams(string $request_url, string $config_url): array
+    {
         $iterator = $this->getIteratorByUrlPair($request_url, $config_url);
-        
+
         $params = [];
-        foreach($iterator as $i) {
-            if($i[0] != $i[1] && preg_match($this->word_regex, $i[1]))
+        foreach ($iterator as $i) {
+            if ($i[0] != $i[1] && preg_match($this->word_regex, $i[1]))
                 $params[str_replace(["{", "}"], "", $i[1])] = (int)$i[0];
         }
 
         return $params;
     }
 
-    private function getIteratorByUrlPair(string $request_url, string $config_url): ?MultipleIterator {
+    private function getIteratorByUrlPair(string $request_url, string $config_url): ?MultipleIterator
+    {
         $request_tokens = explode("/", $request_url);
         $config_tokens = explode("/", $config_url);
 
-        if(sizeof($request_tokens) != sizeof($config_tokens))
+        if (sizeof($request_tokens) != sizeof($config_tokens))
             return NULL;
 
         $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);

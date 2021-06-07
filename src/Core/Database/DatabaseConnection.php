@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Exception;
+use Lea\Core\Exception\DatabaseAccessDeniedException;
 use mysqli;
 use mysqli_sql_exception;
 
