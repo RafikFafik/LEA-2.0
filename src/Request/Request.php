@@ -67,7 +67,7 @@ final class Request
 
     private function parseRequestPayload(): void
     {
-        switch ($_SERVER['CONTENT_TYPE']) {
+        switch ($_SERVER['CONTENT_TYPE'] ?? self::APPLICATION_JSON) {
             case self::APPLICATION_JSON:
                 $this->parseJSON();
                 break;

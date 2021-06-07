@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Lea\Response\Response;
 use Lea\Router\Router;
 use Lea\ServiceLoader;
 
 include_once(__DIR__ . '/../src/ServiceLoader.php');
 include_once(__DIR__ . '/../vendor/autoload.php');
+error_reporting(E_ALL);
 try {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
     $dotenv->load();
@@ -16,7 +16,6 @@ try {
     die("Błąd konfiguracji - skontaktuj się z administratorem");
 }
 ServiceLoader::load();
-die("After");
 if ($_ENV['DEBUG']) {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     ini_set('display_errors', 'On');
