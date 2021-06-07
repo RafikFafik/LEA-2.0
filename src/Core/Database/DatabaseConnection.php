@@ -35,12 +35,12 @@ abstract class DatabaseConnection
             $ddl = DatabaseException::handleSqlException($e, $connection, $object, $query);
             if (is_array($ddl)) {
                 foreach ($ddl as $single_query) {
-                    self::executeQuery($connection, $single_query, $tableName, $columns, $object);
+                    $mysqli_result = self::executeQuery($connection, $single_query, $tableName, $columns, $object);
                 }
             } else {
-                self::executeQuery($connection, $ddl, $tableName, $columns, $object);
+                $mysqli_result = self::executeQuery($connection, $ddl, $tableName, $columns, $object);
             }
-            self::executeQuery($connection, $query, $tableName, $columns, $object);
+            $mysqli_result = self::executeQuery($connection, $query, $tableName, $columns, $object);
         } catch (Exception $e) {
             die("Other non-sql exception");
         }
