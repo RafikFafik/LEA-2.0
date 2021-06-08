@@ -28,12 +28,17 @@ class Event extends Entity
      * @var date
      */
     private $date_end;
-
+    
     /**
      * @var string
      */
     private $time_start;
-
+    
+    /**
+     * @var string
+     */
+    private $time_end;
+    
     /**
      * @var bool
      */
@@ -63,10 +68,6 @@ class Event extends Entity
      */
     private $alerts;
 
-    /**
-     * @var string
-     */
-    private $time_end;
 
 
     /**
