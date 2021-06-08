@@ -9,6 +9,8 @@ use mysqli_sql_exception;
 use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Database\DatabaseManager;
+use Lea\Core\Reflection\ReflectionPropertyExtended;
+use ReflectionProperty;
 
 class DatabaseException extends DatabaseUtil
 {
@@ -26,8 +28,7 @@ class DatabaseException extends DatabaseUtil
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::getCreateTableQueryRecursive($object);
             case self::SQL_UNKNOWN_COLUMN:
-                die("TODO - Alter table: " . $e->getCode() . "\n" . $e->getMessage());
-                // return self::alterTable($object);
+                return self::getAlterTableQuery($object, $connection);
             case self::SQL_MISSING_DEFAULT_VALUE:
                 die("TODO - Default Value failure: " . $e->getCode() . "\n" . $e->getMessage());
             case self::SQL_FOREIGN_KEY_COHESION:
@@ -41,9 +42,28 @@ class DatabaseException extends DatabaseUtil
         }
     }
 
-    private static function alterTable(object $object): string
+    private static function getAlterTableQuery(object $object, $connection): array
     {
-        return die("alter table not handled yet");
+        $described = self::describeTable($object, $connection);
+        $table_keys = self::convertArrayToKeys($described);
+        $entity_methods = $object->getGetters();
+        $last = false;
+        foreach($entity_methods as $method) {
+            $key = self::processPascalToSnake(str_replace('get', '', $method));
+            if(in_array($key, $table_keys)) {
+                $last = $key;
+                continue;
+            }
+            $reflector = new ReflectionPropertyExtended(get_class($object), $key);
+            if($reflector->isObject())
+                continue;
+            $query = 'ALTER TABLE ' . self::getTableNameByObject($object) . ' ADD ';
+            $query .= self::parseReflectProperty($reflector);
+            $query .= $last ?  ' AFTER ' . self::convertKeyToColumn($last) . ';' : ";";
+            $queries[] = $query;
+        }
+        
+        return $queries ?? [];
     }
     
     private static function getCreateTableQueryRecursive(object $object, string $parent_table = NULL): array {
@@ -77,18 +97,24 @@ class DatabaseException extends DatabaseUtil
     {
         $columns = "";
         foreach ($properties as $property) {
-            $comment = $property->getDocComment();
-            /* TODO - DefaultValue */
-            $column_name = DatabaseManager::convertKeyToColumn($property->getName());
-            $column_properties = self::getVarTypeFromComment($comment);
-            if ($column_name == '`fld_Id`') {
-                $column_properties = $column_properties . ' NOT NULL PRIMARY KEY AUTO_INCREMENT';
-            }
-            $columns .= $column_name . " " . $column_properties . ", ";
+            $columns .= self::parseReflectProperty($property) . ", ";
         }
         $columns = rtrim($columns, ", ");
         
         return $columns;
+    }
+
+    private static function parseReflectProperty(ReflectionProperty $property): string
+    {
+        $comment = $property->getDocComment();
+        /* TODO - DefaultValue */
+        $column_name = DatabaseManager::convertKeyToColumn($property->getName());
+        $column_properties = self::getVarTypeFromComment($comment);
+        if ($column_name == '`fld_Id`') {
+            $column_properties = $column_properties . ' NOT NULL PRIMARY KEY AUTO_INCREMENT';
+        }
+        
+        return $column_name . " " . $column_properties;
     }
 
     private static function getEndBracket(): string {

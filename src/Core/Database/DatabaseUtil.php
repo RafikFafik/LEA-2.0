@@ -20,7 +20,7 @@ abstract class DatabaseUtil extends DatabaseConnection
     protected static function convertParentClassToForeignKey(string $class): string
     {
         $key = self::processPascalToSnake($class);
-    
+
         return $key . '_id';
     }
 
@@ -38,19 +38,18 @@ abstract class DatabaseUtil extends DatabaseConnection
 
         return self::getTableNameByClass($class);
     }
-    
+
     protected static function getTableNameByClass(string $class): string
     {
         $tokens = explode('\\', $class);
         $table = end($tokens);
-    
+
         if (substr($table, -1) == 's')
             $result = sprintf('`tbl_%ses`', strtolower($table));
         else
             $result = sprintf('`tbl_%ss`', strtolower($table));
-    
-        return $result;
 
+        return $result;
     }
 
     protected static function getTableColumnsByObject(object $object): string
@@ -128,5 +127,14 @@ abstract class DatabaseUtil extends DatabaseConnection
         $snake_case = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $cammelCase));
 
         return $snake_case;
+    }
+
+    protected static function convertArrayToKeys(array $table_fields): array
+    {
+        foreach ($table_fields as $field) {
+            $keys[] = self::convertToKey($field);
+        }
+
+        return $keys ?? [];
     }
 }
