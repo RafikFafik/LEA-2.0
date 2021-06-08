@@ -13,11 +13,16 @@ class Event extends Entity
      * @var string
      */
     private $type;
-    
+
     /**
      * @var string
      */
     private $title;
+
+    /**
+     * @var string
+     */
+    private $date_full;
 
     /**
      * @var date
@@ -28,17 +33,17 @@ class Event extends Entity
      * @var date
      */
     private $date_end;
-    
+
     /**
      * @var string
      */
     private $time_start;
-    
+
     /**
      * @var string
      */
     private $time_end;
-    
+
     /**
      * @var bool
      */
@@ -74,7 +79,7 @@ class Event extends Entity
      * Get the value of type
      *
      * @return  string
-     */ 
+     */
     public function getType()
     {
         return $this->type;
@@ -86,7 +91,7 @@ class Event extends Entity
      * @param  string  $type
      *
      * @return  self
-     */ 
+     */
     public function setType(string $type)
     {
         $this->type = $type;
@@ -98,7 +103,7 @@ class Event extends Entity
      * Get the value of title
      *
      * @return  string
-     */ 
+     */
     public function getTitle()
     {
         return $this->title;
@@ -110,7 +115,7 @@ class Event extends Entity
      * @param  string  $title
      *
      * @return  self
-     */ 
+     */
     public function setTitle(string $title)
     {
         $this->title = $title;
@@ -122,7 +127,31 @@ class Event extends Entity
      * Get the value of date_start
      *
      * @return  date
-     */ 
+     */
+    public function getDateFull()
+    {
+        return $this->date_full;
+    }
+
+    /**
+     * Set the value of date_start
+     *
+     * @param  date  $date_start
+     *
+     * @return  self
+     */
+    public function setDateFull($date_full)
+    {
+        $this->date_full = $date_full;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of date_start
+     *
+     * @return  date
+     */
     public function getDateStart()
     {
         return $this->date_start;
@@ -134,7 +163,7 @@ class Event extends Entity
      * @param  date  $date_start
      *
      * @return  self
-     */ 
+     */
     public function setDateStart($date_start)
     {
         $this->date_start = $date_start;
@@ -146,7 +175,7 @@ class Event extends Entity
      * Get the value of date_end
      *
      * @return  date
-     */ 
+     */
     public function getDateEnd()
     {
         return $this->date_end;
@@ -158,7 +187,7 @@ class Event extends Entity
      * @param  date  $date_end
      *
      * @return  self
-     */ 
+     */
     public function setDateEnd($date_end)
     {
         $this->date_end = $date_end;
@@ -170,7 +199,7 @@ class Event extends Entity
      * Get the value of time_start
      *
      * @return  string
-     */ 
+     */
     public function getTimeStart()
     {
         return $this->time_start;
@@ -182,7 +211,7 @@ class Event extends Entity
      * @param  string  $time_start
      *
      * @return  self
-     */ 
+     */
     public function setTimeStart(string $time_start)
     {
         $this->time_start = $time_start;
@@ -194,7 +223,7 @@ class Event extends Entity
      * Get the value of periodicity
      *
      * @return  bool
-     */ 
+     */
     public function getPeriodicity()
     {
         return $this->periodicity;
@@ -206,7 +235,7 @@ class Event extends Entity
      * @param  bool  $periodicity
      *
      * @return  self
-     */ 
+     */
     public function setPeriodicity($periodicity)
     {
         $this->periodicity = $periodicity;
@@ -218,7 +247,7 @@ class Event extends Entity
      * Get the value of periodicity_value
      *
      * @return  string
-     */ 
+     */
     public function getPeriodicityValue()
     {
         return $this->periodicity_value;
@@ -230,7 +259,7 @@ class Event extends Entity
      * @param  string  $periodicity_value
      *
      * @return  self
-     */ 
+     */
     public function setPeriodicityValue(string $periodicity_value)
     {
         $this->periodicity_value = $periodicity_value;
@@ -242,7 +271,7 @@ class Event extends Entity
      * Get the value of location
      *
      * @return  string
-     */ 
+     */
     public function getLocation()
     {
         return $this->location;
@@ -254,7 +283,7 @@ class Event extends Entity
      * @param  string  $location
      *
      * @return  self
-     */ 
+     */
     public function setLocation($location)
     {
         $this->location = $location;
@@ -266,7 +295,7 @@ class Event extends Entity
      * Get the value of description
      *
      * @return  string
-     */ 
+     */
     public function getDescription()
     {
         return $this->description;
@@ -278,7 +307,7 @@ class Event extends Entity
      * @param  string  $description
      *
      * @return  self
-     */ 
+     */
     public function setDescription($description)
     {
         $this->description = $description;
@@ -290,7 +319,7 @@ class Event extends Entity
      * Get the value of color
      *
      * @return  string
-     */ 
+     */
     public function getColor()
     {
         return $this->color;
@@ -302,7 +331,7 @@ class Event extends Entity
      * @param  string  $color
      *
      * @return  self
-     */ 
+     */
     public function setColor(string $color)
     {
         $this->color = $color;
@@ -314,7 +343,7 @@ class Event extends Entity
      * Get the value of alerts
      *
      * @return  iterable<Alerts>
-     */ 
+     */
     public function getAlerts()
     {
         return $this->alerts;
@@ -326,7 +355,7 @@ class Event extends Entity
      * @param  iterable<Alerts>  $alerts
      *
      * @return  self
-     */ 
+     */
     public function setAlerts($alerts)
     {
         $this->alerts = $alerts;
@@ -338,7 +367,7 @@ class Event extends Entity
      * Get the value of time_end
      *
      * @return  string
-     */ 
+     */
     public function getTimeEnd()
     {
         return $this->time_end;
@@ -350,7 +379,7 @@ class Event extends Entity
      * @param  string  $time_end
      *
      * @return  self
-     */ 
+     */
     public function setTimeEnd(string $time_end)
     {
         $this->time_end = $time_end;
