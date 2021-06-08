@@ -55,7 +55,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
         $tokens = explode(" ", $comment);
         $index = array_search("@var", $tokens);
 
-        $var = $tokens[$index + 1];
+        $var = trim($tokens[$index + 1]);
 
         return self::getDataType($var);
     }
