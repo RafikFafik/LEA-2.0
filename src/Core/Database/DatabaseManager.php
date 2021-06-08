@@ -135,7 +135,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     private function insertOrUpdateOrDeleteIterablyChildrenObjects(iterable $iterables, string $parent_class, int $parent_id)
     {
         foreach ($iterables as $iterable) {
-            foreach ($iterable as $obj) {
+            foreach ($iterable ?? [] as $obj) {
                 if($obj->hasId())
                     $this->updateData($obj, $obj->getId(), "id", $parent_id, self::convertParentClassToForeignKey($parent_class));
                 else

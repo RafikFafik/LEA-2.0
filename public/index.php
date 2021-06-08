@@ -14,11 +14,20 @@ try {
     http_response_code(500);
     die("Błąd konfiguracji - skontaktuj się z administratorem");
 }
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? "http://insomnia.local";
+header("Access-Control-Allow-Origin: $origin");
+header("Access-Control-Allow-Headers: Accept, Accept-Encoding, Accept-Language, Authorization, Content-Type, Cookie");
+header("Access-Control-Allow-Methods: POST, GET, DELETE, OPTIONS, PUT");
+
 ServiceLoader::load();
 if ($_ENV['DEBUG']) {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);
+    ini_set("log_errors", 'On');
+    ini_set("error_log", __DIR__ . "/../log/error.log");
+    error_log( "Hello, errors!" );
 }
 
 $router = new Router();
