@@ -123,7 +123,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
-        $this->updateProtection($object, $where_value, $where_column, $tableName);
+        $this->updateProtection($object, $where_value, $where_column, $tableName, $columns);
         $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
         $child_objects = $object->getChildObjects();
@@ -148,9 +148,9 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         }
     }
 
-    private function updateProtection($object, $where_value, $where_column): void {
+    private function updateProtection($object, $where_value, $where_column, $tableName, $columns): void {
         $query = DatabaseQuery::getCountQuery($object, $where_value, $where_column);
-        $result = self::executeQuery($this->connection, $query);
+        $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $row = mysqli_fetch_assoc($result);
         if($row['count'] == 0)
             throw new UpdatingNotExistingResource;
