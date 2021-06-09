@@ -19,7 +19,8 @@ final class CalendarRepository extends Repository
 
     public function getEventListByStartDate(string $date, object $object): iterable
     {
-
-        return [];
+        $res = self::getRecordsData($object, $date, 'date_start');
+        
+        return $res;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Controller;
 
+use Dotenv\Validator;
 use Lea\Core\Controller\Controller;
 use Lea\Response\Response;
 use Lea\Core\Serializer\Normalizer;

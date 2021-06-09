@@ -6,7 +6,7 @@ namespace Lea\Core\Controller;
 
 use Lea\Request\Request;
 use Lea\Core\Controller\ControllerInterface;
-
+use Lea\Core\Validator\Validator;
 
 abstract class Controller implements ControllerInterface
 {
@@ -16,5 +16,8 @@ abstract class Controller implements ControllerInterface
     {
         $this->request = $request;
         $this->params = $params;
+
+        if($params)
+            Validator::validateParams($params);
     }
 }

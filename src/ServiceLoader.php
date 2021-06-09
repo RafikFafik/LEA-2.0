@@ -8,9 +8,11 @@ class ServiceLoader {
         $index2 = array_search(__DIR__ . "/Core/Database/DatabaseConnection.php", $list); /* Workaround */
         $index = array_search(__DIR__ . "/Core/Database/DatabaseUtil.php", $list); /* Workaround */
         $index3 = array_search(__DIR__ . "/Core/Controller/ControllerInterface.php", $list); /* Workaround */
+        $index4 = array_search(__DIR__ . "/Core/Validator/ValidatorInterface.php", $list); /* Workaround */
         include $list[$index2]; /* Workaround */
         include $list[$index]; /* Workaround */
         include $list[$index3]; /* Workaround */
+        include $list[$index4]; /* Workaround */
         foreach ($list as $filename) {
             require_once $filename;
         }

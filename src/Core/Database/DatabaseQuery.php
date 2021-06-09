@@ -13,8 +13,12 @@ final class DatabaseQuery extends DatabaseUtil
         $query = "SELECT $columns ";
         $query .= "FROM " . $tableName . " ";
         $query .= "WHERE `fld_Deleted` = 0";
-        if($where_val)
-            $query .= ' AND ' . self::convertKeyToColumn($where_column) . ' = ' .  $where_val;
+        if($where_val) {
+            $type = gettype($where_val);
+            if($type == "string")
+                $where_val = "'" . $where_val . "'";
+            $query .=  ' AND ' . self::convertKeyToColumn($where_column) . ' = ' .  $where_val;
+        }
         $query .= ';';
 
         return $query;
