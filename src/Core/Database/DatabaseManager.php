@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Database\DatabaseUtil;
-use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Exception\ResourceNotExistsException;
+use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
@@ -90,6 +91,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                     if(method_exists($object, $setVal) && $property->isObject()) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {
+                        // TODO - Handle types
+                        // $type = $property->getType2();
                         $object->$setVal($val);
                     }
 
@@ -120,6 +123,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
+        $this->updateProtection($object, $where_value, $where_column, $tableName, $columns);
         $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
         $child_objects = $object->getChildObjects();
@@ -135,13 +139,21 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     private function insertOrUpdateOrDeleteIterablyChildrenObjects(iterable $iterables, string $parent_class, int $parent_id)
     {
         foreach ($iterables as $iterable) {
-            foreach ($iterable as $obj) {
+            foreach ($iterable ?? [] as $obj) {
                 if($obj->hasId())
                     $this->updateData($obj, $obj->getId(), "id", $parent_id, self::convertParentClassToForeignKey($parent_class));
                 else
                     $this->insertRecordData($obj, $parent_class, $parent_id);
             }
         }
+    }
+
+    private function updateProtection($object, $where_value, $where_column, $tableName, $columns): void {
+        $query = DatabaseQuery::getCountQuery($object, $where_value, $where_column);
+        $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        $row = mysqli_fetch_assoc($result);
+        if($row['count'] == 0)
+            throw new UpdatingNotExistingResource;
     }
 
     protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)

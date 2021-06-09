@@ -32,7 +32,7 @@ final class Request
     }
 
     public function getPayload(): array {
-        return $this->payload;
+        return $this->payload ?? [];
     }
 
     public function set(string $key, $value): void
