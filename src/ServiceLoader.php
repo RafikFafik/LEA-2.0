@@ -7,18 +7,20 @@ class ServiceLoader {
         $list = glob($core);
         $index2 = array_search(__DIR__ . "/Core/Database/DatabaseConnection.php", $list); /* Workaround */
         $index = array_search(__DIR__ . "/Core/Database/DatabaseUtil.php", $list); /* Workaround */
+        $index3 = array_search(__DIR__ . "/Core/Controller/ControllerInterface.php", $list); /* Workaround */
         include $list[$index2]; /* Workaround */
         include $list[$index]; /* Workaround */
+        include $list[$index3]; /* Workaround */
         foreach ($list as $filename) {
             require_once $filename;
         }
         $module = __DIR__ . "/**/**/**/*.php";
         foreach (glob($module) as $filename) {
-            include $filename;
+            require_once $filename;
         }
         $additional = __DIR__ . '/**/*.php';
         foreach (glob($additional) as $filename) {
-            include $filename;
+            require_once $filename;
         }
     }
 }

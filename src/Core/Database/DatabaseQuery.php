@@ -87,4 +87,12 @@ final class DatabaseQuery extends DatabaseUtil
 
         return $query;
     }
+
+    public static function getCountQuery(object $object, $where_val, string $where_column): string
+    {
+        $table_name = self::getTableNameByObject($object);
+        $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
+
+        return $query;
+    }
 }
