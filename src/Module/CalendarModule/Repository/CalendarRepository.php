@@ -16,4 +16,10 @@ final class CalendarRepository extends Repository
         $this->entity = new Event();
         parent::__construct($this->entity);
     }
+
+    public function getEventListByStartDate(string $date, object $object): iterable
+    {
+
+        return [];
+    }
 }

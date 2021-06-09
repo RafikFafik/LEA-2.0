@@ -2,18 +2,13 @@
 
 namespace Lea\Module\HomepageModule\Controller;
 
+use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Request\Request;
 use Lea\Response\Response;
 
-class HomepageController implements ControllerInterface
+class HomepageController extends Controller implements ControllerInterface
 {
-
-    function __construct(Request $request, $params = NULL)
-    {
-        $this->request = $request;
-    }
-
     public function init()
     {
         switch ($this->request->method()) {

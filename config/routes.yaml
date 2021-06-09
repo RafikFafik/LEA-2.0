@@ -40,3 +40,7 @@ CalendarModule:
     events:
       url: "/calendar/events"
       controller: EventCollectionController
+    daily:
+      url: "/calendar/daily"
+      params: ['date']
+      controller: "DailyScheduleController"

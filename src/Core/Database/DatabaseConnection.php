@@ -27,7 +27,7 @@ abstract class DatabaseConnection
         return $connection;
     }
 
-    protected static function executeQuery($connection, string $query, string $tableName, string $columns, object $object) // PHP8: mysqli_result|bool
+    protected static function executeQuery($connection, string $query, string $tableName = null, string $columns = null, object $object = null) // PHP8: mysqli_result|bool
     {
         try {
             $mysqli_result = mysqli_query($connection, $query);

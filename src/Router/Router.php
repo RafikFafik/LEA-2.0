@@ -3,6 +3,7 @@
 namespace Lea\Router;
 
 use ArrayIterator;
+use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Request\Request;
 use Lea\Response\Response;
 use MultipleIterator;
@@ -13,7 +14,11 @@ final class Router
 {
 
     private $word_regex = "/{(\w+)}/";
+    private $query_string_regex = "/\?(\w+)/";
     private $number_regex = "/{(\d+)}/";
+
+    private const URL = 0;
+    private const CONFIG = 1;
 
     private const SQL_ACCESS_DENIED = 1045;
     private const SQL_UNKNOWN_DATABASE = 1049;
@@ -24,9 +29,9 @@ final class Router
         $routes = Yaml::parseFile(__DIR__ . '/../../config/routes.yaml');
         $request = new Request();
         // TODO - Baza danych
-        $endpoint = $this->getEndpointByUrl($routes, $request->url());
-        $Controller = $this->getControllerNamespace($endpoint['module_name'], $endpoint['controller']);
-        $controller = new $Controller($request, $endpoint['params']);
+        $module = $this->getEndpointByUrl($routes, $request->url());
+        $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
+        $controller = new $Controller($request, $module['params']);
         try {
             $controller->init();
         } catch (mysqli_sql_exception $e) {
@@ -40,6 +45,8 @@ final class Router
                 default:
                     die("SQL exception not handled: " . $e);
             }
+        } catch (UpdatingNotExistingResource $e) {
+            Response::badRequest("Próba edycji nieistniejącego zasobu");
         }
     }
 
@@ -57,7 +64,8 @@ final class Router
             if ($module['prefix'] == $prefix) {
                 $endpoint = $this->matchEndpoint($module, $url);
                 $endpoint['module_name'] = $module_name;
-                $endpoint['params'] = $this->getUrlParams($url, $endpoint['url']);
+                $endpoint['params'] = $this->getUrlParams($url, $endpoint['url'], $endpoint['params'] ?? null);
+
 
                 return $endpoint;
             }
@@ -68,7 +76,13 @@ final class Router
 
     private function matchEndpoint(array $module, string $request_url): array
     {
-        // $url = $this->parseUrl($url);
+        /* Routing 2.0 */
+        if ($index = strpos($request_url, "?"))
+            $request_url = substr($request_url, 0, $index);
+
+
+        /* Routing 2.0 */
+
         foreach ($module['endpoints'] as $endpoint) {
             if ($this->bothHaveTheSameUri($request_url, $endpoint['url']))
                 return $endpoint;
@@ -84,14 +98,14 @@ final class Router
             return FALSE;
 
         foreach ($iterator as $i) {
-            if (($i[0] === NULL) || ($i[0] !== $i[1] && preg_match($this->word_regex, $i[1]) && !is_numeric($i[0])))
+            if (($i[0] === null || $i[1] === null) || ($i[0] !== $i[1] && (!preg_match($this->word_regex, $i[1]) || !preg_match($this->query_string_regex, $i[1])) && !is_numeric($i[0])))
                 return FALSE;
         }
 
         return TRUE;
     }
 
-    private function getUrlParams(string $request_url, string $config_url): array
+    private function getUrlParams(string $request_url, string $config_url, array $required_params = null): array
     {
         $iterator = $this->getIteratorByUrlPair($request_url, $config_url);
 
@@ -101,6 +115,25 @@ final class Router
                 $params[str_replace(["{", "}"], "", $i[1])] = (int)$i[0];
         }
 
+        if ($index = strpos($request_url, "?")) {
+            $tokens = explode("=", substr($request_url, $index + 1));
+            if (count($tokens) % 2)
+                Response::badRequest("Cos nie teges z query string parametrami. Czy aby napewno dodane są wszystkie wymagane?");
+            foreach ($required_params ?? [] as $param) {
+                if (!in_array($param, $tokens)) {
+                    $not_delivered[] = $param;
+                } else {
+                    $val = $tokens[array_search($param, $tokens) + 1];
+                    $params[$param] = $val;
+                }
+            }
+        } elseif ($required_params) {
+            Response::badRequest($required_params);
+        }
+
+        if ($not_delivered ?? false)
+            Response::badRequest($not_delivered);
+
         return $params;
     }
 
@@ -108,9 +141,6 @@ final class Router
     {
         $request_tokens = explode("/", $request_url);
         $config_tokens = explode("/", $config_url);
-
-        if (sizeof($request_tokens) != sizeof($config_tokens))
-            return NULL;
 
         $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
         $mi->attachIterator(new ArrayIterator($request_tokens), "REQUEST");

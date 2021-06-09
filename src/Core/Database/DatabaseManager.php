@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Database\DatabaseUtil;
-use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Exception\ResourceNotExistsException;
+use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
@@ -122,6 +123,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
+        $this->updateProtection($object, $where_value, $where_column, $tableName);
         $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $affected_rows = $this->connection->affected_rows;
         $child_objects = $object->getChildObjects();
@@ -144,6 +146,14 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                     $this->insertRecordData($obj, $parent_class, $parent_id);
             }
         }
+    }
+
+    private function updateProtection($object, $where_value, $where_column): void {
+        $query = DatabaseQuery::getCountQuery($object, $where_value, $where_column);
+        $result = self::executeQuery($this->connection, $query);
+        $row = mysqli_fetch_assoc($result);
+        if($row['count'] == 0)
+            throw new UpdatingNotExistingResource;
     }
 
     protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
