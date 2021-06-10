@@ -35,7 +35,7 @@ class ContractorCollectionController extends Controller implements ControllerInt
                 Response::ok($res);
                 // Response::noContent();
             case "DELETE":
-                Response::ok("Deleteing not implemented yet");
+                Response::methodNotAllowed();
             default:
                 Response::methodNotAllowed();
         }

@@ -62,6 +62,7 @@ class DatabaseException extends DatabaseUtil
             $query .= $last ?  ' AFTER ' . self::convertKeyToColumn($last) . ';' : ";";
             $queries[] = $query;
         }
+        // TODO - polish collate
         
         return $queries ?? [];
     }

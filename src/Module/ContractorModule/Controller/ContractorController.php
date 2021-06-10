@@ -33,18 +33,16 @@ class ContractorController extends Controller implements ControllerInterface
                     $contractorRepository = new ContractorRepository($this->params);
                     $object = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
                     $affected_rows = $contractorRepository->updateById($object, $this->params['id']);
-
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
                 }
-
-
-
                 $object = $contractorRepository->getById($this->params['id'], new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
             case "DELETE":
-                Response::notImplemented();
+                $contractorRepository = new ContractorRepository($this->params);
+                $contractorRepository->removeById(new Contractor, $this->params['id']);
+                Response::noContent();
             default:
                 Response::methodNotAllowed();
         }

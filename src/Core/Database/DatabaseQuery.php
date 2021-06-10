@@ -86,6 +86,7 @@ final class DatabaseQuery extends DatabaseUtil
         $query = 'UPDATE ' . $table_name .
                 ' SET ' . $changes . 
                 ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
+                // TODO - Deleted 0 - verify
         if($parent_where_val && $parent_key)
             $query .= ' AND ' . self::convertKeyToColumn($parent_key). " = " . $parent_where_val;
 
@@ -96,6 +97,14 @@ final class DatabaseQuery extends DatabaseUtil
     {
         $table_name = self::getTableNameByObject($object);
         $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
+        
+        return $query;
+    }
+    
+    public static function getSoftDeleteQuery(object $object, $where_val): string
+    {
+        $table_name = self::getTableNameByObject($object);
+        $query = 'UPDATE ' . $table_name . ' SET `fld_Deleted` = 1 WHERE `fld_Id` = ' . $where_val;
 
         return $query;
     }

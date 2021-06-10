@@ -37,4 +37,9 @@ abstract class Repository extends DatabaseManager
 
         return $res;
     }
+
+    public function removeById(object $object, int $id): void
+    {
+        $this->removeRecordData($object, $id);
+    }
 }

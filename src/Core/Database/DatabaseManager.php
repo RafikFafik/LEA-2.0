@@ -156,6 +156,15 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
             throw new UpdatingNotExistingResource;
     }
 
+    protected function removeRecordData(object $object, $where_value)
+    {
+        $query = DatabaseQuery::getSoftDeleteQuery($object, $where_value);
+        $tableName = self::getTableNameByObject($object);
+        $columns = self::getTableColumnsByObject($object);
+        $this->updateProtection($object, $where_value, 'id', $tableName, $columns);
+        $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
+    }
+
     protected function getListDataMultiCondition($tableName, $arr = array(), $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
     {
         $strToQuery = "";
@@ -364,22 +373,6 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
 
         return $resArr;
     }
-
-    function removeRecordData($tableName, $fldVal, $fldName = "id", $debug = false)
-    {
-        $query = "DELETE FROM " . $this->cfgArrDatabaseTables[$tableName] . " ";
-        $query .= "WHERE " . $this->cfgArrDatabaseInterface[$tableName][$fldName] . "='" . $this->_stringtodb($fldVal) . "'";
-        if ($debug) return $query;
-        mysqli_query($this->connection, $query);
-        if (mysqli_error($this->connection)) {
-
-            $this->handleError($tableName, $query, $fldVal);
-        }
-        $feedback = mysqli_affected_rows($this->connection);
-
-        return $feedback;
-    }
-
 
     function removeRecordDataMultiCondition($tableName, $arr, $debug = false)
     {

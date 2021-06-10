@@ -49,6 +49,9 @@ class EventController extends Controller implements ControllerInterface
 
 
             case "DELETE":
+                $eventRepository = new CalendarRepository($this->params);
+                $eventRepository->removeById(new Event(), $this->params['id']);
+                Response::noContent();
                 Response::notImplemented();
             default:
                 Response::methodNotAllowed();
