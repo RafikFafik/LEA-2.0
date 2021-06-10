@@ -78,6 +78,7 @@ class DatabaseException extends DatabaseUtil
             $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass($parent_table), $foreign_column);
         }
         $ddl .= $columns;
+        $ddl .= ') CHARACTER SET utf8 COLLATE utf8_polish_ci';
         $ddl .= self::getEndBracket();
         $queries[] = $ddl;
         if($parent_table)
@@ -118,7 +119,7 @@ class DatabaseException extends DatabaseUtil
     }
 
     private static function getEndBracket(): string {
-        return ");";
+        return ";";
     }
     
     private static function getAlterTableAddPrimaryKey(string $tablename): string 
