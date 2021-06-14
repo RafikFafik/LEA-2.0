@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lea\Module\SecurityModule\Entity;
+namespace Lea\Core\SecurityModule\Entity;
 
 use Lea\Core\Entity\Entity;
 

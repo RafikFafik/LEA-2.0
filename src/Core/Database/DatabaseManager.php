@@ -128,7 +128,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         if (!$child_objects)
             return;
         $class = $object->getClassName();
-        $id = $object->getId();
+        $id = (int)$object->getId();
         $this->insertOrUpdateOrDeleteIterablyChildrenObjects($child_objects, $class, $id);
 
         return $affected_rows;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Module\SecurityModule\Controller;
+namespace Lea\Core\SecurityModule\Controller;
 
 use Lea\Core\Controller\Controller;
 use Lea\Response\Response;

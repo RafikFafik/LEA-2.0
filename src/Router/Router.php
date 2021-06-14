@@ -10,6 +10,7 @@ use Lea\Response\Response;
 use MultipleIterator;
 use mysqli_sql_exception;
 use Symfony\Component\Yaml\Yaml;
+use TypeError;
 
 final class Router
 {
@@ -57,6 +58,8 @@ final class Router
             }
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource");
+        } catch (TypeError $e) {
+            Response::internalServerError($e->getMessage());
         }
     }
 

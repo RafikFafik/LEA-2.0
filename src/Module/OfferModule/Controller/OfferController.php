@@ -38,6 +38,16 @@ class OfferController extends Controller implements ControllerInterface
                     Response::badRequest();
                 }
                 break;
+            case "PUT":
+                try {
+                    $offerRepository = new OfferRepository($this->params);
+                    $object = Normalizer::normalize($this->request->getPayload(), Offer::getNamespace());
+                    $affected_rows = $offerRepository->updateById($object, $this->params['id']);
+                    Response::noContent();
+                } catch (ResourceNotExistsException $e) {
+                    Response::badRequest();
+                }
+                break;
             case "DELETE":
                 try {
                     $offerRepository = new OfferRepository;
