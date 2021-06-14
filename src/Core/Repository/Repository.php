@@ -23,6 +23,13 @@ abstract class Repository extends DatabaseManager
         return $res;
     }
 
+    public static function getByField(object $object, string $field_name, $field_value)
+    {
+        $res = self::getRecordData($object, $field_value, $field_name);
+
+        return $res;
+    }
+
     public function updateById(object $object, int $id)
     {
         $object->setId($id);

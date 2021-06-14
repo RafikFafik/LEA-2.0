@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Lea\Response\Response;
 use Lea\Router\Router;
 use Lea\ServiceLoader;
 
@@ -29,5 +30,9 @@ if ($_ENV['DEBUG']) {
     ini_set("error_log", __DIR__ . "/../log/error.log");
     error_log( "Hello, errors!" );
 }
+
+/* Workaround */
+if($_SERVER['REQUEST_METHOD'] === "OPTIONS")
+    Response::noContent();
 
 $router = new Router();

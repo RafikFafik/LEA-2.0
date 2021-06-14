@@ -3,6 +3,7 @@
 namespace Lea\Router;
 
 use ArrayIterator;
+use Error;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Request\Request;
 use Lea\Response\Response;
@@ -31,7 +32,16 @@ final class Router
         // TODO - Baza danych
         $module = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
-        $controller = new $Controller($request, $module['params']);
+        try {
+            $controller = new $Controller($request, $module['params']);
+        } catch(Error $e) {
+            switch($e->getCode()){
+                case 0:
+                    Response::internalServerError("Controller not found - contact with Administrator");
+                default:
+                    Response::internalServerError("Something went wrong - contact with Administrator");
+            }
+        }
         try {
             $controller->init();
         } catch (mysqli_sql_exception $e) {

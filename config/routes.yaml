@@ -30,6 +30,10 @@ ContractorModule:
     collection:
       url: "/contractors"
       controller: ContractorCollectionController
+    library-administrative-division:
+      url: "/contractors/libraries"
+      controller: LibraryAdministrativeDivisionController
+      params: ['postcode']
 
 CalendarModule:
   prefix: "/calendar"

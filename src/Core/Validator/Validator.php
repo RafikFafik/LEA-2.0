@@ -14,11 +14,15 @@ class Validator implements ValidatorInterface
                 $is_correct = self::validateDate($val);
                 if (!$is_correct)
                     Response::badRequest("Invalid date format - use yyyy-mm-dd");
-            }
-            if ($key == 'month') {
+            } elseif ($key == 'month') {
                 $is_correct = self::validateMonth($val);
                 if (!$is_correct)
                     Response::badRequest("Invalid month value - expected integrer between 1-12");
+            } elseif ($key == 'postcode') {
+                $is_correct = self::postcodeIsValid($val);
+                if (!$is_correct) {
+                    Response::badRequest("Invalid postode format - expected [xx-xxx]");
+                }
             }
         }
     }
@@ -38,10 +42,18 @@ class Validator implements ValidatorInterface
         return true;
     }
 
+    public static function postcodeIsValid(string $postcode): bool
+    {
+        if(strlen($postcode) != 6)
+            return false;
+
+        return preg_match("/\d{2}-\d{3}/", $postcode) ? true : false;
+    }
+
     public static function parseMonth(string $month): string
     {
         $month = (int)$month;
-        if($month < 10)
+        if ($month < 10)
             $month = "0" . $month;
 
         return $month;
