@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Module\CalendarModule\Repository;
 
 use Lea\Core\Repository\Repository;
+use Lea\Core\Validator\Validator;
 use Lea\Module\CalendarModule\Entity\Event;
 
 final class CalendarEventRepository extends Repository
@@ -26,6 +27,7 @@ final class CalendarEventRepository extends Repository
 
     public function findCalendarEventListByMonthAndYear(string $month, string $year): iterable
     {
+        $month = Validator::parseMonth($month);
         $constraint = $year . '-' . $month;
         $list = $this->getListDataByConstraints(new Event, ['date_start_LIKE' => $constraint]);
 
