@@ -37,16 +37,16 @@ final class Router
         } catch (mysqli_sql_exception $e) {
             switch ($e->getCode()) {
                 case self::SQL_ACCESS_DENIED:
-                    Response::internalServerError("Nie można nawiązać połączenia z bazą danych - sprawdź konfigurację");
+                    Response::internalServerError("Could not connect to database - check configuration");
                 case self::SQL_UNKNOWN_DATABASE:
-                    Response::internalServerError("Wskazana w konfiguracji baza danych nie istnieje");
+                    Response::internalServerError("The database specified in the configuration does not exist");
                 case self::SQL_UNKNOWN_HOST:
-                    die("Nie można połączyć się z serwerem bazy danych - sprawdź pole host w konfiguracji");
+                    die("Unable to connect to the database server - check the host field in the configuration");
                 default:
                     die("SQL exception not handled: " . $e);
             }
         } catch (UpdatingNotExistingResource $e) {
-            Response::badRequest("Próba edycji nieistniejącego zasobu");
+            Response::badRequest("Attempt to edit a non-existent resource");
         }
     }
 
