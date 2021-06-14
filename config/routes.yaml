@@ -44,3 +44,7 @@ CalendarModule:
       url: "/calendar/daily"
       params: ['date']
       controller: "DailyScheduleController"
+    monthly:
+      url: "/calendar/monthly"
+      params: ['month', 'year']
+      controller: "MonthlyScheduleController"

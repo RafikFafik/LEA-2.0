@@ -7,7 +7,7 @@ namespace Lea\Module\CalendarModule\Repository;
 use Lea\Core\Repository\Repository;
 use Lea\Module\CalendarModule\Entity\Event;
 
-final class CalendarRepository extends Repository
+final class CalendarEventRepository extends Repository
 {
     private $entity;
 
@@ -17,10 +17,18 @@ final class CalendarRepository extends Repository
         parent::__construct($this->entity);
     }
 
-    public function getEventListByStartDate(string $date, object $object): iterable
+    public function findCalendarEventListByStartDate(string $date, object $object): iterable
     {
         $res = self::getRecordsData($object, $date, 'date_start');
-        
+
         return $res;
+    }
+
+    public function findCalendarEventListByMonthAndYear(string $month, string $year): iterable
+    {
+        $constraint = $year . '-' . $month;
+        $list = $this->getListDataByConstraints(new Event, ['date_start_LIKE' => $constraint]);
+
+        return $list;
     }
 }

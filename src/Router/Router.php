@@ -109,32 +109,33 @@ final class Router
     {
         $iterator = $this->getIteratorByUrlPair($request_url, $config_url);
 
-        $params = [];
+        $resource_params = [];
         foreach ($iterator as $i) {
             if ($i[0] != $i[1] && preg_match($this->word_regex, $i[1]))
-                $params[str_replace(["{", "}"], "", $i[1])] = (int)$i[0];
+                $resource_params[str_replace(["{", "}"], "", $i[1])] = (int)$i[0];
         }
 
         if ($index = strpos($request_url, "?")) {
-            $tokens = explode("=", substr($request_url, $index + 1));
-            if (count($tokens) % 2)
-                Response::badRequest("Cos nie teges z query string parametrami. Czy aby napewno dodane są wszystkie wymagane?");
+            $keyvals = explode("&", substr($request_url, $index + 1));
+            foreach($keyvals as $keyval) {
+                if(!$index = strpos($keyval, "="))
+                    Response::badRequest("Incorrect parameter pair: $keyval");
+                $key = substr($keyval, 0, $index);
+                $val = substr($keyval, $index + 1);
+                $query_string_params[$key] = $val;
+            }
             foreach ($required_params ?? [] as $param) {
-                if (!in_array($param, $tokens)) {
+                if (!array_key_exists($param, $query_string_params))
                     $not_delivered[] = $param;
-                } else {
-                    $val = $tokens[array_search($param, $tokens) + 1];
-                    $params[$param] = $val;
-                }
             }
         } elseif ($required_params) {
             Response::badRequest($required_params);
         }
 
         if ($not_delivered ?? false)
-            Response::badRequest($not_delivered);
+            Response::badRequest(['Missed query string params' => $not_delivered]);
 
-        return $params;
+        return array_merge($resource_params, $query_string_params ?? []);
     }
 
     private function getIteratorByUrlPair(string $request_url, string $config_url): ?MultipleIterator

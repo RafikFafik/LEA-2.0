@@ -190,7 +190,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setPriceNetto(int $price_netto)
+    public function setPriceNetto($price_netto)
     {
         $this->price_netto = $price_netto;
 
@@ -214,7 +214,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setPriceVat(int $price_vat)
+    public function setPriceVat($price_vat)
     {
         $this->price_vat = $price_vat;
 
@@ -238,7 +238,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setPriceBrutto(int $price_brutto)
+    public function setPriceBrutto($price_brutto)
     {
         $this->price_brutto = $price_brutto;
 

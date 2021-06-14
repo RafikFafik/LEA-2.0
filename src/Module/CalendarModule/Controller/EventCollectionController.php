@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Lea\Module\CalendarModule\Controller;
 
 use Lea\Core\Controller\Controller;
-use Lea\Request\Request;
 use Lea\Response\Response;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Module\CalendarModule\Entity\Event;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Module\CalendarModule\Repository\CalendarRepository;
+use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
 class EventCollectionController extends Controller implements ControllerInterface
 {
@@ -18,19 +17,19 @@ class EventCollectionController extends Controller implements ControllerInterfac
     {
         switch ($this->request->method()) {
             case "GET":
-                $CalendarRepository = new CalendarRepository($this->params);
-                $list = $CalendarRepository->getList(new Event);
+                $CalendarEventRepository = new CalendarEventRepository($this->params);
+                $list = $CalendarEventRepository->getList(new Event);
                 $res = Normalizer::denormalizeList($list);
 
                 Response::ok($res);
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
-                $Calendar = new CalendarRepository($this->params);
+                $Calendar = new CalendarEventRepository($this->params);
                 $resource_id = $Calendar->save($data);
 
                 // debug
-                $CalendarRepository = new CalendarRepository($this->params);
-                $object = $CalendarRepository->getById($resource_id, new Event);
+                $CalendarEventRepository = new CalendarEventRepository($this->params);
+                $object = $CalendarEventRepository->getById($resource_id, new Event);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
                 // Response::noContent();

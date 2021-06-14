@@ -28,6 +28,7 @@ class ContractorController extends Controller implements ControllerInterface
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
                 }
+                break;
             case "POST":
                 try {
                     $contractorRepository = new ContractorRepository($this->params);
@@ -39,10 +40,12 @@ class ContractorController extends Controller implements ControllerInterface
                 $object = $contractorRepository->getById($this->params['id'], new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
+                break;
             case "DELETE":
                 $contractorRepository = new ContractorRepository($this->params);
                 $contractorRepository->removeById(new Contractor, $this->params['id']);
                 Response::noContent();
+                break;
             default:
                 Response::methodNotAllowed();
         }

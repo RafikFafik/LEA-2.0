@@ -33,7 +33,7 @@ abstract class Entity
 
     public function hasKey(string $key): bool
     {
-        return $this->$key ? TRUE : FALSE;
+        return property_exists($this, $key);
     }
 
     public function set(array $data): void

@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Controller;
 
-use Lea\Core\Controller\Controller;
-use Lea\Request\Request;
 use Lea\Response\Response;
+use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Module\CalendarModule\Entity\Event;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Module\CalendarModule\Entity\Calendar;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
-use Lea\Module\CalendarModule\Repository\CalendarRepository;
+use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
 class EventController extends Controller implements ControllerInterface
 {
@@ -22,7 +20,7 @@ class EventController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 try {
-                    $CalendarRepository = new CalendarRepository($this->params);
+                    $CalendarRepository = new CalendarEventRepository($this->params);
                     $object = $CalendarRepository->getById($this->params['id'], new Event);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
@@ -31,7 +29,7 @@ class EventController extends Controller implements ControllerInterface
                 }
             case "POST":
                 try {
-                    $CalendarRepository = new CalendarRepository($this->params);
+                    $CalendarRepository = new CalendarEventRepository($this->params);
                     $object = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
@@ -49,7 +47,7 @@ class EventController extends Controller implements ControllerInterface
 
 
             case "DELETE":
-                $eventRepository = new CalendarRepository($this->params);
+                $eventRepository = new CalendarEventRepository($this->params);
                 $eventRepository->removeById(new Event(), $this->params['id']);
                 Response::noContent();
                 Response::notImplemented();

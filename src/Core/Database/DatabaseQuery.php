@@ -8,18 +8,37 @@ use Lea\Core\Reflection\Reflection;
 
 final class DatabaseQuery extends DatabaseUtil
 {
-    public static function getSelectRecordDataQuery(object $object, string $tableName, string $columns, $where_val = null, string $where_column = "id"): string
+    public static function getSelectRecordDataQuery(object $object, string $tableName, string $columns, $where_val = null, $where_column = "id"): string
     {
         $query = "SELECT $columns ";
         $query .= "FROM " . $tableName . " ";
         $query .= "WHERE `fld_Deleted` = 0";
-        if($where_val) {
+        if ($where_val) {
             $type = gettype($where_val);
-            if($type == "string")
+            if ($type == "string")
                 $where_val = "'" . $where_val . "'";
-            $query .=  ' AND ' . self::convertKeyToColumn($where_column) . ' = ' .  $where_val;
+            if ($where_column)
+                $query .=  ' AND ' . self::convertKeyToColumn($where_column) . ' = ' .  $where_val;
         }
-        $query .= ';';
+        if($where_column)
+            $query .= ';';
+
+        return $query;
+    }
+
+    public static function getQueryWithConstraints(object $object, string $columns, array $constraints): string
+    {
+        $table_name = self::getTableNameByObject($object);
+        $query = self::getSelectRecordDataQuery($object, $table_name, $columns, null, null);
+        foreach ($constraints as $key => $val) {
+            if (str_contains($key, "_IN") && $object->hasKey(substr($key, 0, strpos($key, "_IN")))) {
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
+            } elseif (str_contains($key, "_LIKE") && $object->hasKey(substr($key, 0, strpos($key, "_LIKE")))) {
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
+            } elseif ($object->hasKey($key)) {
+                $query .= " AND " . self::convertKeyToColumn($key) . "='" . $val . "'";
+            }
+        }
 
         return $query;
     }
@@ -84,11 +103,11 @@ final class DatabaseQuery extends DatabaseUtil
         }
         $changes = rtrim($changes, ', ');
         $query = 'UPDATE ' . $table_name .
-                ' SET ' . $changes . 
-                ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
-                // TODO - Deleted 0 - verify
-        if($parent_where_val && $parent_key)
-            $query .= ' AND ' . self::convertKeyToColumn($parent_key). " = " . $parent_where_val;
+            ' SET ' . $changes .
+            ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
+        // TODO - Deleted 0 - verify
+        if ($parent_where_val && $parent_key)
+            $query .= ' AND ' . self::convertKeyToColumn($parent_key) . " = " . $parent_where_val;
 
         return $query;
     }
@@ -97,10 +116,10 @@ final class DatabaseQuery extends DatabaseUtil
     {
         $table_name = self::getTableNameByObject($object);
         $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
-        
+        $query .= ' AND `fld_Deleted` = 0';
         return $query;
     }
-    
+
     public static function getSoftDeleteQuery(object $object, $where_val): string
     {
         $table_name = self::getTableNameByObject($object);
