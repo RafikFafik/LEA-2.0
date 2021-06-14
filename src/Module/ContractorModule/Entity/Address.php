@@ -36,6 +36,26 @@ class Address extends Entity
     /**
      * @var string
      */
+    private $postcode;
+
+    /**
+     * @var string
+     */
+    private $district;
+
+    /**
+     * @var string
+     */
+    private $commune;
+
+    /**
+     * @var string
+     */
+    private $comment;
+
+    /**
+     * @var string
+     */
     private $country;
 
 
@@ -57,7 +77,7 @@ class Address extends Entity
         return $this->address;
     }
 
-    public function setAddress(string $address)
+    public function setAddress($address)
     {
         $this->address = $address;
 
@@ -69,7 +89,7 @@ class Address extends Entity
         return $this->city;
     }
 
-    public function setCity(string $city)
+    public function setCity($city)
     {
         $this->city = $city;
 
@@ -81,7 +101,7 @@ class Address extends Entity
         return $this->citycode;
     }
 
-    public function setCitycode(string $citycode)
+    public function setCitycode($citycode)
     {
         $this->citycode = $citycode;
 
@@ -93,7 +113,7 @@ class Address extends Entity
         return $this->voivodeship;
     }
 
-    public function setVoivodeship(string $voivodeship)
+    public function setVoivodeship($voivodeship)
     {
         $this->voivodeship = $voivodeship;
 
@@ -105,9 +125,105 @@ class Address extends Entity
         return $this->country;
     }
 
-    public function setCountry(string $country)
+    public function setCountry($country)
     {
         $this->country = $country;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of postcode
+     *
+     * @return  string
+     */ 
+    public function getPostcode()
+    {
+        return $this->postcode;
+    }
+
+    /**
+     * Set the value of postcode
+     *
+     * @param  string  $postcode
+     *
+     * @return  self
+     */ 
+    public function setPostcode($postcode)
+    {
+        $this->postcode = $postcode;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of district
+     *
+     * @return  string
+     */ 
+    public function getDistrict()
+    {
+        return $this->district;
+    }
+
+    /**
+     * Set the value of district
+     *
+     * @param  string  $district
+     *
+     * @return  self
+     */ 
+    public function setDistrict($district)
+    {
+        $this->district = $district;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of commune
+     *
+     * @return  string
+     */ 
+    public function getCommune()
+    {
+        return $this->commune;
+    }
+
+    /**
+     * Set the value of commune
+     *
+     * @param  string  $commune
+     *
+     * @return  self
+     */ 
+    public function setCommune($commune)
+    {
+        $this->commune = $commune;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of comment
+     *
+     * @return  string
+     */ 
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * Set the value of comment
+     *
+     * @param  string  $comment
+     *
+     * @return  self
+     */ 
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
 
         return $this;
     }

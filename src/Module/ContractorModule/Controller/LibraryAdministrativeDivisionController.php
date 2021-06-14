@@ -25,7 +25,7 @@ class LibraryAdministrativeDivisionController extends Controller implements Cont
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
-                    Response::badRequest("");
+                    Response::badRequest();
                 }
                 break;
             default:
