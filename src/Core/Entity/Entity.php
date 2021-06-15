@@ -70,7 +70,7 @@ abstract class Entity
         return $mi;
     }
 
-    public function get(): array
+    public function get(array $specific_fields = null): array
     {
         $res = [];
         $class = get_called_class();

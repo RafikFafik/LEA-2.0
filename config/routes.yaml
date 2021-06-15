@@ -34,6 +34,9 @@ ContractorModule:
             url: "/contractors/libraries"
             controller: LibraryAdministrativeDivisionController
             params: ["postcode"]
+        nutshell:
+            url: "/contractors/nutshell"
+            controller: ContractorNutshellCollectionController
 
 CalendarModule:
     prefix: "/calendar"

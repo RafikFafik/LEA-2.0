@@ -21,6 +21,15 @@ class Normalizer
         return $res;
     }
 
+    public static function denormalizeSpecificFields(object $object, array $needles): array
+    {
+        $res = $object->get();
+
+        return $res;
+    }
+
+
+
     public static function denormalizeList(iterable $list): array {
         foreach($list as $object) {
             $res[] = $object->get();
@@ -28,16 +37,18 @@ class Normalizer
 
         return $res ?? [];
     }
-    // public static function normalize(array $data, object $namespace): object
-    // {
-    //     $ret = [];
-    //     foreach ($data as $key => $el) {
-    //         if (is_array($el))
-    //             $ret[$key] = self::normalize($el, $namespace);
-    //         else if (is_object($el))
-    //             $ret[$key] = array_merge($el->get(), self::normalize($el, $namespace));
-    //         else
-    //             $ret[$key] = $el;
-    //     }
-    // }
+  
+    public static function filterSpecificFieldsFromArrayList(array $haystack, array $needles): array {
+        foreach($haystack as $key => $val) {
+            // if(in_array($key, $to_get)
+                // $res[$key] = 
+        }
+
+        return [];
+    }
+
+    public static function mapKeyOfArrayList(array $haystack, string $seek, $to_replace)
+    {
+
+    }
 }
