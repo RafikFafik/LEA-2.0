@@ -70,6 +70,11 @@ class Event extends Entity
     private $color;
 
     /**
+     * @var int
+     */
+    private $contractor;
+
+    /**
      * @var iterable<Alert>
      */
     private $alerts;
@@ -412,6 +417,30 @@ class Event extends Entity
     public function setEmployees($employees)
     {
         $this->employees = $employees;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor
+     *
+     * @return  int
+     */ 
+    public function getContractor()
+    {
+        return $this->contractor;
+    }
+
+    /**
+     * Set the value of contractor
+     *
+     * @param  int  $contractor
+     *
+     * @return  self
+     */ 
+    public function setContractor(int $contractor)
+    {
+        $this->contractor = $contractor;
 
         return $this;
     }
