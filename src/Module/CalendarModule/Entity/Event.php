@@ -6,6 +6,7 @@ namespace Lea\Module\CalendarModule\Entity;
 
 use Lea\Core\Entity\Entity;
 use Lea\Module\CalendarModule\Entity\Alert;
+use Lea\Module\ContractorModule\Entity\Sloppy;
 
 class Event extends Entity
 {
@@ -73,6 +74,10 @@ class Event extends Entity
      */
     private $alerts;
 
+    /**
+     * @var iterable<Sloppy>
+     */
+    private $employees;
 
 
     /**
@@ -383,6 +388,30 @@ class Event extends Entity
     public function setTimeEnd(string $time_end)
     {
         $this->time_end = $time_end;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of employees
+     *
+     * @return  iterable<Sloppy>
+     */ 
+    public function getEmployees()
+    {
+        return $this->employees;
+    }
+
+    /**
+     * Set the value of employees
+     *
+     * @param  iterable<Sloppy>  $employees
+     *
+     * @return  self
+     */ 
+    public function setEmployees($employees)
+    {
+        $this->employees = $employees;
 
         return $this;
     }
