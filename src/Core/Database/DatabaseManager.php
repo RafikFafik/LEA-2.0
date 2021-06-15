@@ -49,7 +49,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                     if (method_exists($object, $setVal) && $property->isObject()) {
                         $children[] = $setVal;
                     } else if (method_exists($object, $setVal)) {
-                        $object->$setVal($val);
+                        $type = $property->getType2();
+                        $object->$setVal(self::castVariable($val, $type));
                     }
                 }
             }
@@ -90,9 +91,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                     if (method_exists($object, $setVal) && $property->isObject()) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {
-                        // TODO - Handle types
-                        // $type = $property->getType2();
-                        $object->$setVal($val);
+                        $type = $property->getType2();
+                        $object->$setVal(self::castVariable($val, $type));
                     }
                 }
                 $objects[] = $object;
@@ -128,7 +128,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         if (!$child_objects)
             return;
         $class = $object->getClassName();
-        $id = (int)$object->getId();
+        $id = $object->getId();
         $this->insertOrUpdateOrDeleteIterablyChildrenObjects($child_objects, $class, $id);
 
         return $affected_rows;
@@ -151,8 +151,9 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getCountQuery($object, $where_value, $where_column);
         $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
         $row = mysqli_fetch_assoc($result);
+        $table = $object->getClassName();
         if ($row['count'] == 0)
-            throw new UpdatingNotExistingResource;
+            throw new UpdatingNotExistingResource("Table: $table");
     }
 
     protected function removeRecordData(object $object, $where_value)

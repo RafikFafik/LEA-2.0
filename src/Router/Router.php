@@ -57,7 +57,7 @@ final class Router
                     die("SQL exception not handled: " . $e);
             }
         } catch (UpdatingNotExistingResource $e) {
-            Response::badRequest("Attempt to edit a non-existent resource");
+            Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
             Response::internalServerError($e->getMessage());
         }

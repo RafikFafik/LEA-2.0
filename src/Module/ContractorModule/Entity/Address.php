@@ -65,7 +65,7 @@ class Address extends Entity
     }
 
 
-    public function setIsDefault($is_default)
+    public function setIsDefault(bool $is_default)
     {
         $this->is_default = $is_default;
 
