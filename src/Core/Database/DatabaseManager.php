@@ -186,10 +186,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                     if (method_exists($object, $setVal) && $property->isObject()) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {
-                        // TODO - Handle types
-                        // $type = $property->getType2();
-                        $object->$setVal($val);
-                    }
+                        $type = $property->getType2();
+                        $object->$setVal(self::castVariable($val, $type));                    }
                 }
                 $objects[] = $object;
             }
