@@ -30,7 +30,7 @@ class ContractorCollectionController extends Controller implements ControllerInt
 
                 // debug
                 $contractorRepository = new ContractorRepository($this->params);
-                $object = $contractorRepository->getById($resource_id, new Contractor);
+                $object = $contractorRepository->findById($resource_id, new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
                 // Response::noContent();

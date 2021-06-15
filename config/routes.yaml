@@ -1,54 +1,61 @@
 HomepageModule:
-  prefix: "/"
-  endpoints:
-    homepage:
-      url: "/"
-      controller: HomepageController
-      methods:
-        - GET
+    prefix: "/"
+    endpoints:
+        homepage:
+            url: "/"
+            controller: HomepageController
+            methods:
+                - GET
 
 #modules
 OfferModule:
-  prefix: "/offers"
-  endpoints:
-    by-id:
-      url: "/offers/{id}"
-      controller: OfferController
-    collection:
-      url: "/offers"
-      controller: OfferCollectionController
-    submit:
-      url: "/offers/confirm"
-      controller: OfferConfirmController
+    prefix: "/offers"
+    endpoints:
+        by-id:
+            url: "/offers/{id}"
+            controller: OfferController
+        collection:
+            url: "/offers"
+            controller: OfferCollectionController
+        submit:
+            url: "/offers/confirm"
+            controller: OfferConfirmController
 
 ContractorModule:
-  prefix: "/contractors"
-  endpoints:
-    by-id:
-      url: "/contractors/{id}"
-      controller: ContractorController
-    collection:
-      url: "/contractors"
-      controller: ContractorCollectionController
-    library-administrative-division:
-      url: "/contractors/libraries"
-      controller: LibraryAdministrativeDivisionController
-      params: ['postcode']
+    prefix: "/contractors"
+    endpoints:
+        by-id:
+            url: "/contractors/{id}"
+            controller: ContractorController
+        collection:
+            url: "/contractors"
+            controller: ContractorCollectionController
+        library-administrative-division:
+            url: "/contractors/libraries"
+            controller: LibraryAdministrativeDivisionController
+            params: ["postcode"]
 
 CalendarModule:
-  prefix: "/calendar"
-  endpoints:
-    event:
-      url: "/calendar/events/{id}"
-      controller: EventController
-    events:
-      url: "/calendar/events"
-      controller: EventCollectionController
-    daily:
-      url: "/calendar/daily"
-      params: ['date']
-      controller: "DailyScheduleController"
-    monthly:
-      url: "/calendar/monthly"
-      params: ['month', 'year']
-      controller: "MonthlyScheduleController"
+    prefix: "/calendar"
+    endpoints:
+        event:
+            url: "/calendar/events/{id}"
+            controller: EventController
+        events:
+            url: "/calendar/events"
+            controller: EventCollectionController
+        daily:
+            url: "/calendar/daily"
+            params: ["date"]
+            controller: "DailyScheduleController"
+        monthly:
+            url: "/calendar/monthly"
+            params: ["month", "year"]
+            controller: "MonthlyScheduleController"
+
+Security:
+    prefix: "/security"
+    endpoints:
+        login:
+            url: "/security/login"
+            controller: LoginController

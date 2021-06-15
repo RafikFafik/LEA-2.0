@@ -29,7 +29,7 @@ class EventCollectionController extends Controller implements ControllerInterfac
 
                 // debug
                 $CalendarEventRepository = new CalendarEventRepository($this->params);
-                $object = $CalendarEventRepository->getById($resource_id, new Event);
+                $object = $CalendarEventRepository->findById($resource_id, new Event);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
                 // Response::noContent();

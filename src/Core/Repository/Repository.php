@@ -16,7 +16,7 @@ abstract class Repository extends DatabaseManager
         return $id;
     }
 
-    public static function getById(int $id, object $object)
+    public static function findById(int $id, object $object)
     {
         $res = self::getRecordData($object, $id);
 

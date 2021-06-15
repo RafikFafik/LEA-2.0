@@ -19,7 +19,7 @@ class OfferController extends Controller implements ControllerInterface
             case "GET":
                 try {
                     $offerRepository = new OfferRepository();
-                    $object = $offerRepository->getById($this->params['id'], new Offer);
+                    $object = $offerRepository->findById($this->params['id'], new Offer);
                     $result = Normalizer::denormalize($object);
                     Response::ok($result);
                 } catch (ResourceNotExistsException $e) {

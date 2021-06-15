@@ -24,7 +24,7 @@ class OfferCollectionController extends Controller implements ControllerInterfac
                 $object = Normalizer::normalize($this->request->getPayload(), Offer::getNamespace());
                 $offer_repository = new OfferRepository();
                 $id = $offer_repository->save($object);
-                $res = $offer_repository->getById($id, new Offer);
+                $res = $offer_repository->findById($id, new Offer);
                 $res = Normalizer::denormalize($res);
                 Response::ok($res);
             default:

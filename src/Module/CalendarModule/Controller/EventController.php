@@ -21,7 +21,7 @@ class EventController extends Controller implements ControllerInterface
             case "GET":
                 try {
                     $CalendarRepository = new CalendarEventRepository($this->params);
-                    $object = $CalendarRepository->getById($this->params['id'], new Event);
+                    $object = $CalendarRepository->findById($this->params['id'], new Event);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -33,7 +33,7 @@ class EventController extends Controller implements ControllerInterface
                     $object = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
-                    $object = $CalendarRepository->getById($this->params['id'], new Event);
+                    $object = $CalendarRepository->findById($this->params['id'], new Event);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -49,7 +49,7 @@ class EventController extends Controller implements ControllerInterface
                     $object = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
-                    $object = $CalendarRepository->getById($this->params['id'], new Event);
+                    $object = $CalendarRepository->findById($this->params['id'], new Event);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {

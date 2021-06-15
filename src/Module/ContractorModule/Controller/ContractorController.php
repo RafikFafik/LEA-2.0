@@ -22,7 +22,7 @@ class ContractorController extends Controller implements ControllerInterface
             case "GET":
                 try {
                     $contractorRepository = new ContractorRepository($this->params);
-                    $object = $contractorRepository->getById($this->params['id'], new Contractor);
+                    $object = $contractorRepository->findById($this->params['id'], new Contractor);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -37,7 +37,7 @@ class ContractorController extends Controller implements ControllerInterface
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
                 }
-                $object = $contractorRepository->getById($this->params['id'], new Contractor);
+                $object = $contractorRepository->findById($this->params['id'], new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
                 break;
@@ -49,7 +49,7 @@ class ContractorController extends Controller implements ControllerInterface
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
                 }
-                $object = $contractorRepository->getById($this->params['id'], new Contractor);
+                $object = $contractorRepository->findById($this->params['id'], new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);
                 break;
