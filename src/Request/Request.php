@@ -72,7 +72,7 @@ final class Request
                 $this->parseJSON();
                 break;
             default:
-                $this->payload = $_POST;
+                $this->parsePOST();
         }
     }
 
@@ -80,5 +80,16 @@ final class Request
     {
         $json = file_get_contents('php://input');
         $this->payload = json_decode($json, TRUE);
+    }
+
+    private function parsePOST(): void
+    {
+        foreach($_POST as $key => $val) {
+            $parsed = $array = json_decode($val, true);
+            if(is_array($parsed))
+                $this->payload[$key] = $array;
+            else
+                $this->payload[$key] = $val;
+        }
     }
 }
