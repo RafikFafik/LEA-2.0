@@ -8,7 +8,7 @@ use Lea\Response\Response;
 use Lea\Core\Service\ServiceInterface;
 use Lea\Core\Security\Repository\UserRepository;
 
-class AuthenticationService implements ServiceInterface
+abstract class AuthenticationService implements ServiceInterface
 {
     public function __construct()
     {
@@ -18,18 +18,9 @@ class AuthenticationService implements ServiceInterface
         $this->cipher = $_ENV['CIPHER'];
     }
 
-    public function login(string $email, string $password): array
-    {
-        $user = UserRepository::findByEmail($email);
-        if(!password_verify($password, $user->getPassword()))
-            throw new InvalidCredentialsException();
-        $uid = $user->getId();
-        $token = $this->generateJWT($email, $uid);
 
-        return ['token' => $token];
-    }
 
-    private function generateJWT(string $email, int $uid): string
+    protected function generateJWT(string $email, int $uid): string
     {
         $exp = 20; // In minutes
         $payload = [
@@ -56,7 +47,7 @@ class AuthenticationService implements ServiceInterface
         return $front . $encrypted;
     }
 
-    private function getRandomString(int $len)
+    protected function getRandomString(int $len)
     {
         $total_characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randomString = '';
@@ -67,7 +58,7 @@ class AuthenticationService implements ServiceInterface
         return $randomString;
     }
 
-    private function secureEncrypt(string $to_encrypt): string
+    protected function secureEncrypt(string $to_encrypt): string
     {
         $encrypted = openssl_encrypt($to_encrypt, $this->cipher, $this->key, $options = 0, $this->encryption_iv);
 

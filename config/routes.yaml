@@ -44,6 +44,7 @@ CalendarModule:
         event:
             url: "/calendar/events/{id}"
             controller: EventController
+            allow: [user, admin]
         events:
             url: "/calendar/events"
             controller: EventCollectionController

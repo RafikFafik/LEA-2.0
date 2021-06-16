@@ -34,7 +34,7 @@ final class Router
         $module = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
         try {
-            $controller = new $Controller($request, $module['params']);
+            $controller = new $Controller($request, $module['params'], $module['allow'] ?? []);
         } catch(Error $e) {
             switch($e->getCode()){
                 case 0:

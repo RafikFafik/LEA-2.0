@@ -6,8 +6,10 @@ use Lea\Core\Controller\Controller;
 use Lea\Response\Response;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\InvalidCredentialsException;
+use Lea\Core\Exception\InvalidDotEnvConfigurationException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Module\Security\Service\AuthenticationService;
+use Lea\Module\Security\Service\LoginService;
 
 class LoginController extends Controller implements ControllerInterface
 {
@@ -16,7 +18,7 @@ class LoginController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "POST":
                 try {
-                    $auth = new AuthenticationService;
+                    $auth = new LoginService;
                     $token = $auth->login($this->request->payload['email'], $this->request->payload['password']);
                     Response::ok($token);
                 } catch (ResourceNotExistsException $e) {
