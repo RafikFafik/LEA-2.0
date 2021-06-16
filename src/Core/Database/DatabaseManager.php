@@ -95,9 +95,19 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                         $object->$setVal(self::castVariable($val, $type));
                     }
                 }
+                foreach ($reflector->getObjectProperties() as $property) {
+                    $key = $property->getName();
+                    $setVal = 'set' . self::processSnakeToPascal($key);
+                    $child_object_name = $property->type;
+                    $child_object = new $child_object_name;
+                    /* TODO - Currently - Get Record by record -> Get multiple records at once */
+                    $children_objects = self::getRecordsData($child_object, $object->getId(), self::convertParentClassToForeignKey($object->getClassName()));
+                    $object->$setVal($children_objects);
+                }
                 $objects[] = $object;
             }
         }
+
 
         return $objects ?? [];
     }
@@ -187,7 +197,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {
                         $type = $property->getType2();
-                        $object->$setVal(self::castVariable($val, $type));                    }
+                        $object->$setVal(self::castVariable($val, $type));
+                    }
                 }
                 $objects[] = $object;
             }
