@@ -34,6 +34,7 @@ class User extends Entity
 
     /**
      * @var int
+     * @references Role
      */
     private $role_id;
 

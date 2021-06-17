@@ -63,3 +63,15 @@ Security:
         login:
             url: "/security/login"
             controller: LoginController
+        roles:
+            url: "/security/roles"
+            controller: RoleCollectionController
+        role:
+            url: "/security/roles/{id}"
+            controller: RoleController
+        users:
+            url: "/security/users"
+            controller: UserCollectionController
+        user:
+            url: "/security/users/{id}"
+            controller: UserController

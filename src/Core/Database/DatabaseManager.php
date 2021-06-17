@@ -43,6 +43,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         if ($result->num_rows) {
             if ($row = mysqli_fetch_assoc($result)) {
                 foreach ($row as $key => $val) {
+                    if ($val === null)
+                        continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
                     $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
@@ -85,6 +87,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
             while ($row = mysqli_fetch_assoc($result)) {
                 $object = new $Class;
                 foreach ($row as $key => $val) {
+                    if ($val === null)
+                        continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
                     $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
