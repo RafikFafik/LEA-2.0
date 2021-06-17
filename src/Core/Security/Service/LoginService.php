@@ -8,6 +8,7 @@ use Lea\Response\Response;
 use Lea\Core\Service\ServiceInterface;
 use Lea\Core\Security\Repository\UserRepository;
 use Lea\Core\Exception\InvalidCredentialsException;
+use NameDay;
 
 class LoginService extends AuthenticationService implements ServiceInterface
 {
@@ -18,7 +19,16 @@ class LoginService extends AuthenticationService implements ServiceInterface
             throw new InvalidCredentialsException();
         $uid = $user->getId();
         $token = $this->generateJWT($email, $uid);
+        $userdata = [
+            'name' => $user->getName(),
+            'surname' => $user->getSurname(),
+            'token' => $token,
+            'dzis_obchodzimy_imieniny' => [
+                NameDay::getNameDay()
+            ]
 
-        return ['token' => $token];
+        ];
+
+        return $userdata;
     }
 }
