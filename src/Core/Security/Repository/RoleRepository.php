@@ -11,9 +11,4 @@ final class RoleRepository extends Repository
 {
     private $entity;
 
-    public function __construct(array $params)
-    {
-        $this->entity = new Contractor();
-        parent::__construct($this->entity);
-    }
 }

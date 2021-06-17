@@ -22,7 +22,7 @@ abstract class AuthenticationService implements ServiceInterface
 
     protected function generateJWT(string $email, int $uid): string
     {
-        $exp = 20; // In minutes
+        $exp = 200; // In minutes
         $payload = [
             "iss" => $_ENV['TENANT'], /* Issuer */
             "aud" => $email, /* Receiver */

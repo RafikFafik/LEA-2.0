@@ -7,7 +7,7 @@ namespace Lea\Module\Security\Controller;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
-use Lea\Core\SecurityModule\Entity\Role;
+use Lea\Core\Security\Entity\Role;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Security\Repository\RoleRepository;
 use Lea\Core\Exception\ResourceNotExistsException;

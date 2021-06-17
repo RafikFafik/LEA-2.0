@@ -6,6 +6,7 @@ namespace Lea\Core\Controller;
 
 use Lea\Request\Request;
 use Lea\Core\Controller\ControllerInterface;
+use Lea\Core\Database\DatabaseConnection;
 use Lea\Core\SecurityModule\Entity\User;
 use Lea\Core\Validator\Validator;
 use Lea\Module\Security\Service\TokenVerificationService;
@@ -20,13 +21,13 @@ abstract class Controller implements ControllerInterface
         $this->params = $params;
         $this->allow = $allow;
 
-        if($params)
+        if ($params)
             Validator::validateParams($params);
 
-        if($allow) {
-            $auth = new TokenVerificationService();
-            $auth->authorize();
-            $this->user = new User();
-        }
+        if (in_array("all", $allow))
+            return;
+        $auth = new TokenVerificationService();
+        DatabaseConnection::establishDatabaseConnection();
+        $this->user = $auth->authorize();
     }
 }

@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Lea\Core\SecurityModule\Entity;
+namespace Lea\Core\Security\Entity;
 
 use Lea\Core\Entity\Entity;
 
 class User extends Entity
 {
+    public static $user;
+    
     /**
      * @var string
      */

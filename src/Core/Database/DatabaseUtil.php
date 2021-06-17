@@ -7,7 +7,6 @@ namespace Lea\Core\Database;
 use ArrayIterator;
 use MultipleIterator;
 use Lea\Core\Reflection\Reflection;
-use Lea\Core\Database\DatabaseConnection;
 
 abstract class DatabaseUtil extends DatabaseConnection
 {

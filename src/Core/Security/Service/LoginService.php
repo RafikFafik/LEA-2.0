@@ -10,7 +10,7 @@ use Lea\Core\Security\Repository\UserRepository;
 use Lea\Core\Exception\InvalidCredentialsException;
 use NameDay;
 
-class LoginService extends AuthenticationService implements ServiceInterface
+final class LoginService extends AuthenticationService implements ServiceInterface
 {
     public function login(string $email, string $password): array
     {
