@@ -7,13 +7,13 @@ namespace Lea\Module\CalendarModule\Controller;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
-use Lea\Module\CalendarModule\Entity\Event;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
+use Lea\Module\CalendarModule\Entity\CalendarEvent;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
-class EventController extends Controller implements ControllerInterface
+class CalendarEventController extends Controller implements ControllerInterface
 {
     public function init()
     {
@@ -21,7 +21,7 @@ class EventController extends Controller implements ControllerInterface
             case "GET":
                 try {
                     $CalendarRepository = new CalendarEventRepository($this->params);
-                    $object = $CalendarRepository->findById($this->params['id'], new Event);
+                    $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -30,10 +30,10 @@ class EventController extends Controller implements ControllerInterface
             case "POST":
                 try {
                     $CalendarRepository = new CalendarEventRepository($this->params);
-                    $object = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
+                    $object = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
-                    $object = $CalendarRepository->findById($this->params['id'], new Event);
+                    $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -46,10 +46,10 @@ class EventController extends Controller implements ControllerInterface
             case "PUT":
                 try {
                     $CalendarRepository = new CalendarEventRepository($this->params);
-                    $object = Normalizer::normalize($this->request->getPayload(), Event::getNamespace());
+                    $object = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
-                    $object = $CalendarRepository->findById($this->params['id'], new Event);
+                    $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
@@ -61,7 +61,7 @@ class EventController extends Controller implements ControllerInterface
                 }
             case "DELETE":
                 $eventRepository = new CalendarEventRepository($this->params);
-                $eventRepository->removeById(new Event(), $this->params['id']);
+                $eventRepository->removeById(new CalendarEvent(), $this->params['id']);
                 Response::noContent();
                 Response::notImplemented();
             default:

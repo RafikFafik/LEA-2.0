@@ -34,6 +34,11 @@ abstract class DatabaseConnection
         return self::$connection;
     }
 
+    public static function getInsertId()
+    {
+        return self::$connection->insert_id;
+    }
+
     protected static function executeQuery(string $query, string $tableName = null, string $columns = null, object $object = null) // PHP8: mysqli_result|bool
     {
         try {

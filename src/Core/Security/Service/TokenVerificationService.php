@@ -26,15 +26,13 @@ class TokenVerificationService extends AuthenticationService implements ServiceI
 
         try {
             $decoded = (array)JWT::decode($TOKEN, $this->key, array('HS256'));
-            /* Sprawdzenie, czy należy wygenerować nowy TOKEN */
             $credentials = $this->getCredentialsFromToken($decoded);
             $user = UserRepository::findById($credentials['uid'], new User);
             $fresh_token = $this->generateJWT($credentials['email'], $credentials['uid']);
             Header("Authorization: Bearer $fresh_token");
             Header("Access-Control-Expose-Headers: Authorization");
-            /* UID używany do dalszej weryfikacji w systemie */
-            $this->uid = $credentials['uid'];
-            // $this->db->setUser($credentials['uid']); /* Używane do logowania operacji na bazie wykonywanych przez konkretnego USER'a */
+            $user->setToken($fresh_token);
+            $repository = new UserRepository();
         } catch (Exception $e) {
             Response::unauthorized();
         }

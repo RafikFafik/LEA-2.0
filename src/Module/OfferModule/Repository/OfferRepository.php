@@ -11,12 +11,4 @@ use Lea\Module\OfferModule\Entity\Offer;
 
 final class OfferRepository extends Repository
 {
-    private $entity;
-
-    public function __construct()
-    {
-        $this->entity = new Offer();
-        parent::__construct($this->entity);
-        
-    }
 }

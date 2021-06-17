@@ -43,11 +43,11 @@ CalendarModule:
     endpoints:
         event:
             url: "/calendar/events/{id}"
-            controller: EventController
+            controller: CalendarEventController
             allow: [user, admin]
         events:
             url: "/calendar/events"
-            controller: EventCollectionController
+            controller: CalendarEventCollectionController
         daily:
             url: "/calendar/daily"
             params: ["date"]

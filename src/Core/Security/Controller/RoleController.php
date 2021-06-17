@@ -29,17 +29,6 @@ class RoleController extends Controller implements ControllerInterface
                 }
                 break;
             case "POST":
-                try {
-                    $repository = new RoleRepository($this->params);
-                    $object = Normalizer::normalize($this->request->getPayload(), Role::getNamespace());
-                    $affected_rows = $repository->updateById($object, $this->params['id']);
-                } catch (ResourceNotExistsException $e) {
-                    Response::badRequest();
-                }
-                $object = $repository->findById($this->params['id'], new Role);
-                $result = Normalizer::denormalize($object);
-                Response::ok($result);
-                break;
             case "PUT":
                 try {
                     $repository = new RoleRepository($this->params);
@@ -54,7 +43,7 @@ class RoleController extends Controller implements ControllerInterface
                 break;
             case "DELETE":
                 $repository = new RoleRepository($this->params);
-                $repository->removeById(new Role, $this->params['id']);
+                $repository->removeById($this->params['id']);
                 Response::noContent();
                 break;
             default:

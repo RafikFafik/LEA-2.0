@@ -4,23 +4,26 @@ namespace Lea\Core\Repository;
 
 use Lea\Core\Database\DatabaseManager;
 use Lea\Module\OfferModule\Entity\Offer;
+use Lea\Response\Response;
 
 abstract class Repository extends DatabaseManager
 {
-    public function __construct()
+    public function __construct(object $object = null)
     {
-        $this->object = $this->getEntityName();
+        $this->object = self::getRepositoryObject();
+        if($object && $object->getNamespace() != $this->object)
+            Response::internalServerError("Object doesn't match repository");
         $user = "xdd";
-        parent::__construct(new $this->object, $user);
+        parent::__construct($this->object, $user);
     }
 
-    private function getEntityName(): string
+    private static function getRepositoryObject(): object
     {
         $namespace = get_called_class();
         $namespace = str_replace("\Repository", "\Entity", $namespace);
         $namespace = str_replace("Repository", "", $namespace);
 
-        return $namespace;
+        return new $namespace;
     }
 
     public function save(object $object)
@@ -36,7 +39,6 @@ abstract class Repository extends DatabaseManager
     public static function findById(int $id, object $object)
     {
         $res = self::getRecordData($object, $id);
-
         return $res;
     }
 
@@ -55,15 +57,15 @@ abstract class Repository extends DatabaseManager
         return $affected_rows;
     }
 
-    public static function getList(object $object)
+    public static function getList()
     {
-        $res = self::getRecordsData($object);
+        $result = self::getRecordsData(self::getRepositoryObject());
 
-        return $res;
+        return $result;
     }
 
-    public function removeById(object $object, int $id): void
+    public function removeById(int $id): void
     {
-        $this->removeRecordData($object, $id);
+        $this->removeRecordData($this->object, $id);
     }
 }

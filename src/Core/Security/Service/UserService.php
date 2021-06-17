@@ -3,7 +3,7 @@
 namespace Lea\Module\Security\Service;
 
 use Lea\Core\Service\ServiceInterface;
-use Lea\Core\SecurityModule\Entity\User;
+use Lea\Core\Security\Entity\User;
 
 final class AuthorizedUserService implements ServiceInterface
 {

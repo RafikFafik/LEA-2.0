@@ -8,7 +8,7 @@ use Lea\Core\Entity\Entity;
 use Lea\Module\CalendarModule\Entity\Alert;
 use Lea\Module\ContractorModule\Entity\Sloppy;
 
-class Event extends Entity
+class CalendarEvent extends Entity
 {
     /**
      * @var string

@@ -4,20 +4,13 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Repository;
 
-use Lea\Core\Repository\Repository;
 use Lea\Core\Validator\Validator;
+use Lea\Core\Repository\Repository;
 use Lea\Module\CalendarModule\Entity\Event;
+use Lea\Module\CalendarModule\Entity\CalendarEvent;
 
 final class CalendarEventRepository extends Repository
 {
-    private $entity;
-
-    public function __construct(array $params)
-    {
-        $this->entity = new Event();
-        parent::__construct($this->entity);
-    }
-
     public function findCalendarEventListByStartDate(string $date, object $object): iterable
     {
         $res = self::getRecordsData($object, $date, 'date_start');
@@ -29,7 +22,7 @@ final class CalendarEventRepository extends Repository
     {
         $month = Validator::parseMonth($month);
         $constraint = $year . '-' . $month;
-        $list = $this->getListDataByConstraints(new Event, ['date_start_LIKE' => $constraint]);
+        $list = $this->getListDataByConstraints(new CalendarEvent, ['date_start_LIKE' => $constraint]);
 
         return $list;
     }

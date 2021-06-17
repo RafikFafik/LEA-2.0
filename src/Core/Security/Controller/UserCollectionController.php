@@ -7,7 +7,7 @@ namespace Lea\Module\Security\Controller;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
-use Lea\Core\SecurityModule\Entity\User;
+use Lea\Core\Security\Entity\User;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Security\Repository\UserRepository;
 
@@ -17,8 +17,8 @@ final class UserCollectionController extends Controller implements ControllerInt
     {
         switch ($this->request->method()) {
             case "GET":
-                $repository = new UserRepository($this->params);
-                $list = $repository->getList(new User);
+                $repository = new UserRepository();
+                $list = $repository->getList();
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
             case "POST":

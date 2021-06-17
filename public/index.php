@@ -28,7 +28,9 @@ if ($_ENV['DEBUG']) {
     error_reporting(E_ALL);
     ini_set("log_errors", 'On');
     ini_set("error_log", __DIR__ . "/../log/error.log");
-    error_log( "Hello, errors!" );
+    error_log( "Hello, errors!", 500,  __DIR__ . "/../log/error.log");
+} else {
+    ini_set('display_errors', 'Off');
 }
 
 /* Workaround */
