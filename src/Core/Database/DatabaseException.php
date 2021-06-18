@@ -95,7 +95,7 @@ class DatabaseException extends DatabaseUtil
         $child_objects = $class->getObjectProperties();
         foreach($child_objects as $obj) {
             $parent = $object->getClassName();
-            $obj = new $obj->type;
+            $obj = new $obj->getType2(); /* CHECKPOINT */
             $children_queries = array_merge($children_queries ?? [], self::getCreateTableQueryRecursive($obj, $parent));
         }
         $queries = array_merge($queries, $children_queries ?? []);

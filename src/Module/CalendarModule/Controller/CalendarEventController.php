@@ -20,7 +20,7 @@ class CalendarEventController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 try {
-                    $CalendarRepository = new CalendarEventRepository($this->params);
+                    $CalendarRepository = new CalendarEventRepository;
                     $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
@@ -28,24 +28,9 @@ class CalendarEventController extends Controller implements ControllerInterface
                     Response::badRequest();
                 }
             case "POST":
-                try {
-                    $CalendarRepository = new CalendarEventRepository($this->params);
-                    $object = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
-                    $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
-
-                    $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
-                    $res = Normalizer::denormalize($object);
-                    Response::ok($res);
-                } catch (ResourceNotExistsException $e) {
-                    Response::badRequest("Brak zasobu");
-                } catch (UpdatingNotExistingResource $e) {
-                    Response::badRequest("Próba aktualizacji nieistniejącego zasobu");
-                } finally {
-                    Response::badRequest("Coś zawiodło");
-                }
             case "PUT":
                 try {
-                    $CalendarRepository = new CalendarEventRepository($this->params);
+                    $CalendarRepository = new CalendarEventRepository;
                     $object = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
@@ -60,8 +45,8 @@ class CalendarEventController extends Controller implements ControllerInterface
                     Response::badRequest("Coś zawiodło");
                 }
             case "DELETE":
-                $eventRepository = new CalendarEventRepository($this->params);
-                $eventRepository->removeById(new CalendarEvent(), $this->params['id']);
+                $eventRepository = new CalendarEventRepository;
+                $eventRepository->removeById($this->params['id']);
                 Response::noContent();
                 Response::notImplemented();
             default:

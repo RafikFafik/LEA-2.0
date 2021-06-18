@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Entity;
 
+use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
 use Lea\Module\CalendarModule\Entity\Alert;
 use Lea\Module\ContractorModule\Entity\Sloppy;
@@ -26,12 +27,12 @@ class CalendarEvent extends Entity
     private $date_full;
 
     /**
-     * @var date
+     * @var Date
      */
     private $date_start;
 
     /**
-     * @var date
+     * @var Date
      */
     private $date_end;
 
@@ -146,11 +147,11 @@ class CalendarEvent extends Entity
     /**
      * Set the value of date_start
      *
-     * @param  date  $date_start
+     * @param  string  $date_start
      *
      * @return  self
      */
-    public function setDateFull($date_full)
+    public function setDateFull(String $date_full)
     {
         $this->date_full = $date_full;
 
@@ -174,7 +175,7 @@ class CalendarEvent extends Entity
      *
      * @return  self
      */
-    public function setDateStart($date_start)
+    public function setDateStart(Date $date_start)
     {
         $this->date_start = $date_start;
 
@@ -194,11 +195,11 @@ class CalendarEvent extends Entity
     /**
      * Set the value of date_end
      *
-     * @param  date  $date_end
+     * @param  Date  $date_end
      *
      * @return  self
      */
-    public function setDateEnd($date_end)
+    public function setDateEnd(Date $date_end)
     {
         $this->date_end = $date_end;
 

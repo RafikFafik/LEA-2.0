@@ -17,7 +17,7 @@ class MonthlyScheduleController extends Controller implements ControllerInterfac
     {
         switch ($this->request->method()) {
             case "GET":
-                $event_repository = new CalendarEventRepository($this->params);
+                $event_repository = new CalendarEventRepository;
                 $list = $event_repository->findCalendarEventListByMonthAndYear($this->params['month'], $this->params['year']);
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);

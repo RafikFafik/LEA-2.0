@@ -17,18 +17,18 @@ class CalendarEventCollectionController extends Controller implements Controller
     {
         switch ($this->request->method()) {
             case "GET":
-                $CalendarEventRepository = new CalendarEventRepository($this->params);
-                $list = $CalendarEventRepository->getList(new CalendarEvent);
+                $repository = new CalendarEventRepository;
+                $list = $repository->getList(new CalendarEvent);
                 $res = Normalizer::denormalizeList($list);
 
                 Response::ok($res);
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
-                $Calendar = new CalendarEventRepository($this->params);
+                $Calendar = new CalendarEventRepository;
                 $resource_id = $Calendar->save($data);
 
                 // debug
-                $CalendarEventRepository = new CalendarEventRepository($this->params);
+                $CalendarEventRepository = new CalendarEventRepository;
                 $object = $CalendarEventRepository->findById($resource_id, new CalendarEvent);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);

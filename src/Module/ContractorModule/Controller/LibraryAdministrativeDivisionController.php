@@ -20,7 +20,7 @@ class LibraryAdministrativeDivisionController extends Controller implements Cont
         switch ($this->request->method()) {
             case "GET":
                 try {
-                    $repository = new LibraryAdministrativeDivisionRepository($this->params);
+                    $repository = new LibraryAdministrativeDivisionRepository;
                     $object = $repository->getByField(new LibraryAdministrativeDivision, 'postcode', $this->params['postcode']);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
