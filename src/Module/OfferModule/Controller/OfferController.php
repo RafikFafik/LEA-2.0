@@ -30,7 +30,7 @@ class OfferController extends Controller implements ControllerInterface
                 break;
             case "POST":
                 try {
-                    $offerRepository = new OfferRepository($this->params);
+                    $offerRepository = new OfferRepository();
                     $object = Normalizer::normalize($this->request->getPayload(), Offer::getNamespace());
                     $affected_rows = $offerRepository->updateById($object, $this->params['id']);
                     Response::noContent();
@@ -40,7 +40,7 @@ class OfferController extends Controller implements ControllerInterface
                 break;
             case "PUT":
                 try {
-                    $offerRepository = new OfferRepository($this->params);
+                    $offerRepository = new OfferRepository();
                     $object = Normalizer::normalize($this->request->getPayload(), Offer::getNamespace());
                     $affected_rows = $offerRepository->updateById($object, $this->params['id']);
                     Response::noContent();
@@ -50,8 +50,8 @@ class OfferController extends Controller implements ControllerInterface
                 break;
             case "DELETE":
                 try {
-                    $offerRepository = new OfferRepository;
-                    $offerRepository->removeById(new Offer, $this->params['id']);
+                    $offerRepository = new OfferRepository();
+                    $offerRepository->removeById($this->params['id']);
                     Response::noContent();
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();

@@ -48,7 +48,6 @@ final class DatabaseQuery extends DatabaseUtil
         $table_name = self::getTableNameByObject($object);
         $columns = "";
         $values = "";
-        $class = get_class($object);
         $reflection = new Reflection($object);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
@@ -60,7 +59,7 @@ final class DatabaseQuery extends DatabaseUtil
                 continue;
             $columns .= self::convertKeyToColumn($var) . ', ';
 
-            if (gettype($value) == "string")
+            if (gettype($value) == "string" || $property->getType2() == "Date")
                 $value = "'" . $value . "'";
             elseif (gettype($value) == "boolean")
                 $value = (int)$value;
@@ -94,7 +93,7 @@ final class DatabaseQuery extends DatabaseUtil
                 continue;
             if ($value === NULL)
                 continue;
-            if (gettype($value) == "string")
+            if (gettype($value) == "string" || $property->getType2() == "Date")
                 $value = "'" . $value . "'";
             elseif (gettype($value) == "boolean")
                 $value = (int)$value;

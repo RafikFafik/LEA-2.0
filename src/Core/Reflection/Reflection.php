@@ -20,17 +20,8 @@ final class Reflection extends ReflectionClass
         $protected_properties = $this->getProperties(ReflectionProperty::IS_PROTECTED);
         $private_properties = $this->getProperties(ReflectionProperty::IS_PRIVATE);
         $properties = array_merge($protected_properties, $private_properties);
-        foreach ($properties as $property) {
-            $type = ReflectionPropertyExtended::getTypePHP7($property);
-            if (ctype_upper($type[0])) {
-                $property->is_object = TRUE;
-                $property->type = $this->getNamespaceName() . "\\" . $type;
-            } else {
-                $property->is_object = FALSE;
-                $property->type = $type;
-            }
-            $this->properties[] = $property;
-        }
+        $this->properties = $this->genericToExtendedPropertyReflection($properties, $objectOrClass);
+
         $this->namespace = $this->getNamespaceName();
     }
 
@@ -42,7 +33,7 @@ final class Reflection extends ReflectionClass
     public function getPrimitiveProperties(): array
     {
         foreach ($this->properties as $property) {
-            if (!$property->is_object)
+            if (!$property->isObject())
                 $res[] = $property;
         }
 
@@ -52,7 +43,7 @@ final class Reflection extends ReflectionClass
     public function getObjectProperties(): array
     {
         foreach ($this->properties as $property) {
-            if ($property->is_object)
+            if ($property->isObject())
                 $res[] = $property;
         }
 
@@ -67,5 +58,15 @@ final class Reflection extends ReflectionClass
     public function getClassName(): string
     {
         return $this->namespace . "\\" . $this->type;
+    }
+
+    private function genericToExtendedPropertyReflection(array $properties, $objectOrClass): array
+    {
+        $class = is_object($objectOrClass) ? $objectOrClass->getNamespace() : $objectOrClass;
+        foreach ($properties as $property) {
+            $result[] = new ReflectionPropertyExtended($class, $property->getName());
+        }
+
+        return $result ?? [];
     }
 }

@@ -62,7 +62,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         foreach ($reflector->getObjectProperties() as $property) {
             $key = $property->getName();
             $setVal = 'set' . self::processSnakeToPascal($key);
-            $child_object_name = $property->type;
+            $child_object_name = $property->getType2();
             $child_object = new $child_object_name;
             /* TODO - Currently - Get Record by record -> Get multiple records at once */
             $children_objects = self::getRecordsData($child_object, $object->getId(), self::convertParentClassToForeignKey($object->getClassName()));
@@ -90,7 +90,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                         continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
+                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName()); /* TODO - 3 args, required 2 */
                     if (method_exists($object, $setVal) && $property->isObject()) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {
@@ -101,7 +101,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                 foreach ($reflector->getObjectProperties() as $property) {
                     $key = $property->getName();
                     $setVal = 'set' . self::processSnakeToPascal($key);
-                    $child_object_name = $property->type;
+                    $child_object_name = $property->getType2();
                     $child_object = new $child_object_name;
                     /* TODO - Currently - Get Record by record -> Get multiple records at once */
                     $children_objects = self::getRecordsData($child_object, $object->getId(), self::convertParentClassToForeignKey($object->getClassName()));
@@ -136,7 +136,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $columns = self::getTableColumnsByObject($object);
         $this->updateProtection($object, $where_value, $where_column, $tableName, $columns);
         $result = self::executeQuery($query, $tableName, $columns, $object);
-        $affected_rows = $this->connection->affected_rows;
+        $affected_rows = self::getAffectedRows();
         $child_objects = $object->getChildObjects();
         if (!$child_objects)
             return;
@@ -162,7 +162,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     private function updateProtection($object, $where_value, $where_column, $tableName, $columns): void
     {
         $query = DatabaseQuery::getCountQuery($object, $where_value, $where_column);
-        $result = self::executeQuery($this->connection, $query, $tableName, $columns, $object);
+        $result = self::executeQuery($query, $tableName, $columns, $object);
         $row = mysqli_fetch_assoc($result);
         $table = $object->getClassName();
         if ($row['count'] == 0)

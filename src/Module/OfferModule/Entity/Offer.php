@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lea\Module\OfferModule\Entity;
 
-use DateTime;
 use Lea\Core\Entity\Entity;
+use Lea\Core\Type\Date;
 
 class Offer extends Entity
 {
@@ -15,12 +15,12 @@ class Offer extends Entity
     protected $offer_number = 0;
 
     /**
-     * @var date
+     * @var Date
      */
     protected $issue_date;
 
     /**
-     * @var date
+     * @var Date
      */
     protected $expiration_date;
 
@@ -68,7 +68,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setOfferNumber($offer_number)
+    public function setOfferNumber(string $offer_number)
     {
         $this->offer_number = $offer_number;
 
@@ -80,7 +80,7 @@ class Offer extends Entity
     /**
      * Get the value of expiration_date
      *
-     * @return  date
+     * @return  Date
      */
     public function getExpirationDate()
     {
@@ -90,11 +90,11 @@ class Offer extends Entity
     /**
      * Set the value of expiration_date
      *
-     * @param  date  $expiration_date
+     * @param  Date  $expiration_date
      *
      * @return  self
      */
-    public function setExpirationDate($expiration_date)
+    public function setExpirationDate(Date $expiration_date)
     {
         $this->expiration_date = $expiration_date;
 
@@ -104,7 +104,7 @@ class Offer extends Entity
     /**
      * Get the value of issue_date
      *
-     * @return  date
+     * @return  Date
      */
     public function getIssueDate()
     {
@@ -114,11 +114,11 @@ class Offer extends Entity
     /**
      * Set the value of issue_date
      *
-     * @param  date  $issue_date
+     * @param  Date  $issue_date
      *
      * @return  self
      */
-    public function setIssueDate($issue_date)
+    public function setIssueDate(Date $issue_date)
     {
         $this->issue_date = $issue_date;
 
@@ -190,7 +190,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setPriceNetto($price_netto)
+    public function setPriceNetto(int $price_netto)
     {
         $this->price_netto = $price_netto;
 
@@ -214,7 +214,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setPriceVat($price_vat)
+    public function setPriceVat(int $price_vat)
     {
         $this->price_vat = $price_vat;
 
@@ -238,7 +238,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setPriceBrutto($price_brutto)
+    public function setPriceBrutto(int $price_brutto)
     {
         $this->price_brutto = $price_brutto;
 

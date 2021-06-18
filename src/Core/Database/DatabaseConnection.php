@@ -39,6 +39,11 @@ abstract class DatabaseConnection
         return self::$connection->insert_id;
     }
 
+    public static function getAffectedRows()
+    {
+        return self::$connection->affected_rows;
+    }
+
     protected static function executeQuery(string $query, string $tableName = null, string $columns = null, object $object = null) // PHP8: mysqli_result|bool
     {
         try {

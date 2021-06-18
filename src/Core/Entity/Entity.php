@@ -6,7 +6,9 @@ use Generator;
 use ArrayIterator;
 use MultipleIterator;
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Type\Date;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
+use TypeError;
 
 abstract class Entity
 {
@@ -46,17 +48,18 @@ abstract class Entity
             if(!array_key_exists($key, $data))
                 continue;
             $setValue = 'set' . $this->processSnakeToPascal($key);
-            if ($property->is_object) {
+            if ($property->isObject()) {
                 if (is_iterable($data[$key])) {
                     $children = [];
                     foreach ($data[$key] as $obj) {
-                        $ChildClass = $property->type;
+                        $ChildClass = $property->getType2();
                         $children[] = new $ChildClass($obj);
                     }
                     $this->$setValue($children);
                 }
             } else {
-                $this->$setValue($data[$key]);
+                $val = self::castVariable($data[$key], $property->getType2(), $key);
+                $this->$setValue($val);
             }
         }
     }
@@ -91,7 +94,7 @@ abstract class Entity
                     $res[$key] = $recursive_res;
                 }
             } else {
-                $res[$key] = $val;
+                $res[$key] = $reflection->getType2() == "Date" ? $val->__toString() : $res[$key] = $val;
             }
         }
 
@@ -128,7 +131,7 @@ abstract class Entity
         $reflection = new Reflection($obj);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
-            if (!$property->is_object)
+            if (!$property->isObject())
                 continue;
             if (is_iterable($var)) {
                 $recursive_objs = [];
@@ -246,5 +249,24 @@ abstract class Entity
         $class = end($tokens);
 
         return $class;
+    }
+
+    protected static function castVariable($variable, string $type_to_cast, $key)
+    {
+        switch (strtoupper($type_to_cast)) {
+            case "INT":
+                return (int)$variable;
+                break;
+            case "BOOL":
+                return (bool)$variable;
+                break;
+            case "DATE":
+                if(!is_string($variable))
+                    throw new TypeError($key . " - expected string");
+                return new Date($variable);
+            default:
+                return $variable;
+                break;
+        }
     }
 }

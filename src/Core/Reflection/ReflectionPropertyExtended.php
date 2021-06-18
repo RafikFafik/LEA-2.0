@@ -21,13 +21,17 @@ class ReflectionPropertyExtended extends ReflectionProperty
         $b = new ReflectionClass($a);
         $this->namespace = $b->getNamespaceName();
         $type = self::getTypePHP7($this);
-        if (ctype_upper($type[0])) {
-            $this->is_object = TRUE;
-            $this->type = $this->getNamespaceName() . "\\" . $type;
-        } else {
+        if ($this->isPrimitiveType($type)) {
             $this->is_object = FALSE;
             $this->type = $type;
+        } else {
+            $this->is_object = TRUE;
+            $this->type = $this->getNamespaceName() . "\\" . $type;
         }
+    }
+
+    public function setIfObject(bool $is_object): void {
+        $this->is_object = $is_object;
     }
 
     public function isObject(): bool
@@ -40,16 +44,11 @@ class ReflectionPropertyExtended extends ReflectionProperty
         return $this->type;
     }
 
-    private function parseClassNamespace(string $class): string
-    {
-        return "";
-    }
-
     public static function getTypePHP7(ReflectionProperty $property)
     {
         $comment = $property->getDocComment();
         if (!$comment)
-            throw new Exception("TODO - DocComment exception support", 500);
+            throw new Exception("DocComment missed exception", 500);
         if (!(int)strpos($comment, "@var"))
             return null;
         $tokens = explode(" ", $comment);
@@ -73,5 +72,21 @@ class ReflectionPropertyExtended extends ReflectionProperty
     public function getNamespaceName(): string
     {
         return $this->namespace;
+    }
+
+    public static function isPrimitiveType(string $type)
+    {
+        switch (strtoupper($type)) {
+            case "INT":
+            case "INTEGER":
+            case "BOOL":
+            case "BOOLEAN":
+            case "DATE":
+            case "DATETIME":
+            case "STRING":
+                return true;
+            default:
+                return false;
+        }
     }
 }

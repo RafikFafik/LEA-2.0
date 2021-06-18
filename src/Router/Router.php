@@ -35,13 +35,14 @@ final class Router
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
         try {
             $controller = new $Controller($request, $module['params'], $module['allow'] ?? []);
-        } catch(Error $e) {
-            switch($e->getCode()){
-                case 0:
-                    Response::internalServerError("Controller not found - contact with Administrator");
-                default:
-                    Response::internalServerError("Something went wrong - contact with Administrator");
-            }
+        } catch (Error $e) {
+            $message = $e->getMessage();
+            if (str_contains($message, "Call to undefined method"))
+                Response::internalServerError("Something went wrong - contact with Administrator");
+            else if (str_contains($message, "Call to undefined method"))
+                Response::internalServerError("Controller not found - contact with Administrator");
+            else
+                Response::internalServerError("Something went wrong - contact with Administrator");
         }
         try {
             $controller->init();
@@ -59,7 +60,9 @@ final class Router
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
-            Response::internalServerError($e->getMessage());
+            Response::badRequest("Invalid typeof: " . $e->getMessage());
+        } finally {
+            Response::internalServerError("Fatal Error - Contact with Administrator");
         }
     }
 
@@ -130,8 +133,8 @@ final class Router
 
         if ($index = strpos($request_url, "?")) {
             $keyvals = explode("&", substr($request_url, $index + 1));
-            foreach($keyvals as $keyval) {
-                if(!$index = strpos($keyval, "="))
+            foreach ($keyvals as $keyval) {
+                if (!$index = strpos($keyval, "="))
                     Response::badRequest("Incorrect parameter pair: $keyval");
                 $key = substr($keyval, 0, $index);
                 $val = substr($keyval, $index + 1);

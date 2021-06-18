@@ -22,9 +22,9 @@ class OfferCollectionController extends Controller implements ControllerInterfac
                 Response::ok($res);
             case "POST":
                 $object = Normalizer::normalize($this->request->getPayload(), Offer::getNamespace());
-                $offer_repository = new OfferRepository();
-                $id = $offer_repository->save($object);
-                $res = $offer_repository->findById($id, new Offer);
+                $repository = new OfferRepository();
+                $id = $repository->save($object);
+                $res = $repository->findById($id, new Offer);
                 $res = Normalizer::denormalize($res);
                 Response::ok($res);
             default:

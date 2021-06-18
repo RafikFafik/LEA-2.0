@@ -6,6 +6,7 @@ namespace Lea\Core\Database;
 
 use ArrayIterator;
 use MultipleIterator;
+use Lea\Core\Type\Date;
 use Lea\Core\Reflection\Reflection;
 
 abstract class DatabaseUtil extends DatabaseConnection
@@ -151,6 +152,8 @@ abstract class DatabaseUtil extends DatabaseConnection
             case "BOOL":
                 return (bool)$variable;
                 break;
+            case "DATE":
+                return new Date($variable);
             default:
                 return $variable;
                 break;
