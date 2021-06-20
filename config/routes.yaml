@@ -70,6 +70,9 @@ Security:
         role:
             url: "/security/roles/{id}"
             controller: RoleController
+        role-hierarchy:
+            url: "/security/role-hierarchy"
+            controller: RoleHierarchyController
         users:
             url: "/security/users"
             controller: UserCollectionController

@@ -3,7 +3,7 @@
 namespace Lea\Core\Repository;
 
 use Lea\Core\Database\DatabaseManager;
-use Lea\Module\OfferModule\Entity\Offer;
+use Lea\Module\Security\Service\AuthorizedUserService;
 use Lea\Response\Response;
 
 abstract class Repository extends DatabaseManager
@@ -13,8 +13,8 @@ abstract class Repository extends DatabaseManager
         $this->object = self::getRepositoryObject();
         if($object && $object->getNamespace() != $this->object)
             Response::internalServerError("Object doesn't match repository");
-        $user = "xdd";
-        parent::__construct($this->object, $user);
+        $user_id = AuthorizedUserService::getAuthorizedUserId();
+        parent::__construct($this->object, $user_id);
     }
 
     private static function getRepositoryObject(): object

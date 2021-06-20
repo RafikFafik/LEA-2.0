@@ -4,6 +4,8 @@ namespace Lea\Core\Entity;
 
 use Generator;
 use ArrayIterator;
+use Exception;
+use Lea\Core\Exception\InvalidDateFormatException;
 use MultipleIterator;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Type\Date;
@@ -147,6 +149,17 @@ abstract class Entity
         return $objs ?? [];
     }
 
+    public function getReferencedProperties(): iterable
+    {
+        $getters = $this->getGetters();
+        foreach($getters as $getter) {
+            if(str_ends_with($getter, "Id") && $getter !== "getId")
+                $referenced[] = $getter;
+        }
+
+        return $referenced ?? [];
+    }
+
     public function hasPropertyCorrespondingToMethod(string $method_name, bool $is_setter = FALSE): bool
     {
         $prefix = substr($method_name, 0, 3);
@@ -263,7 +276,12 @@ abstract class Entity
             case "DATE":
                 if(!is_string($variable))
                     throw new TypeError($key . " - expected string");
-                return new Date($variable);
+                    try {
+                        $type = new Date($variable);
+                    } catch (Exception $e) {
+                        throw new InvalidDateFormatException($key);
+                    }
+                    return $type;
             default:
                 return $variable;
                 break;

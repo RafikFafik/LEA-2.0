@@ -13,7 +13,7 @@ use Lea\Core\Security\Repository\RoleRepository;
 use Lea\Core\Exception\ResourceNotExistsException;
 
 
-class RoleController extends Controller implements ControllerInterface
+class RoleHierarchyController extends Controller implements ControllerInterface
 {
     public function init()
     {
@@ -27,24 +27,6 @@ class RoleController extends Controller implements ControllerInterface
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
                 }
-                break;
-            case "POST":
-            case "PUT":
-                try {
-                    $repository = new RoleRepository;
-                    $object = Normalizer::normalize($this->request->getPayload(), Role::getNamespace());
-                    $affected_rows = $repository->updateById($object, $this->params['id']);
-                } catch (ResourceNotExistsException $e) {
-                    Response::badRequest();
-                }
-                $object = $repository->findById($this->params['id'], new Role);
-                $result = Normalizer::denormalize($object);
-                Response::ok($result);
-                break;
-            case "DELETE":
-                $repository = new RoleRepository;
-                $repository->removeById($this->params['id']);
-                Response::noContent();
                 break;
             default:
                 Response::methodNotAllowed();

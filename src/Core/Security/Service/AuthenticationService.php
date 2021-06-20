@@ -3,10 +3,7 @@
 namespace Lea\Module\Security\Service;
 
 use Firebase\JWT\JWT;
-use Lea\Core\Exception\InvalidCredentialsException;
-use Lea\Response\Response;
 use Lea\Core\Service\ServiceInterface;
-use Lea\Core\Security\Repository\UserRepository;
 
 abstract class AuthenticationService implements ServiceInterface
 {
@@ -22,7 +19,7 @@ abstract class AuthenticationService implements ServiceInterface
 
     protected function generateJWT(string $email, int $uid): string
     {
-        $exp = 200; // In minutes
+        $exp = 5000; // In minutes
         $payload = [
             "iss" => $_ENV['TENANT'], /* Issuer */
             "aud" => $email, /* Receiver */

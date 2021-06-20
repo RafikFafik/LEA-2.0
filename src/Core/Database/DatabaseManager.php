@@ -19,16 +19,11 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     public $uid = 0;
     private static $connection;
 
-    function __construct(object $object, $user = null)
+    function __construct(object $object, $user_id = null)
     {
         $this->tableName = self::getTableNameByObject($object);
-        if($user)
-            $this->user = $user;
-    }
-
-    public function setUser($uid)
-    {
-        $this->uid = $uid;
+        if($user_id)
+            $this->user_id = $user_id;
     }
 
     protected static function getRecordData(object $object, $where_value, $where_column = "id", $debug = false)
@@ -192,6 +187,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
             while ($row = mysqli_fetch_assoc($result)) {
                 $object = new $Class;
                 foreach ($row as $key => $val) {
+                    if($val === null)
+                        continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
                     $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());

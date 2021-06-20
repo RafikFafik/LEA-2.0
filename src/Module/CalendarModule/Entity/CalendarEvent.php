@@ -12,10 +12,15 @@ use Lea\Module\ContractorModule\Entity\Sloppy;
 class CalendarEvent extends Entity
 {
     /**
+     * @var int
+     */
+    private $user_id;
+    
+    /**
      * @var string
      */
     private $type;
-
+    
     /**
      * @var string
      */
@@ -442,6 +447,30 @@ class CalendarEvent extends Entity
     public function setContractor(int $contractor)
     {
         $this->contractor = $contractor;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor
+     *
+     * @return  int
+     */ 
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    /**
+     * Set the value of contractor
+     *
+     * @param  int  $contractor
+     *
+     * @return  self
+     */ 
+    public function setUserId(int $user_id)
+    {
+        $this->user_id = $user_id;
 
         return $this;
     }

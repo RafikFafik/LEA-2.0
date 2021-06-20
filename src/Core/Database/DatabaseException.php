@@ -23,9 +23,11 @@ class DatabaseException extends DatabaseUtil
     const SQL_FOREIGN_KEY_COHESION = 1451;
     const SQL_INCORRECT_DATE_VALUE = 1292;
     const SQL_OUT_OF_RANGE = 1264;
+    const SQL_FOREIGN_KEY_CONSTRAINTS_FAIL = 1452;
 
     public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query)
     {
+        $message = $e->getMessage();
         switch ($e->getCode()) {
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::getCreateTableQueryRecursive($object);
@@ -33,14 +35,20 @@ class DatabaseException extends DatabaseUtil
                 return self::getAlterTableQuery($object, $connection);
             case self::SQL_MISSING_DEFAULT_VALUE:
                 Response::internalServerError("TODO - Default Value failure: " . $e->getCode() . "\n" . $e->getMessage());
+            case self::SQL_FOREIGN_KEY_CONSTRAINTS_FAIL:
             case self::SQL_FOREIGN_KEY_COHESION:
-                Response::internalServerError("Trying delete or update ROW that has REFERENCES: " . $e->getCode() . "\n" . $e->getMessage());
+                $substr = substr($message, (int)strpos($message, "FOREIGN KEY") + 12);
+                $field = substr($substr, 0, (int)strpos($substr, "REFERENCES") - 1);
+                $field = ltrim($field, '(`');
+                $field = rtrim($field, '`)');
+                $field = self::convertToKey($field);
+                Response::badRequest("Invalid value of field that has reference: " . $field);
             case self::SQL_INCORRECT_DATE_VALUE:
                 Response::internalServerError("Incorrect date value: " . $e->getCode() . "\n" . $e->getMessage());
             case self::SQL_SYMTAMX_ERRORM:
                 Response::internalServerError("Symtamx error \n $query");
             case self::SQL_OUT_OF_RANGE:
-                $field = substr($e->getMessage(), strpos($e->getMessage(), "'",) + 1);
+                $field = substr($message, strpos($message, "'") + 1);
                 $field = substr($field, 0, strpos($field, "'"));
                 Response::badRequest("Passed value of ``" . $field . "`` out of range - Contact with Administrator to increase it");
             default:
@@ -75,16 +83,24 @@ class DatabaseException extends DatabaseUtil
         return $queries ?? [];
     }
     
-    private static function getCreateTableQueryRecursive(object $object, string $parent_table = NULL): array {
+    private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array {
         $tablename = DatabaseManager::getTableNameByObject($object);
         $ddl = 'CREATE TABLE ' . $tablename . ' (';
         $class = new Reflection($object);
         $primitive = $class->getPrimitiveProperties();
+        $referenced = $object->getReferencedProperties();
+        $referenced = self::processListOfGettersToToSnakeCase($referenced);
         $columns = self::parseReflectProperties($primitive);
         if($parent_table) {
-            $foreign_column = self::getParentIdReferencedKeyColumn($parent_table);
+            $foreign_column = self::getReferencedKeyColumn($parent_table);
             $columns .= ', ' . $foreign_column . ' INT NOT NULL';
             $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass($parent_table), $foreign_column);
+        }
+        if($referenced) {
+            foreach($referenced as $table) {
+                $foreign_column = self::convertKeyToColumn($table);
+                $alter_references[] = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass(str_replace('_id', '', $table)), $foreign_column);
+            }
         }
         $ddl .= $columns;
         $ddl .= ') CHARACTER SET utf8 COLLATE utf8_polish_ci';
@@ -92,10 +108,13 @@ class DatabaseException extends DatabaseUtil
         $queries[] = $ddl;
         if($parent_table)
             $queries[] = $alter_foreing_constraint;
+        if($alter_references ?? false)
+            $queries = array_merge($queries, $alter_references);
         $child_objects = $class->getObjectProperties();
         foreach($child_objects as $obj) {
             $parent = $object->getClassName();
-            $obj = new $obj->getType2(); /* CHECKPOINT */
+            $Class = $obj->getType2();
+            $obj = new $Class;
             $children_queries = array_merge($children_queries ?? [], self::getCreateTableQueryRecursive($obj, $parent));
         }
         $queries = array_merge($queries, $children_queries ?? []);
@@ -146,7 +165,7 @@ class DatabaseException extends DatabaseUtil
         return $constraint;
     }
 
-    private static function getParentIdReferencedKeyColumn(string $parent): string
+    private static function getReferencedKeyColumn(string $parent): string
     {
         $column = self::convertKeyToColumn($parent);
         $column = rtrim($column, '`');

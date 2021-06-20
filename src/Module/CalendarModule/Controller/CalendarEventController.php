@@ -9,7 +9,6 @@ use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Module\CalendarModule\Entity\CalendarEvent;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
@@ -39,10 +38,6 @@ class CalendarEventController extends Controller implements ControllerInterface
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest("Brak zasobu");
-                } catch (UpdatingNotExistingResource $e) {
-                    Response::badRequest("Próba aktualizacji nieistniejącego zasobu");
-                } finally {
-                    Response::badRequest("Coś zawiodło");
                 }
             case "DELETE":
                 $eventRepository = new CalendarEventRepository;

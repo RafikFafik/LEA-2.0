@@ -31,8 +31,7 @@ class TokenVerificationService extends AuthenticationService implements ServiceI
             $fresh_token = $this->generateJWT($credentials['email'], $credentials['uid']);
             Header("Authorization: Bearer $fresh_token");
             Header("Access-Control-Expose-Headers: Authorization");
-            $user->setToken($fresh_token);
-            $repository = new UserRepository();
+            AuthorizedUserService::setAuthorizedUser($user);
         } catch (Exception $e) {
             Response::unauthorized();
         }

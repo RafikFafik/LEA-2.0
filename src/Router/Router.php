@@ -4,7 +4,9 @@ namespace Lea\Router;
 
 use ArrayIterator;
 use Error;
+use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
+use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Request\Request;
 use Lea\Response\Response;
 use MultipleIterator;
@@ -60,7 +62,16 @@ final class Router
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
-            Response::badRequest("Invalid typeof: " . $e->getMessage());
+            $message = $e->getMessage();
+            $field = substr($message, strpos($message, "set"));
+            $field = substr($field, 0, strpos($field, "given") + 5);
+            $field = str_replace("()", "", str_replace('set', '', $field));
+            $field = self::pascalToSnake($field);
+            Response::badRequest("Invalid typeof: " . $field);
+        } catch (InvalidDateFormatException $e) {
+            Response::badRequest("Invalid date format of: " . $e->getMessage());
+        } catch (UserAlreadyAuthorizedException $e) {
+            Response::internalServerError("Re-setting user during one connection");
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");
         }
@@ -137,7 +148,7 @@ final class Router
                 if (!$index = strpos($keyval, "="))
                     Response::badRequest("Incorrect parameter pair: $keyval");
                 $key = substr($keyval, 0, $index);
-                $val = substr($keyval, $index + 1);
+                $val = (int)substr($keyval, $index + 1);
                 $query_string_params[$key] = $val;
             }
             foreach ($required_params ?? [] as $param) {
@@ -164,5 +175,13 @@ final class Router
         $mi->attachIterator(new ArrayIterator($config_tokens), "CONFIG");
 
         return $mi;
+    }
+
+    protected static function pascalToSnake(string $PascalCase): string
+    {
+        $cammelCase = lcfirst($PascalCase);
+        $snake_case = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $cammelCase));
+
+        return $snake_case;
     }
 }

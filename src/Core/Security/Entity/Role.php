@@ -17,9 +17,10 @@ class Role extends Entity
     private $name;
 
     /**
+     * Parent role id;
      * @var int
      */
-    private $parent_id;
+    private $role_id;
 
     /**
      * Get the value of name
@@ -50,9 +51,9 @@ class Role extends Entity
      *
      * @return  int
      */
-    public function getParentId()
+    public function getRoleId()
     {
-        return $this->parent_id;
+        return $this->role_id;
     }
 
     /**
@@ -62,9 +63,9 @@ class Role extends Entity
      *
      * @return  self
      */
-    public function setParentId(int $parent_id)
+    public function setRoleId(int $role_id)
     {
-        $this->parent_id = $parent_id;
+        $this->role_id = $role_id;
 
         return $this;
     }

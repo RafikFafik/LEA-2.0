@@ -50,7 +50,7 @@ class Validator implements ValidatorInterface
         return preg_match("/\d{2}-\d{3}/", $postcode) ? true : false;
     }
 
-    public static function parseMonth(string $month): string
+    public static function parseMonth(int $month): string
     {
         $month = (int)$month;
         if ($month < 10)

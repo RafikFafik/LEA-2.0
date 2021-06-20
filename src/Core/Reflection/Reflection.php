@@ -40,6 +40,16 @@ final class Reflection extends ReflectionClass
         return $res ?? [];
     }
 
+    public function getReferencedProperties(): array
+    {
+        foreach ($this->properties as $property) {
+            if (!$property->hasReference())
+                $res[] = $property;
+        }
+
+        return $res ?? [];
+    }
+
     public function getObjectProperties(): array
     {
         foreach ($this->properties as $property) {
