@@ -31,4 +31,13 @@ final class AuthorizedUserService implements ServiceInterface
 
         return $user_id;
     }
+    
+    public static function getAuthorizedUserRoleId(): ?int
+    {
+        if (!self::$user)
+            $role_id = null;
+        $role_id = self::$user->getRoleId();
+    
+        return $role_id;
+    }
 }

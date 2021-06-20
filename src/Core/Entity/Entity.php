@@ -10,6 +10,7 @@ use MultipleIterator;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Throwable;
 use TypeError;
 
 abstract class Entity
@@ -47,7 +48,7 @@ abstract class Entity
         // $mi = $this->getMultipleIterator($reflection->getProperties(), $data);
         foreach ($reflection->getProperties() as $property) {
             $key = $property->getName();
-            if(!array_key_exists($key, $data))
+            if (!array_key_exists($key, $data))
                 continue;
             $setValue = 'set' . $this->processSnakeToPascal($key);
             if ($property->isObject()) {
@@ -99,7 +100,22 @@ abstract class Entity
                 $res[$key] = $reflection->getType2() == "Date" ? $val->__toString() : $res[$key] = $val;
             }
         }
-
+        /* Get fields that are not in entity */
+        $ovars = get_object_vars($this);
+        foreach ($ovars as $key => $val) {
+            if (!isset($res[$key]))
+                $fields[$key] = $val;
+        }
+        foreach ($fields ?? [] as $key => $val) {
+            if (is_iterable($val)) {
+                foreach ($val as $obj) {
+                    $recursive_res[] = $obj->get();
+                }
+                $res[$key] = $recursive_res;
+            } else {
+                $res[$key] = $val;
+            }
+        }
         return $res;
     }
 
@@ -152,8 +168,8 @@ abstract class Entity
     public function getReferencedProperties(): iterable
     {
         $getters = $this->getGetters();
-        foreach($getters as $getter) {
-            if(str_ends_with($getter, "Id") && $getter !== "getId")
+        foreach ($getters as $getter) {
+            if (str_ends_with($getter, "Id") && $getter !== "getId")
                 $referenced[] = $getter;
         }
 
@@ -245,7 +261,8 @@ abstract class Entity
         }
     }
 
-    private function processSnakeToPascal(string $text): string {
+    private function processSnakeToPascal(string $text): string
+    {
         $result = str_replace('_', '', ucwords($text, '_'));
 
         return $result;
@@ -274,14 +291,14 @@ abstract class Entity
                 return (bool)$variable;
                 break;
             case "DATE":
-                if(!is_string($variable))
+                if (!is_string($variable))
                     throw new TypeError($key . " - expected string");
-                    try {
-                        $type = new Date($variable);
-                    } catch (Exception $e) {
-                        throw new InvalidDateFormatException($key);
-                    }
-                    return $type;
+                try {
+                    $type = new Date($variable);
+                } catch (Exception $e) {
+                    throw new InvalidDateFormatException($key);
+                }
+                return $type;
             default:
                 return $variable;
                 break;

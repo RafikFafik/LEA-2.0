@@ -64,6 +64,13 @@ abstract class Repository extends DatabaseManager
         return $result;
     }
 
+    public static function getListByField($field_name, $field_value)
+    {
+        $result = self::getRecordsData(self::getRepositoryObject(), $field_value, $field_name);
+
+        return $result;
+    }
+
     public function removeById(int $id): void
     {
         $this->removeRecordData($this->object, $id);

@@ -79,3 +79,6 @@ Security:
         user:
             url: "/security/users/{id}"
             controller: UserController
+        users-subordinates:
+            url: "/security/users/subordinates"
+            controller: UserSubordinateController
