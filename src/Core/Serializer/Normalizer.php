@@ -47,7 +47,7 @@ class Normalizer
         return [];
     }
 
-    public static function mapKeyOfArrayList(array $haystack, string $seek, $to_replace)
+    public static function mapKeyOfArrayList(array $haystack, string $seek, $to_replace): iterable
     {
         foreach($haystack as $key => $val) {
             if(is_array($val)) {
@@ -59,6 +59,6 @@ class Normalizer
             }
         }
 
-        return $res;
+        return $res ?? [];
     }
 }
