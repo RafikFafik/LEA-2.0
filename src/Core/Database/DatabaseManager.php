@@ -52,7 +52,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                 }
             }
         } else {
-            throw new ResourceNotExistsException();
+            throw new ResourceNotExistsException($object->getClassName());
         }
         foreach ($reflector->getObjectProperties() as $property) {
             $key = $property->getName();

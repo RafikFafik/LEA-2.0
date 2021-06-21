@@ -64,6 +64,10 @@ Security:
             url: "/security/login"
             controller: LoginController
             allow: ['all']
+        register:
+            url: "/security/register"
+            controller: RegisterController
+            allow: ['admin']
         roles:
             url: "/security/roles"
             controller: RoleCollectionController

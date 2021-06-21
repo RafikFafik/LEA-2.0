@@ -3,7 +3,10 @@
 namespace Lea\Core\Validator;
 
 use DateTime;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Response\Response;
+use Lea\Core\Security\Entity\Role;
+use Lea\Core\Security\Repository\RoleRepository;
 
 class Validator implements ValidatorInterface
 {
@@ -44,7 +47,7 @@ class Validator implements ValidatorInterface
 
     public static function postcodeIsValid(string $postcode): bool
     {
-        if(strlen($postcode) != 6)
+        if (strlen($postcode) != 6)
             return false;
 
         return preg_match("/\d{2}-\d{3}/", $postcode) ? true : false;
@@ -57,5 +60,38 @@ class Validator implements ValidatorInterface
             $month = "0" . $month;
 
         return $month;
+    }
+
+    public static function validateRegisterParams(array $params): void
+    {
+        $required = ['email', 'name', 'surname', 'role_id'];
+        foreach ($required as $a) {
+            if(!array_key_exists($a, $params))
+                $non_delivered[] = $a;
+        }
+        if($non_delivered ?? false)
+            Response::badRequest("Missed body params: " . json_encode($non_delivered));
+
+        try {
+            RoleRepository::findById($params['role_id'], new Role);
+        } catch (ResourceNotExistsException $e) {
+            Response::badRequest("Role with given ID does not exists");
+        }
+
+    }
+
+    public static function validatePasswordStrength(string $password): void
+    {
+        // Validate password strength
+        $uppercase = preg_match('@[A-Z]@', $password);
+        $lowercase = preg_match('@[a-z]@', $password);
+        $number    = preg_match('@[0-9]@', $password);
+        $specialChars = preg_match('@[^\w]@', $password);
+
+        if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+            echo 'Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
+        } else {
+            echo 'Strong password.';
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace Lea\Router;
 use ArrayIterator;
 use Error;
 use Lea\Core\Exception\InvalidDateFormatException;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Request\Request;
@@ -72,6 +73,8 @@ final class Router
             Response::badRequest("Invalid date format of: " . $e->getMessage());
         } catch (UserAlreadyAuthorizedException $e) {
             Response::internalServerError("Re-setting user during one connection");
+        } catch (ResourceNotExistsException $e) {
+            Response::badRequest("Tried to reach resource that not exists: " . $e->getMessage());
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");
         }
