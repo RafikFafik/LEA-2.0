@@ -23,7 +23,7 @@ class TokenVerificationService extends AuthenticationService implements ServiceI
             Response::unauthorized();
 
         $TOKEN = explode(" ", $_SERVER['HTTP_AUTHORIZATION']);
-        if (strtoupper($TOKEN[0]) !== "BEARER")
+        if (strtoupper($TOKEN[0]) !== "BEARER" || !isset($TOKEN[1]))
             Response::unauthorized();
         $TOKEN = $TOKEN[1]; /* [0] => "Bearer", [1] => TOKEN */
 
