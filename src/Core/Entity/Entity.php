@@ -97,7 +97,7 @@ abstract class Entity
                     $res[$key] = $recursive_res;
                 }
             } else {
-                $res[$key] = $reflection->getType2() == "Date" ? $val->__toString() : $res[$key] = $val;
+                $res[$key] = $reflection->getType2() == "Date" && $val !== null ? $val->__toString() : $res[$key] = $val;
             }
         }
         /* Get fields that are not in entity */
