@@ -30,11 +30,13 @@ class CalendarEventController extends Controller implements ControllerInterface
             case "PUT":
                 try {
                     $CalendarRepository = new CalendarEventRepository;
-                    $object = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
+                    $payload = Normalizer::mapKeyOfArrayList($this->request->getPayload(), 'field_id', 'field');
+                    $object = Normalizer::normalize($payload, CalendarEvent::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 
                     $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
+                    $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest("Brak zasobu");

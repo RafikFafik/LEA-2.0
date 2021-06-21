@@ -11,7 +11,7 @@ class Sloppy extends Entity
     /**
      * @var int
      */
-    private $field_id;
+    private $field;
 
     /**
      * @var string
@@ -23,9 +23,9 @@ class Sloppy extends Entity
      *
      * @return  int
      */ 
-    public function getFieldId()
+    public function getField()
     {
-        return $this->field_id;
+        return $this->field;
     }
 
     /**
@@ -35,9 +35,9 @@ class Sloppy extends Entity
      *
      * @return  self
      */ 
-    public function setFieldId(int $field_id)
+    public function setField(int $field)
     {
-        $this->field_id = $field_id;
+        $this->field = $field;
 
         return $this;
     }

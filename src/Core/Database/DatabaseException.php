@@ -24,6 +24,7 @@ class DatabaseException extends DatabaseUtil
     const SQL_INCORRECT_DATE_VALUE = 1292;
     const SQL_OUT_OF_RANGE = 1264;
     const SQL_FOREIGN_KEY_CONSTRAINTS_FAIL = 1452;
+    const SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE = 1005;
 
     public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query)
     {
@@ -51,6 +52,8 @@ class DatabaseException extends DatabaseUtil
                 $field = substr($message, strpos($message, "'") + 1);
                 $field = substr($field, 0, strpos($field, "'"));
                 Response::badRequest("Passed value of ``" . $field . "`` out of range - Contact with Administrator to increase it");
+            case self::SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE:
+                return ""; /* Workaround / todo */
             default:
                 Response::internalServerError("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }
@@ -64,14 +67,14 @@ class DatabaseException extends DatabaseUtil
         $table_keys = self::convertArrayToKeys($described);
         $entity_methods = $object->getGetters();
         $last = false;
-        foreach($entity_methods as $method) {
+        foreach ($entity_methods as $method) {
             $key = self::processPascalToSnake(str_replace('get', '', $method));
-            if(in_array($key, $table_keys)) {
+            if (in_array($key, $table_keys)) {
                 $last = $key;
                 continue;
             }
             $reflector = new ReflectionPropertyExtended(get_class($object), $key);
-            if($reflector->isObject())
+            if ($reflector->isObject())
                 continue;
             $query = 'ALTER TABLE ' . self::getTableNameByObject($object) . ' ADD ';
             $query .= self::parseReflectProperty($reflector);
@@ -79,11 +82,12 @@ class DatabaseException extends DatabaseUtil
             $queries[] = $query;
         }
         // TODO - polish collate
-        
+
         return $queries ?? [];
     }
-    
-    private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array {
+
+    private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array
+    {
         $tablename = DatabaseManager::getTableNameByObject($object);
         $ddl = 'CREATE TABLE ' . $tablename . ' (';
         $class = new Reflection($object);
@@ -91,13 +95,13 @@ class DatabaseException extends DatabaseUtil
         $referenced = $object->getReferencedProperties();
         $referenced = self::processListOfGettersToToSnakeCase($referenced);
         $columns = self::parseReflectProperties($primitive);
-        if($parent_table) {
+        if ($parent_table) {
             $foreign_column = self::getReferencedKeyColumn($parent_table);
             $columns .= ', ' . $foreign_column . ' INT NOT NULL';
             $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass($parent_table), $foreign_column);
         }
-        if($referenced) {
-            foreach($referenced as $table) {
+        if ($referenced) {
+            foreach ($referenced as $table) {
                 $foreign_column = self::convertKeyToColumn($table);
                 $alter_references[] = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass(str_replace('_id', '', $table)), $foreign_column);
             }
@@ -106,12 +110,12 @@ class DatabaseException extends DatabaseUtil
         $ddl .= ') CHARACTER SET utf8 COLLATE utf8_polish_ci';
         $ddl .= self::getEndBracket();
         $queries[] = $ddl;
-        if($parent_table)
+        if ($parent_table)
             $queries[] = $alter_foreing_constraint;
-        if($alter_references ?? false)
+        if ($alter_references ?? false)
             $queries = array_merge($queries, $alter_references);
         $child_objects = $class->getObjectProperties();
-        foreach($child_objects as $obj) {
+        foreach ($child_objects as $obj) {
             $parent = $object->getClassName();
             $Class = $obj->getType2();
             $obj = new $Class;
@@ -129,7 +133,7 @@ class DatabaseException extends DatabaseUtil
             $columns .= self::parseReflectProperty($property) . ", ";
         }
         $columns = rtrim($columns, ", ");
-        
+
         return $columns;
     }
 
@@ -142,25 +146,27 @@ class DatabaseException extends DatabaseUtil
         if ($column_name == '`fld_Id`') {
             $column_properties = $column_properties . ' NOT NULL PRIMARY KEY AUTO_INCREMENT';
         }
-        
+
         return $column_name . " " . $column_properties;
     }
 
-    private static function getEndBracket(): string {
+    private static function getEndBracket(): string
+    {
         return ";";
     }
-    
-    private static function getAlterTableAddPrimaryKey(string $tablename): string 
+
+    private static function getAlterTableAddPrimaryKey(string $tablename): string
     {
-        $constraint = 'ALTER TABLE '. $tablename . ' ADD CONSTRAINT PK_' . $tablename . ' PRIMARY KEY (`fld_Id`);';
+        $constraint = 'ALTER TABLE ' . $tablename . ' ADD CONSTRAINT PK_' . $tablename . ' PRIMARY KEY (`fld_Id`);';
 
         return $constraint;
     }
 
-    private static function getForeignKeyConstraint(string $tbl_tablename, string $tbl_parent_table_name, string $fld_Parent): string 
+    private static function getForeignKeyConstraint(string $tbl_tablename, string $tbl_parent_table_name, string $fld_Parent): string
     {
         $formatted_parent = rtrim(ltrim($tbl_tablename, '`'), '`');
-        $constraint = 'ALTER TABLE ' . $tbl_tablename . ' ADD CONSTRAINT FK_' . $formatted_parent . ' FOREIGN KEY ('. $fld_Parent .  ') REFERENCES ' . $tbl_parent_table_name . ' (`fld_Id`);';
+        $formatted_field = rtrim(ltrim($fld_Parent, '`'), '`');
+        $constraint = 'ALTER TABLE ' . $tbl_tablename . ' ADD CONSTRAINT FK_' . $formatted_parent . '_' . $formatted_field . ' FOREIGN KEY (' . $fld_Parent .  ') REFERENCES ' . $tbl_parent_table_name . ' (`fld_Id`);';
 
         return $constraint;
     }

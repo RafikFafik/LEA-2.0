@@ -148,8 +148,12 @@ final class Router
                 if (!$index = strpos($keyval, "="))
                     Response::badRequest("Incorrect parameter pair: $keyval");
                 $key = substr($keyval, 0, $index);
-                $val = (int)substr($keyval, $index + 1);
-                $query_string_params[$key] = $val;
+                $val = substr($keyval, $index + 1);
+                $val_casted = (int)$val;
+                if(strlen((string)$val_casted) == strlen($val))
+                    $query_string_params[$key] = $val_casted;
+                else
+                    $query_string_params[$key] = $val;
             }
             foreach ($required_params ?? [] as $param) {
                 if (!array_key_exists($param, $query_string_params))

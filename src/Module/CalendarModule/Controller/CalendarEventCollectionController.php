@@ -20,10 +20,12 @@ class CalendarEventCollectionController extends Controller implements Controller
                 $repository = new CalendarEventRepository;
                 $list = $repository->getList(new CalendarEvent);
                 $res = Normalizer::denormalizeList($list);
+                $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
 
                 Response::ok($res);
             case "POST":
-                $data = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
+                $payload = Normalizer::mapKeyOfArrayList($this->request->getPayload(), 'field_id', 'field');
+                $data = Normalizer::normalize($payload, CalendarEvent::getNamespace());
                 $Calendar = new CalendarEventRepository;
                 $resource_id = $Calendar->save($data);
 
@@ -31,6 +33,7 @@ class CalendarEventCollectionController extends Controller implements Controller
                 $CalendarEventRepository = new CalendarEventRepository;
                 $object = $CalendarEventRepository->findById($resource_id, new CalendarEvent);
                 $res = Normalizer::denormalize($object);
+                $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
                 Response::ok($res);
                 // Response::noContent();
             default:

@@ -49,6 +49,16 @@ class Normalizer
 
     public static function mapKeyOfArrayList(array $haystack, string $seek, $to_replace)
     {
+        foreach($haystack as $key => $val) {
+            if(is_array($val)) {
+                $res[$key] = self::mapKeyOfArrayList($val, $seek, $to_replace);
+            } elseif($key == $seek) {
+                $res[$to_replace] = $val;
+            } else {
+                $res[$key] = $val;
+            }
+        }
 
+        return $res;
     }
 }
