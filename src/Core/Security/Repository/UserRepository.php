@@ -15,4 +15,11 @@ final class UserRepository extends Repository
 
         return $result;
     }
+
+    public static function findByToken(string $token): User
+    {
+        $result = self::getRecordData(new User, $token, 'token');
+
+        return $result;
+    }
 }

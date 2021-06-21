@@ -8,6 +8,7 @@ use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
+use Lea\Core\Validator\Validator;
 use Lea\Request\Request;
 use Lea\Response\Response;
 use MultipleIterator;
@@ -36,6 +37,8 @@ final class Router
         // TODO - Baza danych
         $module = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
+        if(isset($module['body-params']))
+            Validator::validateBodyParams($module['body-params'], $request->getPayload());
         try {
             $controller = new $Controller($request, $module['params'], $module['allow'] ?? []);
         } catch (Error $e) {

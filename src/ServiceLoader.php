@@ -17,7 +17,10 @@ class ServiceLoader {
             require_once $filename;
         }
         $module = __DIR__ . "/**/**/**/*.php";
-        foreach (glob($module) as $filename) {
+        $modules = glob($module);
+        $index = array_search(__DIR__ . "/Core/Security/Service/AuthenticationService.php", $modules); /* Workaround */
+        include $modules[$index]; /* Workaround */
+        foreach ($modules as $filename) {
             require_once $filename;
         }
         $additional = __DIR__ . '/**/*.php';

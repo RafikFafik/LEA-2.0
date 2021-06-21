@@ -30,6 +30,16 @@ class Validator implements ValidatorInterface
         }
     }
 
+    public static function validateBodyParams(array $required, array $given): void
+    {
+        foreach ($required as $key) {
+            if (!array_key_exists($key, $given))
+                $non_delivered[] = $key;
+        }
+        if ($non_delivered ?? false)
+            Response::badRequest("Missed body params: " . json_encode($non_delivered));
+    }
+
     private static function validateDate($date, $format = 'Y-m-d')
     {
         $d = DateTime::createFromFormat($format, $date);
@@ -65,19 +75,19 @@ class Validator implements ValidatorInterface
     public static function validateRegisterParams(array $params): void
     {
         $required = ['email', 'name', 'surname', 'role_id'];
-        foreach ($required as $a) {
-            if(!array_key_exists($a, $params))
-                $non_delivered[] = $a;
-        }
-        if($non_delivered ?? false)
-            Response::badRequest("Missed body params: " . json_encode($non_delivered));
-
+        self::validateBodyParams($required, $params);
+        self::validateEmail($params['email']);
         try {
             RoleRepository::findById($params['role_id'], new Role);
         } catch (ResourceNotExistsException $e) {
             Response::badRequest("Role with given ID does not exists");
         }
+    }
 
+    public static function validateEmail(string $email): void
+    {
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+            Response::badRequest("Invalid email");
     }
 
     public static function validatePasswordStrength(string $password): void
@@ -88,10 +98,12 @@ class Validator implements ValidatorInterface
         $number    = preg_match('@[0-9]@', $password);
         $specialChars = preg_match('@[^\w]@', $password);
 
-        if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
-            echo 'Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character.';
-        } else {
-            echo 'Strong password.';
-        }
+        if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8)
+            Response::badRequest("Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character");
+    }
+
+    public static function validateAccountActivationParams(array $params): void
+    {
+        /* TODO */
     }
 }

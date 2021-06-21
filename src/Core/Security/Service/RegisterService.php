@@ -3,11 +3,13 @@
 namespace Lea\Module\Security\Service;
 
 use Lea\Response\Response;
+use Lea\Core\Mailer\Mailer;
+use Lea\Core\Validator\Validator;
 use Lea\Core\Security\Entity\User;
 use Lea\Core\Service\ServiceInterface;
 use Lea\Core\Security\Repository\UserRepository;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Core\Validator\Validator;
+use Lea\Core\Mailer\MailerBodyProvider;
 
 final class RegisterService extends AuthenticationService implements ServiceInterface
 {
@@ -22,9 +24,12 @@ final class RegisterService extends AuthenticationService implements ServiceInte
 
         $user = new User($data);
         $repository = new UserRepository;
-        $password = $this->getRandomString(8);
-        $user->setPassword(password_hash($password, PASSWORD_BCRYPT));
+        $token = sha1($this->getRandomString(64) . microtime());
+        $user->setToken($token);
+        $user->setActive(false);
         $repository->save($user);
-        Response::ok($password);
+        $body = MailerBodyProvider::getAccountCreatedBodyMessage($token, $_ENV['TENANT']);
+        Mailer::sendMail($data['email'], "Nowe konto w systemie " . $_ENV['TENANT'], $body);
+        Response::accepted();
     }
 }

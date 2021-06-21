@@ -68,6 +68,10 @@ Security:
             url: "/security/register"
             controller: RegisterController
             allow: ['admin']
+        activate-account:
+            url: "/security/account-activation"
+            controller: AccountActivationController
+            body-params: ['token', 'password']
         roles:
             url: "/security/roles"
             controller: RoleCollectionController
