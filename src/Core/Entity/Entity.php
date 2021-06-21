@@ -10,6 +10,7 @@ use MultipleIterator;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Lea\Module\Security\Service\AuthorizedUserService;
 use Throwable;
 use TypeError;
 
@@ -48,7 +49,7 @@ abstract class Entity
         // $mi = $this->getMultipleIterator($reflection->getProperties(), $data);
         foreach ($reflection->getProperties() as $property) {
             $key = $property->getName();
-            if (!array_key_exists($key, $data))
+            if (!array_key_exists($key, $data) && $key != 'user_id')
                 continue;
             $setValue = 'set' . $this->processSnakeToPascal($key);
             if ($property->isObject()) {
@@ -61,7 +62,10 @@ abstract class Entity
                     $this->$setValue($children);
                 }
             } else {
-                $val = self::castVariable($data[$key], $property->getType2(), $key);
+                if($setValue == 'setUserId' && !isset($data[$key])) 
+                    $val = AuthorizedUserService::getAuthorizedUserId();
+                else 
+                    $val = self::castVariable($data[$key], $property->getType2(), $key);
                 $this->$setValue($val);
             }
         }
