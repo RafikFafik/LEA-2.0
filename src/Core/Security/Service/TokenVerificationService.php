@@ -16,6 +16,9 @@ class TokenVerificationService extends AuthenticationService implements ServiceI
         if (isset($_SERVER['HTTP_AUTHORIZATION2']) && !empty($_SERVER['HTTP_AUTHORIZATION2']))
             $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['HTTP_AUTHORIZATION2'];
 
+        if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION']))
+            $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+
         if (!isset($_SERVER['HTTP_AUTHORIZATION']) || empty($_SERVER['HTTP_AUTHORIZATION']))
             Response::unauthorized();
 
