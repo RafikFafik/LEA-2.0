@@ -6,6 +6,7 @@ use Exception;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
+use Lea\Core\Exception\EmailNotSentException;
 use Lea\Module\Security\Service\LoginService;
 use Lea\Module\Security\Service\RegisterService;
 use Lea\Core\Exception\ResourceNotExistsException;
@@ -18,7 +19,11 @@ class RegisterController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "POST":
                     $service = new RegisterService;
-                    $service->register($this->request->getPayload());
+                    try {
+                        $service->register($this->request->getPayload());
+                    } catch (EmailNotSentException $e) {
+                        Response::accepted("Caution! Email not sent, but 202 status code");
+                    }
                     Response::accepted();
             default:
                 Response::methodNotAllowed();

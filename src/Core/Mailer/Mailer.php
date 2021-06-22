@@ -2,7 +2,9 @@
 
 namespace Lea\Core\Mailer;
 
+use Throwable;
 use PHPMailer\PHPMailer\PHPMailer;
+use Lea\Core\Exception\EmailNotSentException;
 
 class Mailer
 {
@@ -27,7 +29,10 @@ class Mailer
     $mail->isHTML(true);                                  // Set email format to HTML
     $mail->Subject = $subject;
     $mail->Body = $body;
-
-    $mail->send();
+    try {
+      $mail->send();
+    } catch (Throwable $t) {
+      throw new EmailNotSentException;
+    }
   }
 }
