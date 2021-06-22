@@ -23,7 +23,8 @@ class UserSubordinateController extends Controller implements ControllerInterfac
                 try {
                     $role_id = AuthorizedUserService::getAuthorizedUserRoleId();
                     $service = new UserSubordinateService;
-                    $objects = $service->findSubordinateUsersRecursive($role_id);
+                    // $objects = $service->findSubordinateUsersRecursive($role_id);
+                    $objects = $service->findSubordinateUsersFlat($role_id);
                     $result = Normalizer::denormalizeList($objects);
                     Response::ok($result);
                 } catch (ResourceNotExistsException $e) {

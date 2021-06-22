@@ -23,11 +23,11 @@ final class UserCollectionController extends Controller implements ControllerInt
                 Response::ok($res);
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), User::getNamespace());
-                $repository = new UserRepository($this->params);
+                $repository = new UserRepository();
                 $resource_id = $repository->save($data);
 
                 // debug
-                $repository = new UserRepository($this->params);
+                $repository = new UserRepository();
                 $object = $repository->findById($resource_id, new User);
                 $result = Normalizer::denormalize($object);
                 Response::ok($result);

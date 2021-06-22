@@ -22,4 +22,12 @@ final class UserRepository extends Repository
 
         return $result;
     }
+
+    public function findListDataByRoleIds(array $role_ids): iterable
+    {
+        $constraints['role_id_IN'] = $role_ids;
+        $result = $this->getListDataByConstraints(new User, $constraints);
+
+        return $result;
+    }
 }
