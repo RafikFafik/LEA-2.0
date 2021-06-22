@@ -25,12 +25,19 @@ class ReflectionPropertyExtended extends ReflectionProperty
             $this->is_object = FALSE;
             $this->type = $type;
         } else {
+            /* WIP */
             $this->is_object = TRUE;
-            $this->type = $this->getNamespaceName() . "\\" . $type;
+            $class_list = get_declared_classes();
+            $index = array_keys(get_declared_classes(), $type);
+            if (str_contains($type, "\\"))
+                $this->type = $type;
+            else
+                $this->type = $this->getNamespaceName() . "\\" . $type;
         }
     }
 
-    public function setIfObject(bool $is_object): void {
+    public function setIfObject(bool $is_object): void
+    {
         $this->is_object = $is_object;
     }
 

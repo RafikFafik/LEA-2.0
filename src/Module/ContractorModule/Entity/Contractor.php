@@ -7,6 +7,7 @@ namespace Lea\Module\ContractorModule\Entity;
 use Lea\Core\Entity\Entity;
 use Lea\Module\ContractorModule\Entity\Address;
 use Lea\Module\ContractorModule\Entity\Employee;
+use Lea\Module\CalendarModule\Entity\CalendarEvent;
 
 class Contractor extends Entity
 {
@@ -38,6 +39,11 @@ class Contractor extends Entity
      * @var iterable<Employee>
      */
     private $employees;
+
+    /**
+     * @var iterable<Lea\Module\CalendarModule\Entity\CalendarEvent>
+     */
+    private $calendar_events;
 
 
     public function getShortname()
@@ -108,6 +114,30 @@ class Contractor extends Entity
     public function setEmployees($employees)
     {
         $this->employees = $employees;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of calendar_events
+     *
+     * @return  iterable<CalendarEvent>
+     */ 
+    public function getCalendarEvents()
+    {
+        return $this->calendar_events;
+    }
+
+    /**
+     * Set the value of calendar_events
+     *
+     * @param  iterable<CalendarEvent>  $calendar_events
+     *
+     * @return  self
+     */ 
+    public function setCalendarEvents($calendar_events)
+    {
+        $this->calendar_events = $calendar_events;
 
         return $this;
     }

@@ -7,7 +7,6 @@ namespace Lea\Module\CalendarModule\Entity;
 use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
 use Lea\Module\CalendarModule\Entity\Alert;
-use Lea\Module\ContractorModule\Entity\Sloppy;
 
 class CalendarEvent extends Entity
 {
@@ -78,7 +77,7 @@ class CalendarEvent extends Entity
     /**
      * @var int
      */
-    private $contractor;
+    private $contractor_id;
 
     /**
      * @var iterable<Alert>
@@ -86,7 +85,7 @@ class CalendarEvent extends Entity
     private $alerts;
 
     /**
-     * @var iterable<Sloppy>
+     * @var string
      */
     private $employees;
 
@@ -406,7 +405,7 @@ class CalendarEvent extends Entity
     /**
      * Get the value of employees
      *
-     * @return  iterable<Sloppy>
+     * @return  string
      */ 
     public function getEmployees()
     {
@@ -416,11 +415,11 @@ class CalendarEvent extends Entity
     /**
      * Set the value of employees
      *
-     * @param  iterable<Sloppy>  $employees
+     * @param  string  $employees
      *
      * @return  self
      */ 
-    public function setEmployees($employees)
+    public function setEmployees(string $employees)
     {
         $this->employees = $employees;
 
@@ -428,25 +427,25 @@ class CalendarEvent extends Entity
     }
 
     /**
-     * Get the value of contractor
+     * Get the value of contractor_id
      *
      * @return  int
      */ 
-    public function getContractor()
+    public function getContractorId()
     {
-        return $this->contractor;
+        return $this->contractor_id;
     }
 
     /**
-     * Set the value of contractor
+     * Set the value of contractor_id
      *
      * @param  int  $contractor
      *
      * @return  self
      */ 
-    public function setContractor(int $contractor)
+    public function setContractorId(int $contractor_id)
     {
-        $this->contractor = $contractor;
+        $this->contractor_id = $contractor_id;
 
         return $this;
     }
