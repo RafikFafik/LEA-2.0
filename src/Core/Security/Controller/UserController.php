@@ -33,6 +33,8 @@ class UserController extends Controller implements ControllerInterface
                 try {
                     $repository = new UserRepository();
                     $object = Normalizer::normalize($this->request->getPayload(), User::getNamespace());
+                    if($object->getEmail())
+                        Response::badRequest("Cannot change email");
                     $affected_rows = $repository->updateById($object, $this->params['id']);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();

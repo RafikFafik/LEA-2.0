@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Lea\Module\ContractorModule\Controller;
 
 use Lea\Core\Controller\Controller;
-use Lea\Request\Request;
 use Lea\Response\Response;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Core\Database\DatabaseException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Module\ContractorModule\Entity\Contractor;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
@@ -30,17 +28,6 @@ class ContractorController extends Controller implements ControllerInterface
                 }
                 break;
             case "POST":
-                try {
-                    $contractorRepository = new ContractorRepository;
-                    $object = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
-                    $affected_rows = $contractorRepository->updateById($object, $this->params['id']);
-                } catch (ResourceNotExistsException $e) {
-                    Response::badRequest();
-                }
-                $object = $contractorRepository->findById($this->params['id'], new Contractor);
-                $res = Normalizer::denormalize($object);
-                Response::ok($res);
-                break;
             case "PUT":
                 try {
                     $contractorRepository = new ContractorRepository;
