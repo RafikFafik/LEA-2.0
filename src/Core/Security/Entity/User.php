@@ -153,7 +153,7 @@ class User extends Entity
      *
      * @return  self
      */
-    public function setToken(string $token)
+    public function setToken(?string $token)
     {
         $this->token = $token;
 

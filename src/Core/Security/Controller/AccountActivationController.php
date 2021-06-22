@@ -24,7 +24,7 @@ class AccountActivationController extends Controller implements ControllerInterf
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest("Invalid Token");
                 }
-                Response::accepted();
+                Response::noContent();
             default:
                 Response::methodNotAllowed();
         }
