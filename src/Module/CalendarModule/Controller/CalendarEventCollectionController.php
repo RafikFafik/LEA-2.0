@@ -24,16 +24,17 @@ class CalendarEventCollectionController extends Controller implements Controller
 
                 Response::ok($res);
             case "POST":
-                $payload = Normalizer::mapKeyOfArrayList($this->request->getPayload(), 'field_id', 'field');
+                $payload = Normalizer::arrayToJson($this->request->getPayload(), 'employees');
                 $data = Normalizer::normalize($payload, CalendarEvent::getNamespace());
                 $Calendar = new CalendarEventRepository;
                 $resource_id = $Calendar->save($data);
-
+                
                 // debug
                 $CalendarEventRepository = new CalendarEventRepository;
                 $object = $CalendarEventRepository->findById($resource_id, new CalendarEvent);
                 $res = Normalizer::denormalize($object);
-                $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
+                // $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
+                $res = Normalizer::jsonToArray($res, 'employees');
                 Response::ok($res);
                 // Response::noContent();
             default:

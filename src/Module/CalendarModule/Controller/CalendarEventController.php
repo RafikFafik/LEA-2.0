@@ -30,7 +30,8 @@ class CalendarEventController extends Controller implements ControllerInterface
             case "PUT":
                 try {
                     $CalendarRepository = new CalendarEventRepository;
-                    $payload = Normalizer::mapKeyOfArrayList($this->request->getPayload(), 'field_id', 'field');
+                    // $payload = Normalizer::mapKeyOfArrayList($this->request->getPayload(), 'field_id', 'field');
+                    $payload = Normalizer::arrayToJson($this->request->getPayload(), 'employees');
                     $object = Normalizer::normalize($payload, CalendarEvent::getNamespace());
                     $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
 

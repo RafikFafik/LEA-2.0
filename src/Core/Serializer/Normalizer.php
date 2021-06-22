@@ -61,4 +61,29 @@ class Normalizer
 
         return $res ?? [];
     }
+
+    /**
+     * One dimension support only
+     */
+    public static function arrayToJson(array $haystack, string $needle): array
+    {
+        foreach($haystack as $key => $val) {
+            if($key != $needle || !is_array($val))
+                continue;
+            $haystack[$key] = json_encode($val);
+        }
+
+        return $haystack ?? [];
+    }
+
+    public static function jsonToArray(array $haystack, string $needle): array
+    {
+        foreach($haystack as $key => $val) {
+            if($key != $needle)
+                continue;
+            $haystack[$key] = json_decode($val, true);
+        }
+
+        return $haystack ?? [];
+    }
 }
