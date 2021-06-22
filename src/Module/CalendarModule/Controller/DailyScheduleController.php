@@ -20,7 +20,7 @@ class DailyScheduleController extends Controller implements ControllerInterface
                 $repo = new CalendarEventRepository;
                 $list = $repo->findCalendarEventListByStartDate($this->params['date'], new CalendarEvent);
                 $res = Normalizer::denormalizeList($list);
-                $res = Normalizer::jsonToArray($res, 'employees');
+                $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
             default:
                 Response::methodNotAllowed();

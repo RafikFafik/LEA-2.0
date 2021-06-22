@@ -20,7 +20,7 @@ class MonthlyScheduleController extends Controller implements ControllerInterfac
                 $repository = new CalendarEventRepository;
                 $list = $repository->findCalendarEventListByConstraints($this->params['month'], $this->params['year'], $this->params['user_id'] ?? null);
                 $res = Normalizer::denormalizeList($list);
-                $res = Normalizer::jsonToArray($res, 'employees');
+                $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
             default:
                 Response::methodNotAllowed();
