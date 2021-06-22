@@ -22,6 +22,7 @@ class CalendarEventController extends Controller implements ControllerInterface
                     $CalendarRepository = new CalendarEventRepository;
                     $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
+                    $res = Normalizer::jsonToArray($res, 'employees');
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();

@@ -86,4 +86,13 @@ class Normalizer
 
         return $haystack ?? [];
     }
+
+    public static function jsonToArrayList(array $arrays, string $needle): array
+    {
+        foreach($arrays as $array) {
+            $res[] = self::jsonToArray($array, $needle);
+        }
+
+        return $res ?? [];
+    }
 }

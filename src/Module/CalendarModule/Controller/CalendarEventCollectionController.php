@@ -20,8 +20,8 @@ class CalendarEventCollectionController extends Controller implements Controller
                 $repository = new CalendarEventRepository;
                 $list = $repository->getList(new CalendarEvent);
                 $res = Normalizer::denormalizeList($list);
-                $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
-
+                // $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
+                $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
             case "POST":
                 $payload = Normalizer::arrayToJson($this->request->getPayload(), 'employees');
