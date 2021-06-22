@@ -18,18 +18,18 @@ class ContractorCollectionController extends Controller implements ControllerInt
     {
         switch ($this->request->method()) {
             case "GET":
-                $contractorRepository = new ContractorRepository($this->params);
+                $contractorRepository = new ContractorRepository;
                 $list = $contractorRepository->getList(new Contractor);
                 $res = Normalizer::denormalizeList($list);
 
                 Response::ok($res);
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
-                $contractor = new ContractorRepository($this->params);
+                $contractor = new ContractorRepository;
                 $resource_id = $contractor->save($data);
 
                 // debug
-                $contractorRepository = new ContractorRepository($this->params);
+                $contractorRepository = new ContractorRepository;
                 $object = $contractorRepository->findById($resource_id, new Contractor);
                 $res = Normalizer::denormalize($object);
                 Response::ok($res);

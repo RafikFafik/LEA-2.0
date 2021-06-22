@@ -28,7 +28,7 @@ final class RegisterService extends AuthenticationService implements ServiceInte
         $user->setToken($token);
         $user->setActive(false);
         $repository->save($user);
-        $body = MailerBodyProvider::getAccountCreatedBodyMessage($token, $_ENV['TENANT']);
+        $body = MailerBodyProvider::getAccountCreatedBodyMessage($token, $_ENV['TENANT'], $user->getName(), $user->getSurname());
         Mailer::sendMail($data['email'], "Nowe konto w systemie " . $_ENV['TENANT'], $body);
         Response::accepted();
     }

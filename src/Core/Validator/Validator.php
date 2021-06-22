@@ -102,7 +102,7 @@ class Validator implements ValidatorInterface
             Response::badRequest("Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character");
     }
 
-    public static function validateAccountActivationParams(array $params): void
+    public static function validateAccountActivationParams($params): void
     {
         /* TODO */
     }

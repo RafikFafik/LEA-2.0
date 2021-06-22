@@ -166,7 +166,7 @@ final class Router
                     $not_delivered[] = $param;
             }
         } elseif ($required_params) {
-            Response::badRequest($required_params);
+            Response::badRequest('Missed query string params: ' . json_encode($required_params));
         }
 
         if ($not_delivered ?? false)

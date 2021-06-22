@@ -21,7 +21,7 @@ class ContractorController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 try {
-                    $contractorRepository = new ContractorRepository($this->params);
+                    $contractorRepository = new ContractorRepository;
                     $object = $contractorRepository->findById($this->params['id'], new Contractor);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
@@ -31,7 +31,7 @@ class ContractorController extends Controller implements ControllerInterface
                 break;
             case "POST":
                 try {
-                    $contractorRepository = new ContractorRepository($this->params);
+                    $contractorRepository = new ContractorRepository;
                     $object = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
                     $affected_rows = $contractorRepository->updateById($object, $this->params['id']);
                 } catch (ResourceNotExistsException $e) {
@@ -43,7 +43,7 @@ class ContractorController extends Controller implements ControllerInterface
                 break;
             case "PUT":
                 try {
-                    $contractorRepository = new ContractorRepository($this->params);
+                    $contractorRepository = new ContractorRepository;
                     $object = Normalizer::normalize($this->request->getPayload(), Contractor::getNamespace());
                     $affected_rows = $contractorRepository->updateById($object, $this->params['id']);
                 } catch (ResourceNotExistsException $e) {
@@ -54,8 +54,8 @@ class ContractorController extends Controller implements ControllerInterface
                 Response::ok($res);
                 break;
             case "DELETE":
-                $contractorRepository = new ContractorRepository($this->params);
-                $contractorRepository->removeById(new Contractor, $this->params['id']);
+                $contractorRepository = new ContractorRepository;
+                $contractorRepository->removeById($this->params['id']);
                 Response::noContent();
                 break;
             default:

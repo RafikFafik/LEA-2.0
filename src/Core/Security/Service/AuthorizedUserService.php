@@ -27,7 +27,8 @@ final class AuthorizedUserService implements ServiceInterface
     {
         if (!self::$user)
             $user_id = null;
-        $user_id = self::$user->getId();
+        else
+            $user_id = self::$user->getId();
 
         return $user_id;
     }

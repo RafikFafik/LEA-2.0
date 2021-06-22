@@ -72,6 +72,12 @@ Security:
             url: "/security/account-activation"
             controller: AccountActivationController
             body-params: ['token', 'password']
+            allow: ['all']
+        email-resend:
+            url: "/security/account-activation-email-resend"
+            controller: AccountActivationEmailResendController
+            params: ['email']
+            allow: ['all']
         roles:
             url: "/security/roles"
             controller: RoleCollectionController
