@@ -19,6 +19,11 @@ class CalendarEvent extends Entity
      * @var string
      */
     private $type;
+
+    /**
+     * @var string
+     */
+    private $status;
     
     /**
      * @var string
@@ -470,6 +475,30 @@ class CalendarEvent extends Entity
     public function setUserId(int $user_id)
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of status
+     *
+     * @return  string
+     */ 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set the value of status
+     *
+     * @param  string  $status
+     *
+     * @return  self
+     */ 
+    public function setStatus(string $status)
+    {
+        $this->status = $status;
 
         return $this;
     }
