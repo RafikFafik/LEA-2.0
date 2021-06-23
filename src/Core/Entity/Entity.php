@@ -292,7 +292,7 @@ abstract class Entity
                 return (int)$variable;
                 break;
             case "BOOL":
-                return (bool)$variable;
+                return filter_var($variable, FILTER_VALIDATE_BOOLEAN);
                 break;
             case "DATE":
                 if (!is_string($variable))

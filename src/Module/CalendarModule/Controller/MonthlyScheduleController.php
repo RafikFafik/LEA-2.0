@@ -7,7 +7,6 @@ namespace Lea\Module\CalendarModule\Controller;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
-use Lea\Module\CalendarModule\Entity\Event;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 

@@ -155,7 +155,7 @@ class CalendarEvent extends Entity
      *
      * @return  self
      */
-    public function setDateFull(String $date_full)
+    public function setDateFull($date_full)
     {
         $this->date_full = $date_full;
 
