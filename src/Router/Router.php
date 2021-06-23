@@ -2,19 +2,19 @@
 
 namespace Lea\Router;
 
-use ArrayIterator;
 use Error;
+use TypeError;
+use ArrayIterator;
+use MultipleIterator;
+use Lea\Request\Request;
+use mysqli_sql_exception;
+use Lea\Response\Response;
+use Symfony\Component\Yaml\Yaml;
+use Lea\Core\Validator\Validator;
 use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
-use Lea\Core\Validator\Validator;
-use Lea\Request\Request;
-use Lea\Response\Response;
-use MultipleIterator;
-use mysqli_sql_exception;
-use Symfony\Component\Yaml\Yaml;
-use TypeError;
 
 final class Router
 {
@@ -93,7 +93,7 @@ final class Router
     private function getEndpointByUrl(array $routes, string $url): array
     {
         foreach ($routes as $module_name => $module) {
-            $prefix = "/" . explode("/", $url)[1];
+            $prefix = "/" . explode("?", explode("/", $url)[1])[0];
             if ($module['prefix'] == $prefix) {
                 $endpoint = $this->matchEndpoint($module, $url);
                 $endpoint['module_name'] = $module_name;

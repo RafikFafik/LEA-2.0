@@ -96,3 +96,10 @@ Security:
         users-subordinates:
             url: "/security/users/subordinates"
             controller: UserSubordinateController
+Gus:
+    prefix: "/gus"
+    endpoints:
+        gus-nip:
+            url: "/gus"
+            controller: "GusController"
+            params: ['nip']

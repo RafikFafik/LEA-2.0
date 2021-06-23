@@ -1,5 +1,5 @@
 {
-    "name": "vendor/kpfp",
+    "name": "vendor/lea-2.0",
     "description": "To są wnioski",
     "config": {
 	"platform-check": false
@@ -9,6 +9,9 @@
         "phpmailer/phpmailer": "^6.2",
         "ext-json": "*",
         "zircote/swagger-php": "^3.1",
-        "firebase/php-jwt": "^5.2"
+        "firebase/php-jwt": "^5.2",
+        "ext-soap": "*",
+        "gusapi/gusapi": "5.1",
+        "symfony/yaml": "^5.3"
     }
 }
