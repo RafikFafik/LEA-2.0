@@ -9,12 +9,11 @@ use ArrayIterator;
 use MultipleIterator;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\Reflection;
-use Lea\Core\Entity\EntityInterface;
 use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Module\Security\Service\AuthorizedUserService;
 
-abstract class Entity
+abstract class Entity implements EntityInterface
 {
     /**
      * @var int

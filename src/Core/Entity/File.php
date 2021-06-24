@@ -4,7 +4,7 @@ namespace Lea\Core\Entity;
 
 use Lea\Core\Entity\Entity;
 
-class File extends Entity
+abstract class File extends Entity implements FileInterface
 {
     /**
      * @var string
