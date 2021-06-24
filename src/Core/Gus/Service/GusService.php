@@ -2,17 +2,14 @@
 
 namespace Lea\Module\Gus\Service;
 
-use Exception;
 use GusApi\GusApi;
-use GusApi\ReportTypes;
 use Lea\Core\Service\ServiceInterface;
 
 final class GusService implements ServiceInterface
 {
     function __construct()
     {
-        $this->gus = new GusApi('af77b7b8657c41fab6c3');
-        // $gus = new GusApi('abcde12345abcde12345'); //dev
+        $this->gus = new GusApi($_ENV['GUS_API_KEY']);
         $this->gus->login();
     }
 
