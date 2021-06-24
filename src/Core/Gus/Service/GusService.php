@@ -16,29 +16,6 @@ final class GusService implements ServiceInterface
         $this->gus->login();
     }
 
-    /**
-     * Formatowanie danych NIP / REGON dla frontu
-     */
-    private function formatOutput(array $data): array
-    {
-        $headquarter = [
-            'main' => "1",
-            'city' => $data['city'],
-            'post_code' => $data['post_code'],
-            'address' => $data['address'],
-            'correspondence' => "1",
-        ];
-
-        $res['company_name'] = $data['company_name'];
-        $res['regon'] = $data['regon'];
-        $res['nip'] = $data['nip'];
-        $res['krs'] = $data['krs'] ?? null;
-        $res['company_creation_date'] = $data['company_creation_date'] ?? null;
-        $res['headquarters'][] = $headquarter;
-
-        return $res;
-    }
-
     public function returnData($type, $val)
     {
         $type = strtolower($type);
@@ -46,53 +23,16 @@ final class GusService implements ServiceInterface
             case "nip":
                 $gusReports = $this->gus->getByNip($val);
                 $res = $this->getData($gusReports);
-                $res['nip'] = $val;
-                $res = $this->formatOutput($res);
+                $res['nip'] = (string)$val;
+                // $res = $this->formatOutput($res);
 
                 return $res;
-                break;
-            case "regon":
-                $gusReports = $this->gus->getByRegon($val);
-                $res = $this->getData($gusReports);
-                $res = $this->formatOutput($res);
-
-                return $res;
-                break;
-            case "krs":
-                $gusReports = $this->gus->getByKrs($val);
-                return $this->getData($gusReports);
-                break;
-            case "ceidg":
-                $this->getCEIDG();
-                break;
-            case "teryt":
-                $this->getTeryt();
                 break;
             default:
                 break;
         }
     }
 
-    /** pobranie z teryt */
-    private function getTeryt()
-    {
-        $wsdl = 'https://uslugaterytws1.stat.gov.pl/wsdl/terytws1.wsdl';
-        include('./api/webservices.php');
-        $webservice = new TERYT_Webservices('TestPubliczny', '1234abcd', 'test', true);
-        try {
-            $towns = $webservice->town_search('Gdańsk');
-            var_dump($towns);
-        } catch (SoapFault $exception) {
-            var_dump($exception);
-        }
-    }
-    /** pobranie danych z ceidg */
-    private function getCEIDG()
-    {
-        $url = 'https://datastoretest.ceidg.gov.pl/CEIDG.DataStore/services/DataStoreProvider201901.svc';
-        $client = new SoapClient($url);
-        resp($client);
-    }
     /** pobranie pelnych informacji */
     private function getData($gusReports)
     {
