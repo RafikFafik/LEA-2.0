@@ -25,9 +25,9 @@ class Offer extends Entity
     protected $expiration_date;
 
     /**
-     * @var string
+     * @var int
      */
-    protected $contractor;
+    protected $contractor_id;
 
     /**
      * @var string
@@ -130,9 +130,9 @@ class Offer extends Entity
      *
      * @return  string
      */
-    public function getContractor()
+    public function getContractorId()
     {
-        return $this->contractor;
+        return $this->contractor_id;
     }
 
     /**
@@ -142,9 +142,9 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setContractor(string $contractor)
+    public function setContractorId(int $contractor_id)
     {
-        $this->contractor = $contractor;
+        $this->contractor_id = $contractor_id;
 
         return $this;
     }
