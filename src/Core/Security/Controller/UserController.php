@@ -32,7 +32,9 @@ class UserController extends Controller implements ControllerInterface
             case "PUT":
                 try {
                     $repository = new UserRepository();
-                    $object = Normalizer::normalize($this->request->getPayload(), User::getNamespace());
+                    $payload = $this->request->getPayload();
+                    unset($payload['email']);
+                    $object = Normalizer::normalize($payload, User::getNamespace());
                     if($object->getEmail())
                         Response::badRequest("Cannot change email");
                     $affected_rows = $repository->updateById($object, $this->params['id']);

@@ -41,6 +41,11 @@ class User extends Entity
     private $role_id;
 
     /**
+     * @var string
+     */
+    private $phone;
+
+    /**
      * Get the value of email
      *
      * @return  string
@@ -180,6 +185,30 @@ class User extends Entity
     public function setRoleId(int $role_id)
     {
         $this->role_id = $role_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of phone
+     *
+     * @return  string
+     */ 
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Set the value of phone
+     *
+     * @param  string  $phone
+     *
+     * @return  self
+     */ 
+    public function setPhone(string $phone)
+    {
+        $this->phone = $phone;
 
         return $this;
     }
