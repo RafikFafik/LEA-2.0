@@ -4,7 +4,7 @@ namespace Lea\Core\Entity;
 
 use Lea\Core\Entity\Entity;
 
-abstract class File extends Entity
+class File extends Entity
 {
     /**
      * @var string

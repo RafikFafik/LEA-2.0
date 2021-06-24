@@ -36,13 +36,13 @@ final class GusService implements ServiceInterface
     {
         foreach ($gusReports as $gusReport) {
             $ret_arr = array(
-                'company_name' => $gusReport->getName(),
+                'fullname' => $gusReport->getName(),
                 'nip' => $gusReport->getNip(),
-                'activityEndDate' => $gusReport->getActivityEndDate(),
+                'activity_end_date' => $gusReport->getActivityEndDate(),
                 'regon' => $gusReport->getRegon(),
-                'province' => $gusReport->getProvince(),
+                'voivodeship' => strtolower($gusReport->getProvince()),
                 'address' => $gusReport->getStreet() . ' ' . $gusReport->getPropertyNumber() . (strlen($gusReport->getApartmentNumber()) > 0 ? "/" . $gusReport->getApartmentNumber() : ""),
-                'post_code' => $gusReport->getZipCode(),
+                'postcode' => $gusReport->getZipCode(),
                 'city' => $gusReport->getCity()
             );
             if ($gusReport->getType() == 'p') { //7381099191

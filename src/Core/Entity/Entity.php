@@ -2,17 +2,17 @@
 
 namespace Lea\Core\Entity;
 
-use Generator;
-use ArrayIterator;
 use Exception;
-use Lea\Core\Exception\InvalidDateFormatException;
+use Generator;
+use TypeError;
+use ArrayIterator;
 use MultipleIterator;
-use Lea\Core\Reflection\Reflection;
 use Lea\Core\Type\Date;
+use Lea\Core\Reflection\Reflection;
+use Lea\Core\Entity\EntityInterface;
+use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Module\Security\Service\AuthorizedUserService;
-use Throwable;
-use TypeError;
 
 abstract class Entity
 {

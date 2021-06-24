@@ -21,22 +21,18 @@ class Address extends Entity
     /**
      * @var string
      */
-    private $city;
-
+    private $postcode;
+    
     /**
      * @var string
      */
-    private $citycode;
+    private $city;
 
     /**
      * @var string
      */
     private $voivodeship;
 
-    /**
-     * @var string
-     */
-    private $postcode;
 
     /**
      * @var string
