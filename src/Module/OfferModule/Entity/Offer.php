@@ -52,7 +52,7 @@ class Offer extends Entity
     /**
      * @var string
      */
-    protected $offer_file;
+    protected $offer_files;
 
 
     /**
