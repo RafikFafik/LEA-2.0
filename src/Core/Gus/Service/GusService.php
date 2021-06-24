@@ -3,6 +3,7 @@
 namespace Lea\Module\Gus\Service;
 
 use GusApi\GusApi;
+use GusApi\ReportTypes;
 use Lea\Core\Service\ServiceInterface;
 
 final class GusService implements ServiceInterface
