@@ -45,6 +45,11 @@ class Contractor extends Entity
      */
     private $calendar_events;
 
+    /**
+     * @var iterable<Lea\Module\OfferModule\Entity\Offer>
+     */
+    private $offers;
+
 
     public function getShortname()
     {
@@ -138,6 +143,30 @@ class Contractor extends Entity
     public function setCalendarEvents($calendar_events)
     {
         $this->calendar_events = $calendar_events;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of offers
+     *
+     * @return  iterable<Lea\Module\OfferModule\Entity\Offer>
+     */ 
+    public function getOffers()
+    {
+        return $this->offers;
+    }
+
+    /**
+     * Set the value of offers
+     *
+     * @param  iterable<Lea\Module\OfferModule\Entity\Offer>  $offers
+     *
+     * @return  self
+     */ 
+    public function setOffers($offers)
+    {
+        $this->offers = $offers;
 
         return $this;
     }
