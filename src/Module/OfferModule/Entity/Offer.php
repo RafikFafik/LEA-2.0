@@ -50,7 +50,7 @@ class Offer extends Entity
     protected $price_brutto;
 
     /**
-     * @var string
+     * @var iterable<OfferFile>
      */
     protected $offer_files;
 
@@ -248,11 +248,11 @@ class Offer extends Entity
     /**
      * Get the value of offer_file
      *
-     * @return  string
+     * @return  iterable<OfferFile>
      */
-    public function getOfferFile()
+    public function getOfferFiles()
     {
-        return $this->offer_file;
+        return $this->offer_files;
     }
 
     /**
@@ -262,9 +262,9 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setOfferFile(string $offer_file)
+    public function setOfferFiles($offer_files)
     {
-        $this->offer_file = $offer_file;
+        $this->offer_files = $offer_files;
 
         return $this;
     }

@@ -7,6 +7,7 @@ namespace Lea\Core\Reflection;
 use Exception;
 use ReflectionClass;
 use ReflectionProperty;
+use Lea\Core\Exception\DocCommentMissedException;
 
 class ReflectionPropertyExtended extends ReflectionProperty
 {
@@ -55,7 +56,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
     {
         $comment = $property->getDocComment();
         if (!$comment)
-            throw new Exception("DocComment missed exception", 500);
+            throw new DocCommentMissedException($property->getName());
         if (!(int)strpos($comment, "@var"))
             return null;
         $tokens = explode(" ", $comment);

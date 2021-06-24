@@ -28,6 +28,7 @@ abstract class Repository extends DatabaseManager
 
     public function save(object $object)
     {
+        $object->saveFiles();
         if ($object->hasId())
             $id = $this->updateData($object, $object->getId());
         else

@@ -61,9 +61,9 @@ abstract class Entity implements EntityInterface
                     $this->$setValue($children);
                 }
             } else {
-                if($setValue == 'setUserId' && !isset($data[$key])) 
+                if ($setValue == 'setUserId' && !isset($data[$key]))
                     $val = AuthorizedUserService::getAuthorizedUserId();
-                else 
+                else
                     $val = self::castVariable($data[$key], $property->getType2(), $key);
                 $this->$setValue($val);
             }
@@ -306,5 +306,22 @@ abstract class Entity implements EntityInterface
                 return $variable;
                 break;
         }
+    }
+
+    public function saveFiles(): void
+    {
+        foreach ($this->getChildObjects() as $children) {
+            foreach ($children as $obj) {
+                if ($obj->isFileClass())
+                    $obj->moveUploadedFile();
+            }
+        }
+    }
+
+    public function isFileClass(): bool
+    {
+        $classname = $this->getClassName();
+
+        return str_contains($classname, "File") ? true : false;
     }
 }

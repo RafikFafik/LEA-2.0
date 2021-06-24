@@ -103,3 +103,10 @@ Gus:
             url: "/gus"
             controller: "GusController"
             params: ['nip']
+File:
+    prefix: "/file"
+    endpoints:
+        preview-file:
+            url: "/file"
+            controller: "FileController"
+            params: ['hash']

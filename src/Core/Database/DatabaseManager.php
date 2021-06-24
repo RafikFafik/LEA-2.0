@@ -115,7 +115,8 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $query = DatabaseQuery::getInsertIntoQuery($object, $parent_class, $parent_id);
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
-        $mysqli_result = self::executeQuery($query, $tableName, $columns, $object);
+        
+        self::executeQuery($query, $tableName, $columns, $object);
         $id = DatabaseConnection::getInsertId();
         $child_objects = $object->getChildObjects();
         $class = $object->getClassName();

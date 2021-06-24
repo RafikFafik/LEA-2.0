@@ -52,6 +52,8 @@ final class DatabaseQuery extends DatabaseUtil
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
             $getValue = 'get' . self::processSnakeToPascal($var);
+            if(!method_exists(get_class($object), $getValue))
+                continue;
             $value = $object->$getValue();
             if (is_iterable($value))
                 continue;

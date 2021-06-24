@@ -11,6 +11,9 @@ use mysqli_sql_exception;
 use Lea\Response\Response;
 use Symfony\Component\Yaml\Yaml;
 use Lea\Core\Validator\Validator;
+use Lea\Core\Exception\FileNotExistsException;
+use Lea\Core\Exception\FileSaveFailedException;
+use Lea\Core\Exception\DocCommentMissedException;
 use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
@@ -66,6 +69,7 @@ final class Router
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
+            /* TODO - does not work correctly */
             $message = $e->getMessage();
             $field = substr($message, strpos($message, "set"));
             $field = substr($field, 0, strpos($field, "given") + 5);
@@ -78,6 +82,12 @@ final class Router
             Response::internalServerError("Re-setting user during one connection");
         } catch (ResourceNotExistsException $e) {
             Response::badRequest("Tried to reach resource that not exists: " . $e->getMessage());
+        } catch (FileNotExistsException $e) {
+            Response::badRequest("Expected file with file_key: " . $e->getMessage());
+        } catch (FileSaveFailedException $e) {
+            Response::internalServerError("Saving file failed: " . $e->getMessage());
+        } catch (DocCommentMissedException $e) {
+            Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");
         }
