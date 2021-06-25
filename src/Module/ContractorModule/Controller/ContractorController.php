@@ -9,7 +9,9 @@ use Lea\Response\Response;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\ResourceNotExistsException;
+use Lea\Core\File\Entity\File;
 use Lea\Module\ContractorModule\Entity\Contractor;
+use Lea\Module\ContractorModule\Entity\ContractorFile;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
 class ContractorController extends Controller implements ControllerInterface

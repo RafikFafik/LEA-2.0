@@ -4,8 +4,7 @@ HomepageModule:
         homepage:
             url: "/"
             controller: HomepageController
-            methods:
-                - GET
+            allow: ['all']
 
 #modules
 OfferModule:

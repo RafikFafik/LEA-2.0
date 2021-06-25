@@ -12,6 +12,7 @@ class FileService implements ServiceInterface
 {
     public function previewFile(string $file_name)
     {
+        $file_name = urldecode($file_name);
         $file = $this->getFileName($file_name);
         if (!file_exists($file))
             throw new FileNotExistsException();
@@ -19,7 +20,8 @@ class FileService implements ServiceInterface
         header("Content-Type: " . mime_content_type($file));
         header("Content-Length: " . filesize($file));
         echo file_get_contents($file);
-        ob_clean();
+        if (ob_get_contents())
+            ob_end_clean();
         flush();
         readfile($file);
     }

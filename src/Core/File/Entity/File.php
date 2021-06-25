@@ -9,7 +9,7 @@ use Lea\Core\Exception\FileSaveFailedException;
 
 abstract class File extends Entity implements FileInterface
 {
-    const PATH = __DIR__ . '/../../../../files/';
+    public const PATH = __DIR__ . '/../../../../files/';
     /**
      * @var string
      */
@@ -48,6 +48,11 @@ abstract class File extends Entity implements FileInterface
         $this->file_name = $file_name;
     }
 
+    public static function getPath(): string
+    {
+        return self::PATH;
+    }
+
     public function moveUploadedFile(): void
     {
         $ext = pathinfo($this->file["name"]);
@@ -58,5 +63,13 @@ abstract class File extends Entity implements FileInterface
         if (!move_uploaded_file($name, $dir . $this->server_name))
             throw new FileSaveFailedException($this->file['name']);
 
+    }
+
+    public function get(array $specific_fields = null): array
+    {
+        $result = parent::get($specific_fields);
+        $result['server_name'] = base64_encode($result['server_name']);
+
+        return $result;
     }
 }

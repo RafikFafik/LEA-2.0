@@ -18,7 +18,7 @@ class FileController extends Controller implements ControllerInterface
                 $service = new FileService();
                 $data = $service->previewFile((string)$this->params['hash']);
 
-                Response::ok($data);
+                Response::file($data);
 
             default:
                 Response::methodNotAllowed();

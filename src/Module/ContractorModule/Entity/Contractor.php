@@ -50,6 +50,11 @@ class Contractor extends Entity
      */
     private $offers;
 
+    /**
+     * @var iterable<ContractorFile>
+     */
+    private $contractor_files;
+
 
     public function getShortname()
     {
@@ -167,6 +172,30 @@ class Contractor extends Entity
     public function setOffers($offers)
     {
         $this->offers = $offers;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor_files
+     *
+     * @return  iterable<ContractorFile>
+     */ 
+    public function getContractorFiles()
+    {
+        return $this->contractor_files;
+    }
+
+    /**
+     * Set the value of contractor_files
+     *
+     * @param  iterable<ContractorFile>  $contractor_files
+     *
+     * @return  self
+     */ 
+    public function setContractorFiles($contractor_files)
+    {
+        $this->contractor_files = $contractor_files;
 
         return $this;
     }
