@@ -24,7 +24,7 @@ abstract class File extends Entity implements FileInterface
     public function set(array $data): void
     {
         if ($this->id === null && !isset($_FILES[$data['file_key'] ?? false])) /* TODO - check if does have sense */
-            throw new FileNotExistsException($data['file_key']);
+            throw new FileNotExistsException($data['file_key'] ?? "Work in Progress - Contact with rafalj@lea24.pl to make him repair it.");
         $this->file = $_FILES[$data['file_key']] ?? null;
     }
 
