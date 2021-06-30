@@ -314,7 +314,7 @@ abstract class Entity implements EntityInterface
             if(!is_array($children))
                 continue;
             foreach ($children as $obj) {
-                if ($obj->isFileClass())
+                if ($obj->isFileClass() && $obj->binaryFileAppended())
                     $obj->moveUploadedFile();
             }
         }
@@ -325,5 +325,10 @@ abstract class Entity implements EntityInterface
         $classname = $this->getClassName();
 
         return str_contains($classname, "File") ? true : false;
+    }
+
+    public function binaryFileAppended(): bool
+    {
+        return $this->file ?? false ? true : false;
     }
 }
