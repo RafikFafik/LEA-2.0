@@ -14,16 +14,22 @@ class ReflectionPropertyExtended extends ReflectionProperty
     private $is_object;
     private $type;
     private $namespace;
+    private $comment;
 
     public function __construct($class, $property)
     {
         parent::__construct($class, $property);
+        $this->loadDocComment();
         $a = new $class;
         $b = new ReflectionClass($a);
         $this->namespace = $b->getNamespaceName();
-        $type = self::getTypePHP7($this);
+        $type = $this->getTypePHP7($this);
         if ($this->isPrimitiveType($type)) {
             $this->is_object = FALSE;
+            $this->type = $type;
+        } else if ($this->hasManyToManyRelation()) {
+            $this->many_to_many_class = $this->getManyToManyClass();
+            $this->is_object = true;
             $this->type = $type;
         } else {
             /* WIP */
@@ -52,19 +58,23 @@ class ReflectionPropertyExtended extends ReflectionProperty
         return $this->type;
     }
 
-    public static function getTypePHP7(ReflectionProperty $property)
+    public function getTypePHP7()
     {
-        $comment = $property->getDocComment();
-        if (!$comment)
-            throw new DocCommentMissedException($property->getName());
-        if (!(int)strpos($comment, "@var"))
+        if (!(int)strpos($this->comment, "@var"))
             return null;
-        $tokens = explode(" ", $comment);
+        $tokens = explode(" ", $this->comment);
         $index = array_search("@var", $tokens);
 
         $var = trim($tokens[$index + 1]);
 
         return self::getDataType($var);
+    }
+
+    private function loadDocComment(): void
+    {
+        $this->comment = $this->getDocComment();
+        if (!$this->comment)
+            throw new DocCommentMissedException($this->getName());
     }
 
     private static function getDataType(string $data_type)
@@ -96,5 +106,22 @@ class ReflectionPropertyExtended extends ReflectionProperty
             default:
                 return false;
         }
+    }
+
+    private function hasManyToManyRelation(): bool
+    {
+        if (!(int)strpos($this->comment, "@reference"))
+            return false;
+        return true;
+    }
+
+    private function getManyToManyClass(): string
+    {
+        $tokens = explode(" ", $this->comment);
+        $index = array_search("@reference", $tokens);
+
+        $class = trim($tokens[$index + 1]);
+
+        return $class;
     }
 }
