@@ -311,6 +311,8 @@ abstract class Entity implements EntityInterface
     public function saveFiles(): void
     {
         foreach ($this->getChildObjects() as $children) {
+            if(!is_array($children))
+                continue;
             foreach ($children as $obj) {
                 if ($obj->isFileClass())
                     $obj->moveUploadedFile();
