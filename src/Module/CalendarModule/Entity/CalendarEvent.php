@@ -91,6 +91,7 @@ class CalendarEvent extends Entity
 
     /**
      * @var string
+     * @references Lea\Core\Security\Entity
      */
     private $employees;
 

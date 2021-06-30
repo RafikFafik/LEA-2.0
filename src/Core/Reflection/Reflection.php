@@ -19,6 +19,7 @@ final class Reflection extends ReflectionClass
         parent::__construct($objectOrClass);
         $protected_properties = $this->getProperties(ReflectionProperty::IS_PROTECTED);
         $private_properties = $this->getProperties(ReflectionProperty::IS_PRIVATE);
+        /* TODO getProperties(ReflectionPropertyExtended::WITH_LOG_DOC); */
         $properties = array_merge($protected_properties, $private_properties);
         $this->properties = $this->genericToExtendedPropertyReflection($properties, $objectOrClass);
 
