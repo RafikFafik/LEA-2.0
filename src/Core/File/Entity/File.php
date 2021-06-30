@@ -25,7 +25,7 @@ abstract class File extends Entity implements FileInterface
     {
         if ($this->id === null && !isset($_FILES[$data['file_key'] ?? false])) /* TODO - check if does have sense */
             throw new FileNotExistsException($data['file_key']);
-        $this->file = $_FILES[$data['file_key']];
+        $this->file = $_FILES[$data['file_key']] ?? null;
     }
 
     public function getServerName(): string
