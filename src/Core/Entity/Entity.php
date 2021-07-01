@@ -98,6 +98,10 @@ abstract class Entity implements EntityInterface
                         $recursive_res[] = $obj->get();
                     }
                     $res[$key] = $recursive_res;
+                    /* Disposable - Begin */
+                    if(str_contains($reflection->getName(), "files"))
+                        $res[$key][] = ['file_key' => ""];
+                    /* Disposable - End*/
                 }
             } else {
                 $res[$key] = $reflection->getType2() == "Date" && $val !== null ? $val->__toString() : $res[$key] = $val;
