@@ -35,7 +35,7 @@ abstract class File extends Entity implements FileInterface
             $this->server_name = base64_decode($data['server_name']);
     }
 
-    public function getServerName(): string
+    public function getServerName(): ?string
     {
         return $this->server_name;
     }

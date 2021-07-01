@@ -56,6 +56,10 @@ abstract class Entity implements EntityInterface
                     $children = [];
                     foreach ($data[$key] as $obj) {
                         $ChildClass = $property->getType2();
+                        /* Disposable - begin */
+                        if(str_contains($ChildClass, "File") && !isset($obj['id']))
+                            continue;
+                        /* Disposable - end */
                         $children[] = new $ChildClass($obj);
                     }
                     $this->$setValue($children);
