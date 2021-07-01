@@ -57,7 +57,7 @@ abstract class Entity implements EntityInterface
                     foreach ($data[$key] as $obj) {
                         $ChildClass = $property->getType2();
                         /* Disposable - begin */
-                        if(str_contains($ChildClass, "File") && !isset($obj['id']))
+                        if(str_contains($ChildClass, "File") && !isset($obj['id']) && !isset($_FILES[$obj['file_key']]))
                             continue;
                         /* Disposable - end */
                         $children[] = new $ChildClass($obj);
