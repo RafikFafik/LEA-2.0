@@ -16,9 +16,16 @@ OfferModule:
         collection:
             url: "/offers"
             controller: OfferCollectionController
-        submit:
-            url: "/offers/confirm"
-            controller: OfferConfirmController
+
+ProductModule:
+    prefix: "/products"
+    endpoints:
+        by-id:
+            url: "/products/{id}"
+            controller: ProductController
+        collection:
+            url: "/products"
+            controller: ProductCollectionController
 
 ContractorModule:
     prefix: "/contractors"
