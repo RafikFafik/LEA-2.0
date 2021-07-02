@@ -20,23 +20,14 @@ class CalendarEventCollectionController extends Controller implements Controller
                 $repository = new CalendarEventRepository;
                 $list = $repository->getList(new CalendarEvent);
                 $res = Normalizer::denormalizeList($list);
-                // $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
-                $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
             case "POST":
-                $payload = Normalizer::jsonToArray($this->request->getPayload(), 'employees');
-                $data = Normalizer::normalize($payload, CalendarEvent::getNamespace());
-                $Calendar = new CalendarEventRepository;
-                $resource_id = $Calendar->save($data);
+            case "PUT":
+                $data = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
+                $repository = new CalendarEventRepository;
+                $repository->save($data);
                 
-                // debug
-                $CalendarEventRepository = new CalendarEventRepository;
-                $object = $CalendarEventRepository->findById($resource_id, new CalendarEvent);
-                $res = Normalizer::denormalize($object);
-                // $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
-                $res = Normalizer::jsonToArray($res, 'employees');
-                Response::ok($res);
-                // Response::noContent();
+                Response::noContent();
             default:
                 Response::methodNotAllowed();
         }

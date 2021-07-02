@@ -22,7 +22,6 @@ class CalendarEventController extends Controller implements ControllerInterface
                     $CalendarRepository = new CalendarEventRepository;
                     $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
                     $res = Normalizer::denormalize($object);
-                    $res = Normalizer::jsonToArray($res, 'employees');
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();
@@ -30,24 +29,17 @@ class CalendarEventController extends Controller implements ControllerInterface
             case "POST":
             case "PUT":
                 try {
-                    $CalendarRepository = new CalendarEventRepository;
-                    // $payload = Normalizer::mapKeyOfArrayList($this->request->getPayload(), 'field_id', 'field');
-                    $payload = Normalizer::arrayToJson($this->request->getPayload(), 'employees');
-                    $object = Normalizer::normalize($payload, CalendarEvent::getNamespace());
-                    $affected_rows = $CalendarRepository->updateById($object, $this->params['id']);
-
-                    $object = $CalendarRepository->findById($this->params['id'], new CalendarEvent);
-                    $res = Normalizer::denormalize($object);
-                    $res = Normalizer::mapKeyOfArrayList($res, 'field', 'field_id');
-                    Response::ok($res);
+                    $repository = new CalendarEventRepository;
+                    $object = Normalizer::normalize($this->request->getPayload(), CalendarEvent::getNamespace());
+                    $repository->updateById($object, $this->params['id']);
+                    Response::noContent();
                 } catch (ResourceNotExistsException $e) {
-                    Response::badRequest("Brak zasobu");
+                    Response::badRequest("Resource does not exists");
                 }
             case "DELETE":
                 $eventRepository = new CalendarEventRepository;
                 $eventRepository->removeById($this->params['id']);
                 Response::noContent();
-                Response::notImplemented();
             default:
                 Response::methodNotAllowed();
         }
