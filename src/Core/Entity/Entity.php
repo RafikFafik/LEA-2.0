@@ -104,8 +104,7 @@ abstract class Entity implements EntityInterface
                     $res[$key] = $recursive_res;
                     /* Disposable - Begin */
                     if(str_contains($reflection->getName(), "files")) {
-                        $res[$key][] = ['file_key' => ""];
-                        $res[$key][] = ['deleted' => false];
+                        $res[$key][] = ['file_key' => "", 'deleted' => false];
                     }
                     /* Disposable - End*/
                 }
