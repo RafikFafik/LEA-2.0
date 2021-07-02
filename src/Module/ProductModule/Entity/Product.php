@@ -21,12 +21,17 @@ class Product extends Entity
   /**
    * @var string
    */
-  private $tags;
+  private $unit_of_measure;
 
   /**
-   * @var string
+   * @var int
    */
-  private $unit_of_measure;
+  private $price;
+
+  /**
+   * @var int
+   */
+  private $vat_rate;
 
   /**
    * @var string
@@ -102,30 +107,6 @@ class Product extends Entity
   public function setProductModel(string $product_model)
   {
     $this->product_model = $product_model;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of tags
-   *
-   * @return  string
-   */ 
-  public function getTags()
-  {
-    return $this->tags;
-  }
-
-  /**
-   * Set the value of tags
-   *
-   * @param  string  $tags
-   *
-   * @return  self
-   */ 
-  public function setTags(string $tags)
-  {
-    $this->tags = $tags;
 
     return $this;
   }
@@ -294,6 +275,54 @@ class Product extends Entity
   public function setProductFiles($product_files)
   {
     $this->product_files = $product_files;
+
+    return $this;
+  }
+
+  /**
+   * Get the value of price
+   *
+   * @return  int
+   */ 
+  public function getPrice()
+  {
+    return $this->price;
+  }
+
+  /**
+   * Set the value of price
+   *
+   * @param  int  $price
+   *
+   * @return  self
+   */ 
+  public function setPrice(int $price)
+  {
+    $this->price = $price;
+
+    return $this;
+  }
+
+  /**
+   * Get the value of vat_rate
+   *
+   * @return  int
+   */ 
+  public function getVatRate()
+  {
+    return $this->vat_rate;
+  }
+
+  /**
+   * Set the value of vat_rate
+   *
+   * @param  int  $vat_rate
+   *
+   * @return  self
+   */ 
+  public function setVatRate(int $vat_rate)
+  {
+    $this->vat_rate = $vat_rate;
 
     return $this;
   }
