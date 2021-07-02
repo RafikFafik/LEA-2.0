@@ -8,6 +8,10 @@ use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
 use Lea\Module\CalendarModule\Entity\Alert;
 
+/**
+ * @dependency Lea\Module\CalendarModule\Entity\CalendarEventUser
+ * @property user_id
+ */
 class CalendarEvent extends Entity
 {
     /**
@@ -91,6 +95,7 @@ class CalendarEvent extends Entity
 
     /**
      * @var iterable<CalendarEventUser>
+     * @many-to-many
      */
     private $employees;
 

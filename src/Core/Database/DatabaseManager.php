@@ -177,7 +177,6 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     protected function getListDataByConstraints(object $object, $constraints = [], $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
     {
         $tableName = self::getTableNameByObject($object);
-        // $columns = self::getTableColumnsByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
         $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints);
@@ -205,6 +204,12 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         }
 
         return $objects ?? [];
+    }
+
+    protected function getIdListByConstraints(object $object, $constraints = [], $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
+    {
+        $result = $this->getListDataByConstraints($object, $constraints);
+        
     }
 
     function getFieldsDataMultiCondition($tableName, $arr = array(), $fields = array(),  $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)

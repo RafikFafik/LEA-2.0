@@ -2,9 +2,6 @@
 
 namespace Lea\Core\Serializer;
 
-use Lea\Module\ContractorModule\Entity\Contractor;
-use Lea\Module\ContractorModule\Service\ContractorService;
-
 class Normalizer
 {
     public static function normalize(array $data, string $class): object
@@ -30,18 +27,20 @@ class Normalizer
 
 
 
-    public static function denormalizeList(iterable $list): array {
-        foreach($list as $object) {
+    public static function denormalizeList(iterable $list): array
+    {
+        foreach ($list as $object) {
             $res[] = $object->get();
         }
 
         return $res ?? [];
     }
-  
-    public static function filterSpecificFieldsFromArrayList(array $haystack, array $needles): array {
-        foreach($haystack as $key => $val) {
+
+    public static function filterSpecificFieldsFromArrayList(array $haystack, array $needles): array
+    {
+        foreach ($haystack as $key => $val) {
             // if(in_array($key, $to_get)
-                // $res[$key] = 
+            // $res[$key] = 
         }
 
         return [];
@@ -49,10 +48,10 @@ class Normalizer
 
     public static function mapKeyOfArrayList(array $haystack, string $seek, $to_replace): array
     {
-        foreach($haystack as $key => $val) {
-            if(is_array($val)) {
+        foreach ($haystack as $key => $val) {
+            if (is_array($val)) {
                 $res[$key] = self::mapKeyOfArrayList($val, $seek, $to_replace);
-            } elseif($key == $seek) {
+            } elseif ($key == $seek) {
                 $res[$to_replace] = $val;
             } else {
                 $res[$key] = $val;
@@ -67,8 +66,8 @@ class Normalizer
      */
     public static function arrayToJson(array $haystack, string $needle): array
     {
-        foreach($haystack as $key => $val) {
-            if($key != $needle || !is_array($val))
+        foreach ($haystack as $key => $val) {
+            if ($key != $needle || !is_array($val))
                 continue;
             $haystack[$key] = json_encode($val);
         }
@@ -78,8 +77,8 @@ class Normalizer
 
     public static function jsonToArray(array $haystack, string $needle): array
     {
-        foreach($haystack as $key => $val) {
-            if($key != $needle || is_array($val))
+        foreach ($haystack as $key => $val) {
+            if ($key != $needle || is_array($val))
                 continue;
             $haystack[$key] = json_decode($val, true);
         }
@@ -89,7 +88,7 @@ class Normalizer
 
     public static function jsonToArrayList(array $arrays, string $needle): array
     {
-        foreach($arrays as $array) {
+        foreach ($arrays as $array) {
             $res[] = self::jsonToArray($array, $needle);
         }
 

@@ -14,6 +14,11 @@ class CalendarEventUser extends Entity
     private $user_id;
 
     /**
+     * @var int
+     */
+    private $calendar_event_id;
+
+    /**
      * Get the value of user_id
      *
      * @return  int
@@ -33,6 +38,30 @@ class CalendarEventUser extends Entity
     public function setUserId(int $user_id)
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of calendar_event
+     *
+     * @return  int
+     */ 
+    public function getCalendarEventId()
+    {
+        return $this->calendar_event_id;
+    }
+
+    /**
+     * Set the value of calendar_event
+     *
+     * @param  int  $calendar_event
+     *
+     * @return  self
+     */ 
+    public function setCalendarEventId(int $calendar_event_id)
+    {
+        $this->calendar_event_id = $calendar_event_id;
 
         return $this;
     }
