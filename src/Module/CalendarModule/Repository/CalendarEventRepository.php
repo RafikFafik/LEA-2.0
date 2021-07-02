@@ -6,7 +6,6 @@ namespace Lea\Module\CalendarModule\Repository;
 
 use Lea\Core\Validator\Validator;
 use Lea\Core\Repository\Repository;
-use Lea\Module\CalendarModule\Entity\Event;
 use Lea\Module\CalendarModule\Entity\CalendarEvent;
 use Lea\Module\Security\Service\AuthorizedUserService;
 
