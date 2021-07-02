@@ -44,14 +44,14 @@ abstract class DatabaseConnection
         return self::$connection->affected_rows;
     }
 
-    protected static function executeQuery(string $query, string $tableName = null, string $columns = null, object $object = null) // PHP8: mysqli_result|bool
+    protected static function executeQuery(string $query, string $tableName = null, string $columns = null, object $object = null, $parent_class = null) // PHP8: mysqli_result|bool
     {
         try {
             if(self::$connection === null)
                 Response::internalServerError("No database connection established");
             $mysqli_result = mysqli_query(self::$connection, $query);
         } catch (mysqli_sql_exception $e) {
-            $ddl = DatabaseException::handleSqlException($e, self::$connection, $object, $query);
+            $ddl = DatabaseException::handleSqlException($e, self::$connection, $object, $query, $parent_class);
             if (is_array($ddl)) {
                 foreach ($ddl as $single_query) {
                     $mysqli_result = self::executeQuery($single_query, $tableName, $columns, $object);

@@ -24,7 +24,7 @@ class CalendarEventCollectionController extends Controller implements Controller
                 $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
             case "POST":
-                $payload = Normalizer::arrayToJson($this->request->getPayload(), 'employees');
+                $payload = Normalizer::jsonToArray($this->request->getPayload(), 'employees');
                 $data = Normalizer::normalize($payload, CalendarEvent::getNamespace());
                 $Calendar = new CalendarEventRepository;
                 $resource_id = $Calendar->save($data);

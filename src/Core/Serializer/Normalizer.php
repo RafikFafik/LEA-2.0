@@ -79,7 +79,7 @@ class Normalizer
     public static function jsonToArray(array $haystack, string $needle): array
     {
         foreach($haystack as $key => $val) {
-            if($key != $needle)
+            if($key != $needle || is_array($val))
                 continue;
             $haystack[$key] = json_decode($val, true);
         }

@@ -58,6 +58,7 @@ abstract class DatabaseUtil extends DatabaseConnection
 
     protected static function getTableColumnsByObject(object $object): string
     {
+        /* TODO - Probably contains mistakes, include columns that are objects */
         $res = "";
         foreach (get_class_methods($object) as $method) {
             if ($object->hasPropertyCorrespondingToMethod($method)) {

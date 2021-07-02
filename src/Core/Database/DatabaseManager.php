@@ -22,7 +22,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     function __construct(object $object, $user_id = null)
     {
         $this->tableName = self::getTableNameByObject($object);
-        if($user_id)
+        if ($user_id)
             $this->user_id = $user_id;
     }
 
@@ -116,7 +116,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         $tableName = self::getTableNameByObject($object);
         $columns = self::getTableColumnsByObject($object);
         
-        self::executeQuery($query, $tableName, $columns, $object);
+        self::executeQuery($query, $tableName, $columns, $object, $parent_class);
         $id = DatabaseConnection::getInsertId();
         $child_objects = $object->getChildObjects();
         $class = $object->getClassName();
@@ -188,7 +188,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
             while ($row = mysqli_fetch_assoc($result)) {
                 $object = new $Class;
                 foreach ($row as $key => $val) {
-                    if($val === null)
+                    if ($val === null)
                         continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);

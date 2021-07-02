@@ -90,8 +90,7 @@ class CalendarEvent extends Entity
     private $alerts;
 
     /**
-     * @var string
-     * @reference Lea\Core\Security\Entity\User
+     * @var iterable<CalendarEventUser>
      */
     private $employees;
 
@@ -425,7 +424,7 @@ class CalendarEvent extends Entity
      *
      * @return  self
      */ 
-    public function setEmployees(string $employees)
+    public function setEmployees($employees)
     {
         $this->employees = $employees;
 

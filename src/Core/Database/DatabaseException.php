@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use ReflectionClass;
 use mysqli_sql_exception;
 use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Reflection\Reflection;
@@ -26,14 +25,14 @@ class DatabaseException extends DatabaseUtil
     const SQL_FOREIGN_KEY_CONSTRAINTS_FAIL = 1452;
     const SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE = 1005;
 
-    public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query)
+    public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query, $parent_class = null)
     {
         $message = $e->getMessage();
         switch ($e->getCode()) {
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::getCreateTableQueryRecursive($object);
             case self::SQL_UNKNOWN_COLUMN:
-                return self::getAlterTableQuery($object, $connection);
+                return self::getAlterTableQuery($object, $connection, $parent_class);
             case self::SQL_MISSING_DEFAULT_VALUE:
                 Response::internalServerError("TODO - Default Value failure: " . $e->getCode() . "\n" . $e->getMessage());
             case self::SQL_FOREIGN_KEY_CONSTRAINTS_FAIL:
@@ -61,7 +60,7 @@ class DatabaseException extends DatabaseUtil
         return "";
     }
 
-    private static function getAlterTableQuery(object $object, $connection): array
+    private static function getAlterTableQuery(object $object, $connection, string $parent_class = null): array
     {
         $described = self::describeTable($object, $connection);
         $table_keys = self::convertArrayToKeys($described);
@@ -80,6 +79,11 @@ class DatabaseException extends DatabaseUtil
             $query .= self::parseReflectProperty($reflector);
             $query .= $last ?  ' AFTER ' . self::convertKeyToColumn($last) . ';' : ";";
             $queries[] = $query;
+        }
+        if ($parent_class) {
+            $query = 'ALTER TABLE ' . self::getTableNameByObject($object) . ' ADD ';
+            $queries[] = $query . self::getReferencedKeyColumn($parent_class) . ' INT NOT NULL';
+            $queries[] = self::getForeignKeyConstraint(self::getTableNameByObject($object), self::getTableNameByClass($parent_class), self::getReferencedKeyColumn($parent_class));
         }
         // TODO - polish collate
 

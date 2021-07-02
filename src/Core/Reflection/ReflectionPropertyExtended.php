@@ -27,12 +27,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
         if ($this->isPrimitiveType($type)) {
             $this->is_object = FALSE;
             $this->type = $type;
-        } else if ($this->hasManyToManyRelation()) {
-            $this->many_to_many_class = $this->getManyToManyClass();
-            $this->is_object = true;
-            $this->type = $type;
         } else {
-            /* WIP */
             $this->is_object = TRUE;
             $class_list = get_declared_classes();
             $index = array_keys(get_declared_classes(), $type);
@@ -110,7 +105,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
 
     private function hasManyToManyRelation(): bool
     {
-        if (!(int)strpos($this->comment, "@reference"))
+        if (!(int)strpos($this->comment, "@many-to-many"))
             return false;
         return true;
     }
@@ -118,7 +113,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
     private function getManyToManyClass(): string
     {
         $tokens = explode(" ", $this->comment);
-        $index = array_search("@reference", $tokens);
+        $index = array_search("@many-to-many", $tokens);
 
         $class = trim($tokens[$index + 1]);
 
