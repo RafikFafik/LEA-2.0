@@ -16,11 +16,17 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         parent::__construct($this->object, $user_id);
     }
 
+    public function getEntityClass(): string
+    {
+        return $this->entity_class;
+    }
+
     private function getObjectInstance(): object
     {
         $namespace = get_called_class();
         $namespace = str_replace("\Repository", "\Entity", $namespace);
         $namespace = str_replace("Repository", "", $namespace);
+        $this->entity_class = $namespace;
 
         return new $namespace;
     }
