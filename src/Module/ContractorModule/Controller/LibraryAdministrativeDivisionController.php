@@ -19,7 +19,7 @@ class LibraryAdministrativeDivisionController extends Controller implements Cont
             case "GET":
                 try {
                     $repository = new LibraryAdministrativeDivisionRepository;
-                    $object = $repository->getByField('postcode', $this->params['postcode']);
+                    $object = $repository->findByPostcode($this->params['postcode']);
                     $res = Normalizer::denormalize($object);
                     Response::ok($res);
                 } catch (ResourceNotExistsException $e) {

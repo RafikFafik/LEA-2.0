@@ -18,7 +18,7 @@ final class UserCollectionController extends Controller implements ControllerInt
         switch ($this->request->method()) {
             case "GET":
                 $repository = new UserRepository();
-                $list = $repository->getList();
+                $list = $repository->findList();
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
             case "POST":

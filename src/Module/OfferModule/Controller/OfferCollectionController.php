@@ -17,7 +17,7 @@ class OfferCollectionController extends Controller implements ControllerInterfac
         switch ($this->request->method()) {
             case "GET":
                 $offer_repository = new OfferRepository();
-                $list = $offer_repository->getList(new Offer);
+                $list = $offer_repository->findList();
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
             case "POST":

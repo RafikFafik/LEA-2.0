@@ -15,7 +15,10 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
     const METHOD = 1;
     const VALUE = 0;
 
-    public $uid = 0;
+    private $root_object;
+    private $root_reflector;
+    private $tableName;
+
     private static $connection;
 
     protected function __construct(object $object, $user_id = null)
@@ -35,7 +38,7 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         $result = self::executeQuery($query, $this->tableName, $columns, $this->root_object);
         if ($result->num_rows == 0)
             throw new ResourceNotExistsException($this->root_object->getClassName());
-            
+
         $row = mysqli_fetch_assoc($result);
         foreach ($row as $key => $val) {
             if ($val === null)
@@ -56,14 +59,14 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
             $child_object_name = $property->getType2();
             $child_object = new $child_object_name;
             /* TODO - Currently - Get Record by record -> Get multiple records at once */
-            $children_objects = $this->getRecordsData($child_object, $this->root_object->getId(), self::convertParentClassToForeignKey($this->root_object->getClassName()));
+            $children_objects = $this->getRecordsData($this->root_object->getId(), self::convertParentClassToForeignKey($this->root_object->getClassName()), $child_object);
             $this->root_object->$setVal($children_objects);
         }
 
         return $this->root_object;
     }
 
-    protected function getRecordsData(object $object, $where_value = null, $where_column = 'id'): iterable
+    protected function getRecordsData($where_value = null, $where_column = 'id', object $object = null): iterable
     {
         $tableName = self::getTableNameByObject($object);
         $reflector = new Reflection($object);
@@ -94,8 +97,40 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
                     $child_object_name = $property->getType2();
                     $child_object = new $child_object_name;
                     /* TODO - Currently - Get Record by record -> Get multiple records at once */
-                    $children_objects = $this->getRecordsData($child_object, $object->getId(), self::convertParentClassToForeignKey($object->getClassName()));
+                    $children_objects = $this->getRecordsData($object->getId(), self::convertParentClassToForeignKey($object->getClassName()), $child_object);
                     $object->$setVal($children_objects);
+                }
+                $objects[] = $object;
+            }
+        }
+
+        return $objects ?? [];
+    }
+
+    protected function getListDataByConstraints(object $object, $constraints = [], $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
+    {
+        $tableName = self::getTableNameByObject($object);
+        $reflector = new Reflection($object);
+        $columns = self::getTableColumnsByReflector($reflector);
+        $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints);
+
+        $result = self::executeQuery($query, $tableName, $columns, $object);
+        if ($result) {
+            $Class = get_class($object);
+            while ($row = mysqli_fetch_assoc($result)) {
+                $object = new $Class;
+                foreach ($row as $key => $val) {
+                    if ($val === null)
+                        continue;
+                    $key = self::convertToKey($key);
+                    $setVal = 'set' . self::processSnakeToPascal($key);
+                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
+                    if (method_exists($object, $setVal) && $property->isObject()) {
+                        $children[] = $setVal; /* TODO - Nested Objects */
+                    } else if (method_exists($object, $setVal)) {
+                        $type = $property->getType2();
+                        $object->$setVal(self::castVariable($val, $type));
+                    }
                 }
                 $objects[] = $object;
             }
@@ -166,43 +201,6 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         $columns = self::getTableColumnsByObject($object);
         $this->updateProtection($object, $where_value, 'id', $tableName, $columns);
         self::executeQuery($query, $tableName, $columns, $object);
-    }
-
-    protected function getListDataByConstraints(object $object, $constraints = [], $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
-    {
-        $tableName = self::getTableNameByObject($object);
-        $reflector = new Reflection($object);
-        $columns = self::getTableColumnsByReflector($reflector);
-        $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints);
-
-        $result = self::executeQuery($query, $tableName, $columns, $object);
-        if ($result) {
-            $Class = get_class($object);
-            while ($row = mysqli_fetch_assoc($result)) {
-                $object = new $Class;
-                foreach ($row as $key => $val) {
-                    if ($val === null)
-                        continue;
-                    $key = self::convertToKey($key);
-                    $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
-                    if (method_exists($object, $setVal) && $property->isObject()) {
-                        $children[] = $setVal; /* TODO - Nested Objects */
-                    } else if (method_exists($object, $setVal)) {
-                        $type = $property->getType2();
-                        $object->$setVal(self::castVariable($val, $type));
-                    }
-                }
-                $objects[] = $object;
-            }
-        }
-
-        return $objects ?? [];
-    }
-
-    protected function getIdListByConstraints(object $object, $constraints = [], $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
-    {
-        $result = $this->getListDataByConstraints($object, $constraints);
     }
 
     function getFieldsDataMultiCondition($tableName, $arr = array(), $fields = array(),  $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)

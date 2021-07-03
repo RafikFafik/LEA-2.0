@@ -17,22 +17,20 @@ final class RoleCollectionController extends Controller implements ControllerInt
     {
         switch ($this->request->method()) {
             case "GET":
-                $repository = new RoleRepository;
-                $list = $repository->getList(new Role);
+                $repository = new RoleRepository();
+                $list = $repository->findList();
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
             case "POST":
                 $data = Normalizer::normalize($this->request->getPayload(), Role::getNamespace());
-                $repository = new RoleRepository;
+                $repository = new RoleRepository();
                 $resource_id = $repository->save($data);
 
                 // debug
-                $repository = new RoleRepository;
+                $repository = new RoleRepository();
                 $object = $repository->findById($resource_id);
                 $result = Normalizer::denormalize($object);
                 Response::ok($result);
-            case "DELETE":
-                Response::methodNotAllowed();
             default:
                 Response::methodNotAllowed();
         }

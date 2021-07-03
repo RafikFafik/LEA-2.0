@@ -16,7 +16,7 @@ class ProductCollectionController extends Controller implements ControllerInterf
         switch ($this->request->method()) {
             case "GET":
                 $repository = new ProductRepository();
-                $list = $repository->getList(new Product);
+                $list = $repository->findList();
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
             case "POST":

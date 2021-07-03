@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace Lea\Module\ContractorModule\Repository;
 
 use Lea\Core\Repository\Repository;
-use Lea\Module\ContractorModule\Entity\Contractor;
 
 final class LibraryAdministrativeDivisionRepository extends Repository
 {
+    public function findByPostcode(string $postcode): object
+    {
+        $object = $this->getRecordData($postcode, 'postcode');
+
+        return $object;
+    }
 }

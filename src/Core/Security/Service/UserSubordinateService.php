@@ -4,7 +4,6 @@ namespace Lea\Module\Security\Service;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
-use Lea\Core\Security\Entity\User;
 use Lea\Core\Service\ServiceInterface;
 use Lea\Core\Security\Repository\RoleRepository;
 use Lea\Core\Security\Repository\UserRepository;
@@ -17,10 +16,10 @@ final class UserSubordinateService implements ServiceInterface
         $role_repository = new RoleRepository();
         $user_repository = new UserRepository();
         try {
-            $subroles = $role_repository->getListByField('role_id', $role_id);
+            $subroles = $role_repository->findListByRoleId($role_id);
             foreach ($subroles as $subrole) {
                 $role_id = $subrole->getId();
-                $user = $user_repository->getByField('role_id', $role_id);
+                $user = $user_repository->findByRoleId($role_id);
                 $role_id = $user->getRoleId();
                 $user->subordinates = $this->findSubordinateUsersRecursive($role_id);
                 $users[] = $user;
@@ -34,10 +33,10 @@ final class UserSubordinateService implements ServiceInterface
     public function findSubordinateUsersFlat(int $role_id): iterable
     {
         $roles = $this->getSubordinateRoles($role_id);
-        foreach($roles as $role) {
+        foreach ($roles as $role) {
             $role_ids[] = $role->getId();
         }
-        if(!isset($role_ids))
+        if (!isset($role_ids))
             return [];
 
         $repository = new UserRepository();
@@ -50,7 +49,7 @@ final class UserSubordinateService implements ServiceInterface
     {
         $repository = new RoleRepository();
         try {
-            $subroles = $repository->getListByField('role_id', $role_id);
+            $subroles = $repository->findListByRoleId($role_id);
             foreach ($subroles as $subrole) {
                 $subsubroles = $this->getSubordinateRoles($subrole->getId());
             }

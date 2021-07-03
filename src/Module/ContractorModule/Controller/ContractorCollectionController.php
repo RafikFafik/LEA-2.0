@@ -19,7 +19,7 @@ class ContractorCollectionController extends Controller implements ControllerInt
         switch ($this->request->method()) {
             case "GET":
                 $contractorRepository = new ContractorRepository;
-                $list = $contractorRepository->getList(new Contractor);
+                $list = $contractorRepository->findList();
                 $res = Normalizer::denormalizeList($list);
 
                 Response::ok($res);

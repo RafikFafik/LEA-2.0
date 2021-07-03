@@ -19,7 +19,7 @@ class ContractorNutshellCollectionController extends Controller implements Contr
         switch ($this->request->method()) {
             case "GET":
                 $contractorRepository = new ContractorRepository;
-                $list = $contractorRepository->getList();
+                $list = $contractorRepository->findList();
                 $result = Normalizer::denormalizeList($list);
                 // $result = Normalizer::filterSpecificFieldsFromArrayList($result, ['id', 'shortname']);
                 // $result = Normalizer::mapKeyOfArrayList();

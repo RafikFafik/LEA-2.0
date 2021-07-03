@@ -6,15 +6,12 @@ namespace Lea\Core\Repository;
 
 use Lea\Core\Database\DatabaseManager;
 use Lea\Module\Security\Service\AuthorizedUserService;
-use Lea\Response\Response;
 
 abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
-    public function __construct(object $object = null)
+    public function __construct()
     {
         $this->object = $this->getObjectInstance();
-        if ($object && $object->getNamespace() != $this->object)
-            Response::internalServerError("Object doesn't match repository");
         $user_id = AuthorizedUserService::getAuthorizedUserId();
         parent::__construct($this->object, $user_id);
     }
@@ -45,13 +42,6 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $res;
     }
 
-    public function getByField(string $field_name, $field_value)
-    {
-        $res = $this->getRecordData($field_value, $field_name);
-
-        return $res;
-    }
-
     public function updateById(object $object, int $id)
     {
         $object->setId($id);
@@ -60,16 +50,9 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $affected_rows;
     }
 
-    public function getList()
+    public function findList()
     {
-        $result = $this->getRecordsData($this->object);
-
-        return $result;
-    }
-
-    public function getListByField($field_name, $field_value)
-    {
-        $result = $this->getRecordsData($this->object, $field_value, $field_name);
+        $result = $this->getRecordsData(null, 'id', $this->object);
 
         return $result;
     }
