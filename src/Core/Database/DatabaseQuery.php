@@ -6,9 +6,13 @@ namespace Lea\Core\Database;
 
 use Lea\Core\Reflection\Reflection;
 
-final class DatabaseQuery extends DatabaseUtil
+class DatabaseQuery extends DatabaseUtil
 {
-    public static function getSelectRecordDataQuery(object $object, string $tableName, string $columns, $where_val = null, $where_column = "id"): string
+    public function __construct(object $object)
+    {
+        $this->object = $object;
+    }
+    public function getSelectRecordDataQuery(string $tableName, string $columns, $where_val = null, $where_column = "id"): string
     {
         $query = "SELECT $columns ";
         $query .= "FROM " . $tableName . " ";
@@ -26,10 +30,10 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getQueryWithConstraints(object $object, string $columns, array $constraints): string
+    public function getQueryWithConstraints(object $object, string $columns, array $constraints): string
     {
         $table_name = self::getTableNameByObject($object);
-        $query = self::getSelectRecordDataQuery($object, $table_name, $columns, null, null);
+        $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
         foreach ($constraints as $key => $val) {
             if (str_contains($key, "_IN") && $object->hasKey(substr($key, 0, strpos($key, "_IN")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
@@ -43,7 +47,7 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getInsertIntoQuery(object $object, string $parent_class = NULL, int $parent_id = NULL): string
+    public function getInsertIntoQuery(object $object, string $parent_class = NULL, int $parent_id = NULL): string
     {
         $table_name = self::getTableNameByObject($object);
         $columns = "";
@@ -80,7 +84,7 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getUpdateQuery(object $object, $where_val, string $where_column, $parent_where_val = NULL, string $parent_key = NULL): string
+    public function getUpdateQuery(object $object, $where_val, string $where_column, $parent_where_val = NULL, string $parent_key = NULL): string
     {
         $table_name = self::getTableNameByObject($object);
         $changes = "";
@@ -113,7 +117,7 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getCountQuery(object $object, $where_val, string $where_column): string
+    public function getCountQuery(object $object, $where_val, string $where_column): string
     {
         $table_name = self::getTableNameByObject($object);
         $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
@@ -121,7 +125,7 @@ final class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public static function getSoftDeleteQuery(object $object, $where_val): string
+    public function getSoftDeleteQuery(object $object, $where_val): string
     {
         $table_name = self::getTableNameByObject($object);
         $query = 'UPDATE ' . $table_name . ' SET `fld_Deleted` = 1 WHERE `fld_Id` = ' . $where_val;

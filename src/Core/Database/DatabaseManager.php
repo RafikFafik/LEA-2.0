@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
-abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManagerInterface
+abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManagerInterface
 {
     const PROPERTY = 2;
     const METHOD = 1;
@@ -19,21 +18,21 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
     public $uid = 0;
     private static $connection;
 
-    function __construct(object $object, $user_id = null)
+    protected function __construct(object $object, $user_id = null)
     {
+        $this->root_object = $object;
+        $this->root_reflector = new Reflection($object);
         $this->tableName = self::getTableNameByObject($object);
         if ($user_id)
             $this->user_id = $user_id;
     }
 
-    protected function getRecordData(object $object, $where_value, $where_column = "id", $debug = false)
+    protected function getRecordData($where_value, $where_column = "id")
     {
-        $tableName = self::getTableNameByObject($object);
-        $reflector = new Reflection($object);
-        $columns = self::getTableColumnsByReflector($reflector);
-        $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
+        $columns = self::getTableColumnsByReflector($this->root_reflector);
+        $query = $this->getSelectRecordDataQuery($this->tableName, $columns, $where_value, $where_column);
 
-        $result = self::executeQuery($query, $tableName, $columns, $object);
+        $result = self::executeQuery($query, $this->tableName, $columns, $this->root_object);
         if ($result->num_rows) {
             if ($row = mysqli_fetch_assoc($result)) {
                 foreach ($row as $key => $val) {
@@ -41,29 +40,29 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
                         continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
-                    if (method_exists($object, $setVal) && $property->isObject()) {
+                    $property = new ReflectionPropertyExtended(get_class($this->root_object), $key, $this->root_reflector->getNamespaceName());
+                    if (method_exists($this->root_object, $setVal) && $property->isObject()) {
                         $children[] = $setVal;
-                    } else if (method_exists($object, $setVal)) {
+                    } else if (method_exists($this->root_object, $setVal)) {
                         $type = $property->getType2();
-                        $object->$setVal(self::castVariable($val, $type));
+                        $this->root_object->$setVal(self::castVariable($val, $type));
                     }
                 }
             }
         } else {
-            throw new ResourceNotExistsException($object->getClassName());
+            throw new ResourceNotExistsException($this->root_object->getClassName());
         }
-        foreach ($reflector->getObjectProperties() as $property) {
+        foreach ($this->root_reflector->getObjectProperties() as $property) {
             $key = $property->getName();
             $setVal = 'set' . self::processSnakeToPascal($key);
             $child_object_name = $property->getType2();
             $child_object = new $child_object_name;
             /* TODO - Currently - Get Record by record -> Get multiple records at once */
-            $children_objects = $this->getRecordsData($child_object, $object->getId(), self::convertParentClassToForeignKey($object->getClassName()));
-            $object->$setVal($children_objects);
+            $children_objects = $this->getRecordsData($child_object, $this->root_object->getId(), self::convertParentClassToForeignKey($this->root_object->getClassName()));
+            $this->root_object->$setVal($children_objects);
         }
 
-        return $object;
+        return $this->root_object;
     }
 
     protected function getRecordsData(object $object, $where_value = null, $where_column = 'id'): iterable
@@ -72,7 +71,7 @@ abstract class DatabaseManager extends DatabaseUtil // implements DatabaseManage
         // $columns = self::getTableColumnsByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
-        $query = DatabaseQuery::getSelectRecordDataQuery($object, $tableName, $columns, $where_value, $where_column);
+        $query = DatabaseQuery::getSelectRecordDataQuery($tableName, $columns, $where_value, $where_column);
 
         $result = self::executeQuery($query, $tableName, $columns, $object);
         if ($result) {

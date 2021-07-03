@@ -41,13 +41,13 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
 
     public function findById(int $id)
     {
-        $res = $this->getRecordData($this->getObjectInstance(), $id);
+        $res = $this->getRecordData($id);
         return $res;
     }
 
     public function getByField(string $field_name, $field_value)
     {
-        $res = $this->getRecordData($this->object, $field_value, $field_name);
+        $res = $this->getRecordData($field_value, $field_name);
 
         return $res;
     }

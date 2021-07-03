@@ -11,14 +11,14 @@ final class UserRepository extends Repository
 {
     public function findByEmail(string $email): User
     {
-        $result = $this->getRecordData($this->object, $email, 'email');
+        $result = $this->getRecordData($email, 'email');
 
         return $result;
     }
 
     public function findByToken(string $token): User
     {
-        $result = $this->getRecordData($this->object, $token, 'token');
+        $result = $this->getRecordData($token, 'token');
 
         return $result;
     }
