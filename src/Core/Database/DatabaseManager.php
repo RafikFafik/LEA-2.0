@@ -59,55 +59,14 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
             $child_object_name = $property->getType2();
             $child_object = new $child_object_name;
             /* TODO - Currently - Get Record by record -> Get multiple records at once */
-            $children_objects = $this->getRecordsData($this->root_object->getId(), self::convertParentClassToForeignKey($this->root_object->getClassName()), $child_object);
+            $children_objects = $this->getListDataByConstraints($child_object, [self::convertParentClassToForeignKey($this->root_object->getClassName()) => $this->root_object->getId()]);
             $this->root_object->$setVal($children_objects);
         }
 
         return $this->root_object;
     }
 
-    protected function getRecordsData($where_value = null, $where_column = 'id', object $object = null): iterable
-    {
-        $tableName = self::getTableNameByObject($object);
-        $reflector = new Reflection($object);
-        $columns = self::getTableColumnsByReflector($reflector);
-        $query = DatabaseQuery::getSelectRecordDataQuery($tableName, $columns, $where_value, $where_column);
-
-        $result = self::executeQuery($query, $tableName, $columns, $object);
-        if ($result) {
-            $Class = get_class($object);
-            while ($row = mysqli_fetch_assoc($result)) {
-                $object = new $Class;
-                foreach ($row as $key => $val) {
-                    if ($val === null)
-                        continue;
-                    $key = self::convertToKey($key);
-                    $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName()); /* TODO - 3 args, required 2 */
-                    if (method_exists($object, $setVal) && $property->isObject()) {
-                        $children[] = $setVal; /* TODO - Nested Objects */
-                    } else if (method_exists($object, $setVal)) {
-                        $type = $property->getType2();
-                        $object->$setVal(self::castVariable($val, $type));
-                    }
-                }
-                foreach ($reflector->getObjectProperties() as $property) {
-                    $key = $property->getName();
-                    $setVal = 'set' . self::processSnakeToPascal($key);
-                    $child_object_name = $property->getType2();
-                    $child_object = new $child_object_name;
-                    /* TODO - Currently - Get Record by record -> Get multiple records at once */
-                    $children_objects = $this->getRecordsData($object->getId(), self::convertParentClassToForeignKey($object->getClassName()), $child_object);
-                    $object->$setVal($children_objects);
-                }
-                $objects[] = $object;
-            }
-        }
-
-        return $objects ?? [];
-    }
-
-    protected function getListDataByConstraints(object $object, $constraints = [], $start = 0, $limit = 0, $sortBy = "", $sortOrder = "", $debug = false)
+    protected function getListDataByConstraints(object $object, $constraints = [], $pagination = [])
     {
         $tableName = self::getTableNameByObject($object);
         $reflector = new Reflection($object);
@@ -131,6 +90,15 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
                         $type = $property->getType2();
                         $object->$setVal(self::castVariable($val, $type));
                     }
+                }
+                foreach ($reflector->getObjectProperties() as $property) {
+                    $key = $property->getName();
+                    $setVal = 'set' . self::processSnakeToPascal($key);
+                    $child_object_name = $property->getType2();
+                    $child_object = new $child_object_name;
+                    /* TODO - Currently - Get Record by record -> Get multiple records at once */
+                    $children_objects = $this->getListDataByConstraints($child_object, [self::convertParentClassToForeignKey($object->getClassName()) => $object->getId()]);
+                    $object->$setVal($children_objects);
                 }
                 $objects[] = $object;
             }

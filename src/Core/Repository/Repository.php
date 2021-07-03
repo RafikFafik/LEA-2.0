@@ -52,7 +52,8 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
 
     public function findList()
     {
-        $result = $this->getRecordsData(null, 'id', $this->object);
+        $constraints = [];
+        $result = $this->getListDataByConstraints($this->object, $constraints);
 
         return $result;
     }
