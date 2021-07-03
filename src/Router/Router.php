@@ -1,37 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lea\Router;
 
-use Error;
-use TypeError;
 use ArrayIterator;
 use MultipleIterator;
 use Lea\Request\Request;
-use mysqli_sql_exception;
 use Lea\Response\Response;
 use Symfony\Component\Yaml\Yaml;
 use Lea\Core\Validator\Validator;
-use Lea\Core\Exception\FileNotExistsException;
-use Lea\Core\Exception\FileSaveFailedException;
-use Lea\Core\Exception\DocCommentMissedException;
-use Lea\Core\Exception\InvalidDateFormatException;
-use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Core\Exception\UpdatingNotExistingResource;
-use Lea\Core\Exception\UserAlreadyAuthorizedException;
 
-final class Router
+final class Router extends ExceptionDriver
 {
-
     private $word_regex = "/{(\w+)}/";
     private $query_string_regex = "/\?(\w+)/";
-    private $number_regex = "/{(\d+)}/";
-
-    private const URL = 0;
-    private const CONFIG = 1;
-
-    private const SQL_ACCESS_DENIED = 1045;
-    private const SQL_UNKNOWN_DATABASE = 1049;
-    private const SQL_UNKNOWN_HOST = 2002;
 
     function __construct()
     {
@@ -40,57 +23,10 @@ final class Router
         // TODO - Baza danych
         $module = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
-        if(isset($module['body-params']))
+        if (isset($module['body-params']))
             Validator::validateBodyParams($module['body-params'], $request->getPayload());
-        try {
-            $controller = new $Controller($request, $module['params'], $module['allow'] ?? []);
-        } catch (Error $e) {
-            $message = $e->getMessage();
-            if (str_contains($message, "Call to undefined method"))
-                Response::internalServerError("Something went wrong - contact with Administrator");
-            else if (str_contains($message, "Call to undefined method"))
-                Response::internalServerError("Controller not found - contact with Administrator");
-            else
-                Response::internalServerError("Something went wrong - contact with Administrator");
-        }
-        try {
-            $controller->init();
-        } catch (mysqli_sql_exception $e) {
-            switch ($e->getCode()) {
-                case self::SQL_ACCESS_DENIED:
-                    Response::internalServerError("Could not connect to database - check configuration");
-                case self::SQL_UNKNOWN_DATABASE:
-                    Response::internalServerError("The database specified in the configuration does not exist");
-                case self::SQL_UNKNOWN_HOST:
-                    die("Unable to connect to the database server - check the host field in the configuration");
-                default:
-                    die("SQL exception not handled: " . $e);
-            }
-        } catch (UpdatingNotExistingResource $e) {
-            Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
-        } catch (TypeError $e) {
-            /* TODO - does not work correctly */
-            $message = $e->getMessage();
-            $field = substr($message, strpos($message, "set"));
-            $field = substr($field, 0, strpos($field, "given") + 5);
-            $field = str_replace("()", "", str_replace('set', '', $field));
-            $field = self::pascalToSnake($field);
-            Response::badRequest("Invalid typeof: " . $field);
-        } catch (InvalidDateFormatException $e) {
-            Response::badRequest("Invalid date format of: " . $e->getMessage());
-        } catch (UserAlreadyAuthorizedException $e) {
-            Response::internalServerError("Re-setting user during one connection");
-        } catch (ResourceNotExistsException $e) {
-            Response::badRequest("Tried to reach resource that not exists: " . $e->getMessage());
-        } catch (FileNotExistsException $e) {
-            Response::badRequest("Expected file with file_key: " . $e->getMessage());
-        } catch (FileSaveFailedException $e) {
-            Response::internalServerError("Saving file failed: " . $e->getMessage());
-        } catch (DocCommentMissedException $e) {
-            Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
-        } finally {
-            Response::internalServerError("Fatal Error - Contact with Administrator");
-        }
+        $this->instantiateController($Controller, $request, $module['params'], $module['allow'] ?? []);
+        $this->initializeController();
     }
 
     private function getControllerNamespace($module_name, $class_name)
@@ -166,7 +102,7 @@ final class Router
                 $key = substr($keyval, 0, $index);
                 $val = substr($keyval, $index + 1);
                 $val_casted = (int)$val;
-                if(strlen((string)$val_casted) == strlen($val))
+                if (strlen((string)$val_casted) == strlen($val))
                     $query_string_params[$key] = $val_casted;
                 else
                     $query_string_params[$key] = $val;
@@ -195,13 +131,5 @@ final class Router
         $mi->attachIterator(new ArrayIterator($config_tokens), "CONFIG");
 
         return $mi;
-    }
-
-    protected static function pascalToSnake(string $PascalCase): string
-    {
-        $cammelCase = lcfirst($PascalCase);
-        $snake_case = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $cammelCase));
-
-        return $snake_case;
     }
 }

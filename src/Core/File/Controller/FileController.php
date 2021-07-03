@@ -6,7 +6,6 @@ use Exception;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\File\Manager\FileService;
-use GusApi\Exception\NotFoundException;
 use Lea\Core\Controller\ControllerInterface;
 
 class FileController extends Controller implements ControllerInterface
