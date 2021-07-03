@@ -33,24 +33,22 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         $query = $this->getSelectRecordDataQuery($this->tableName, $columns, $where_value, $where_column);
 
         $result = self::executeQuery($query, $this->tableName, $columns, $this->root_object);
-        if ($result->num_rows) {
-            if ($row = mysqli_fetch_assoc($result)) {
-                foreach ($row as $key => $val) {
-                    if ($val === null)
-                        continue;
-                    $key = self::convertToKey($key);
-                    $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($this->root_object), $key, $this->root_reflector->getNamespaceName());
-                    if (method_exists($this->root_object, $setVal) && $property->isObject()) {
-                        $children[] = $setVal;
-                    } else if (method_exists($this->root_object, $setVal)) {
-                        $type = $property->getType2();
-                        $this->root_object->$setVal(self::castVariable($val, $type));
-                    }
-                }
-            }
-        } else {
+        if ($result->num_rows == 0)
             throw new ResourceNotExistsException($this->root_object->getClassName());
+            
+        $row = mysqli_fetch_assoc($result);
+        foreach ($row as $key => $val) {
+            if ($val === null)
+                continue;
+            $key = self::convertToKey($key);
+            $setVal = 'set' . self::processSnakeToPascal($key);
+            $property = new ReflectionPropertyExtended(get_class($this->root_object), $key, $this->root_reflector->getNamespaceName());
+            if (method_exists($this->root_object, $setVal) && $property->isObject()) {
+                $children[] = $setVal;
+            } else if (method_exists($this->root_object, $setVal)) {
+                $type = $property->getType2();
+                $this->root_object->$setVal(self::castVariable($val, $type));
+            }
         }
         foreach ($this->root_reflector->getObjectProperties() as $property) {
             $key = $property->getName();
@@ -68,7 +66,6 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
     protected function getRecordsData(object $object, $where_value = null, $where_column = 'id'): iterable
     {
         $tableName = self::getTableNameByObject($object);
-        // $columns = self::getTableColumnsByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
         $query = DatabaseQuery::getSelectRecordDataQuery($tableName, $columns, $where_value, $where_column);
