@@ -15,13 +15,13 @@ use Lea\Core\Exception\ResourceNotExistsException;
 
 class RoleHierarchyController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":
                 try {
                     $repository = new RoleRepository;
-                    $object = $repository->findById($this->params['id'], new Role);
+                    $object = $repository->findById($this->params['id']);
                     $result = Normalizer::denormalize($object);
                     Response::ok($result);
                 } catch (ResourceNotExistsException $e) {

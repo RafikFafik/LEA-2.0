@@ -14,11 +14,13 @@ final class UserSubordinateService implements ServiceInterface
 {
     public function findSubordinateUsersRecursive(int $role_id): iterable
     {
+        $role_repository = new RoleRepository();
+        $user_repository = new UserRepository();
         try {
-            $subroles = RoleRepository::getListByField('role_id', $role_id);
+            $subroles = $role_repository->getListByField('role_id', $role_id);
             foreach ($subroles as $subrole) {
                 $role_id = $subrole->getId();
-                $user = UserRepository::getByField(new User, 'role_id', $role_id);
+                $user = $user_repository->getByField('role_id', $role_id);
                 $role_id = $user->getRoleId();
                 $user->subordinates = $this->findSubordinateUsersRecursive($role_id);
                 $users[] = $user;
@@ -46,8 +48,9 @@ final class UserSubordinateService implements ServiceInterface
 
     public function getSubordinateRoles(int $role_id): iterable
     {
+        $repository = new RoleRepository();
         try {
-            $subroles = RoleRepository::getListByField('role_id', $role_id);
+            $subroles = $repository->getListByField('role_id', $role_id);
             foreach ($subroles as $subrole) {
                 $subsubroles = $this->getSubordinateRoles($subrole->getId());
             }
@@ -56,14 +59,6 @@ final class UserSubordinateService implements ServiceInterface
         }
 
         return array_merge($subroles ?? [], $subsubroles ?? []);
-    }
-
-    private function nestedToFlatArray(iterable $users): iterable
-    {
-        foreach ($users as $user) {
-        }
-
-        return $users;
     }
 
     function flatten($arr)

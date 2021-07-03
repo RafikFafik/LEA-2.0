@@ -12,11 +12,11 @@ final class AccountActivationEmailResendService extends AuthenticationService im
 {
     public function resendEmail(string $email): void
     {
-        $user = UserRepository::findByEmail($email);
+        $repository = new UserRepository();
+        $user = $repository->findByEmail($email);
         $active = $user->getActive();
         if ($active)
             Response::badRequest("Account already activated");
-        $repository = new UserRepository;
         $token = sha1($this->getRandomString(64) . microtime());
         $user->setToken($token);
         $repository->save($user);

@@ -15,7 +15,8 @@ final class LoginService extends AuthenticationService implements ServiceInterfa
 {
     public function login(string $email, string $password): array
     {
-        $user = UserRepository::findByEmail($email);
+        $repository = new UserRepository();
+        $user = $repository->findByEmail($email);
         if (!password_verify($password, $user->getPassword()))
             throw new InvalidCredentialsException();
         if($user->getActive() === false)

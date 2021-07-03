@@ -14,7 +14,7 @@ use Lea\Core\Exception\InvalidCredentialsException;
 
 class RegisterController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "POST":

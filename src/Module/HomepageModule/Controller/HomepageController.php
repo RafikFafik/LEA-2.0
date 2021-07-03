@@ -9,7 +9,7 @@ use Lea\Response\Response;
 
 class HomepageController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":

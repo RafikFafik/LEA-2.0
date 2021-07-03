@@ -152,11 +152,6 @@ abstract class DatabaseUtil extends DatabaseConnection
         return $keys ?? [];
     }
 
-    protected static function convertKeyWithFilterToKey(string $key_with_filter): string
-    {
-        return "";
-    }
-
     protected static function castVariable($variable, string $type_to_cast)
     {
         switch (strtoupper($type_to_cast)) {

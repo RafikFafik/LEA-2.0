@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lea\Core\Entity;
 
 use Exception;
@@ -45,7 +47,6 @@ abstract class Entity implements EntityInterface
     {
         $class = get_called_class();
         $reflection = new Reflection($this);
-        // $mi = $this->getMultipleIterator($reflection->getProperties(), $data);
         foreach ($reflection->getProperties() as $property) {
             $key = $property->getName();
             if (!array_key_exists($key, $data) && $key != 'user_id')
@@ -57,7 +58,7 @@ abstract class Entity implements EntityInterface
                     foreach ($data[$key] as $obj) {
                         $ChildClass = $property->getType2();
                         /* Disposable - begin */
-                        if(str_contains($ChildClass, "File") && !isset($obj['id']) && !isset($_FILES[$obj['file_key']]))
+                        if (str_contains($ChildClass, "File") && !isset($obj['id']) && !isset($_FILES[$obj['file_key']]))
                             continue;
                         /* Disposable - end */
                         $children[] = new $ChildClass($obj);
@@ -72,15 +73,6 @@ abstract class Entity implements EntityInterface
                 $this->$setValue($val);
             }
         }
-    }
-
-    private function getMultipleIterator(array $data, array $properties): ?MultipleIterator
-    {
-        $mi = new MultipleIterator(MultipleIterator::MIT_NEED_ANY);
-        $mi->attachIterator(new ArrayIterator($data), "REQUEST");
-        $mi->attachIterator(new ArrayIterator($properties), "REFLECTOR");
-
-        return $mi;
     }
 
     public function get(array $specific_fields = null): array
@@ -103,7 +95,7 @@ abstract class Entity implements EntityInterface
                     }
                     $res[$key] = $recursive_res;
                     /* Disposable - Begin */
-                    if(str_contains($reflection->getName(), "files")) {
+                    if (str_contains($reflection->getName(), "files")) {
                         $res[$key][] = ['file_key' => "", 'deleted' => false];
                     }
                     /* Disposable - End*/
@@ -133,24 +125,22 @@ abstract class Entity implements EntityInterface
 
     public function getGetters(): array
     {
-        $getters = [];
         foreach (get_class_methods($this) as $method) {
             if ($this->hasPropertyCorrespondingToMethod($method))
                 $getters[] = $method;
         }
 
-        return $getters;
+        return $getters ?? [];
     }
 
     public function getSetters(): array
     {
-        $setters = [];
         foreach (get_class_methods($this) as $method) {
             if ($this->hasPropertyCorrespondingToMethod($method, TRUE))
                 $setters[] = $method;
         }
 
-        return $setters;
+        return $setters ?? [];
     }
 
     public function getChildObjects(): iterable
@@ -320,7 +310,7 @@ abstract class Entity implements EntityInterface
     public function saveFiles(): void
     {
         foreach ($this->getChildObjects() as $children) {
-            if(!is_array($children))
+            if (!is_array($children))
                 continue;
             foreach ($children as $obj) {
                 if ($obj->isFileClass() && $obj->binaryFileAppended())

@@ -10,14 +10,14 @@ final class AccountActivationService extends AuthenticationService implements Se
 {
     public function activateAccount(string $token, string $password): void
     {
-        $user = UserRepository::findByToken($token);
+        $repository = new UserRepository();
+        $user = $repository->findByToken($token);
         if($user->getActive())
             Response::badRequest("Account already activated");
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         $user->setPassword($hashed_password);
         $user->setActive(true);
         $user->setToken("");
-        $repository = new UserRepository;
         $repository->save($user);
     }
 }

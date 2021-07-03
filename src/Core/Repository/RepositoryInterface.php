@@ -7,6 +7,7 @@ namespace Lea\Core\Repository;
 interface RepositoryInterface
 {
     public function save(object $object);
-    public static function findById(int $id, object $object);
-    public static function getList($object);
+    public function findById(int $id);
+    public function getByField(string $field_name, $field_value);
+    public function getList();
 }

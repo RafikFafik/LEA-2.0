@@ -12,7 +12,7 @@ use Lea\Module\Security\Service\LoginService;
 
 class LoginController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "POST":

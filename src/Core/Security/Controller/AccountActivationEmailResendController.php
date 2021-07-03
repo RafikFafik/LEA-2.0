@@ -13,7 +13,7 @@ use Lea\Module\Security\Service\AccountActivationEmailResendService;
 
 class AccountActivationEmailResendController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":

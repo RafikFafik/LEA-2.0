@@ -9,16 +9,16 @@ use Lea\Core\Security\Entity\User;
 
 final class UserRepository extends Repository
 {
-    public static function findByEmail(string $email): User
+    public function findByEmail(string $email): User
     {
-        $result = self::getRecordData(new User, $email, 'email');
+        $result = $this->getRecordData($this->object, $email, 'email');
 
         return $result;
     }
 
-    public static function findByToken(string $token): User
+    public function findByToken(string $token): User
     {
-        $result = self::getRecordData(new User, $token, 'token');
+        $result = $this->getRecordData($this->object, $token, 'token');
 
         return $result;
     }
@@ -26,7 +26,7 @@ final class UserRepository extends Repository
     public function findListDataByRoleIds(array $role_ids): iterable
     {
         $constraints['role_id_IN'] = $role_ids;
-        $result = $this->getListDataByConstraints(new User, $constraints);
+        $result = $this->getListDataByConstraints($this->object, $constraints);
 
         return $result;
     }

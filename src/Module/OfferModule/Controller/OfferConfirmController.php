@@ -9,7 +9,7 @@ use Lea\Response\Response;
 
 class OfferConfirmController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":

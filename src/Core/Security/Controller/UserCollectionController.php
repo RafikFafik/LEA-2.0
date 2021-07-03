@@ -13,7 +13,7 @@ use Lea\Core\Security\Repository\UserRepository;
 
 final class UserCollectionController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":
@@ -28,7 +28,7 @@ final class UserCollectionController extends Controller implements ControllerInt
 
                 // debug
                 $repository = new UserRepository();
-                $object = $repository->findById($resource_id, new User);
+                $object = $repository->findById($resource_id);
                 $result = Normalizer::denormalize($object);
                 Response::ok($result);
             case "DELETE":

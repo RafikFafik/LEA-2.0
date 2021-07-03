@@ -13,7 +13,7 @@ use Lea\Core\Security\Repository\RoleRepository;
 
 final class RoleCollectionController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":
@@ -28,7 +28,7 @@ final class RoleCollectionController extends Controller implements ControllerInt
 
                 // debug
                 $repository = new RoleRepository;
-                $object = $repository->findById($resource_id, new Role);
+                $object = $repository->findById($resource_id);
                 $result = Normalizer::denormalize($object);
                 Response::ok($result);
             case "DELETE":

@@ -7,7 +7,6 @@ namespace Lea\Core\Controller;
 use Lea\Request\Request;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Database\DatabaseConnection;
-use Lea\Core\Security\Entity\User;
 use Lea\Core\Validator\Validator;
 use Lea\Module\Security\Service\TokenVerificationService;
 

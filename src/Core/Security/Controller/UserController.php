@@ -15,7 +15,7 @@ use Lea\Core\Exception\ResourceNotExistsException;
 
 class UserController extends Controller implements ControllerInterface
 {
-    public function init()
+    public function init(): void
     {
         switch ($this->request->method()) {
             case "GET":

@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lea\Core\Repository;
 
 use Lea\Core\Database\DatabaseManager;
 use Lea\Module\Security\Service\AuthorizedUserService;
 use Lea\Response\Response;
 
-abstract class Repository extends DatabaseManager
+abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
     public function __construct(object $object = null)
     {
-        $this->object = self::getRepositoryObject();
-        if($object && $object->getNamespace() != $this->object)
+        $this->object = $this->getObjectInstance();
+        if ($object && $object->getNamespace() != $this->object)
             Response::internalServerError("Object doesn't match repository");
         $user_id = AuthorizedUserService::getAuthorizedUserId();
         parent::__construct($this->object, $user_id);
     }
 
-    private static function getRepositoryObject(): object
+    private function getObjectInstance(): object
     {
         $namespace = get_called_class();
         $namespace = str_replace("\Repository", "\Entity", $namespace);
@@ -37,15 +39,15 @@ abstract class Repository extends DatabaseManager
         return $id;
     }
 
-    public static function findById(int $id, object $object)
+    public function findById(int $id)
     {
-        $res = self::getRecordData($object, $id);
+        $res = $this->getRecordData($this->getObjectInstance(), $id);
         return $res;
     }
 
-    public static function getByField(object $object, string $field_name, $field_value)
+    public function getByField(string $field_name, $field_value)
     {
-        $res = self::getRecordData($object, $field_value, $field_name);
+        $res = $this->getRecordData($this->object, $field_value, $field_name);
 
         return $res;
     }
@@ -58,16 +60,16 @@ abstract class Repository extends DatabaseManager
         return $affected_rows;
     }
 
-    public static function getList()
+    public function getList()
     {
-        $result = self::getRecordsData(self::getRepositoryObject());
+        $result = $this->getRecordsData($this->object);
 
         return $result;
     }
 
-    public static function getListByField($field_name, $field_value)
+    public function getListByField($field_name, $field_value)
     {
-        $result = self::getRecordsData(self::getRepositoryObject(), $field_value, $field_name);
+        $result = $this->getRecordsData($this->object, $field_value, $field_name);
 
         return $result;
     }
