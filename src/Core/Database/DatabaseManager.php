@@ -30,7 +30,17 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
             $this->user_id = $user_id;
     }
 
-    protected function getRecordData($where_value, $where_column = "id")
+    protected function getRecordData($where_value, $where_column = "id"): object
+    {
+        return $this->getObjectData($where_value, $where_column, false);
+    }
+
+    protected function getNestedRecordData($where_value, $where_column = "id"): object
+    {
+        return $this->getObjectData($where_value, $where_column, true);
+    }
+
+    private function getObjectData($where_value, $where_column = "id", $is_nested): object
     {
         $columns = self::getTableColumnsByReflector($this->root_reflector);
         $query = $this->getSelectRecordDataQuery($this->tableName, $columns, $where_value, $where_column);
@@ -53,7 +63,16 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
                 $this->root_object->$setVal(self::castVariable($val, $type));
             }
         }
-        foreach ($this->root_reflector->getObjectProperties() as $property) {
+        if($is_nested) 
+            $this->includeNestedObjectData();
+
+        return $this->root_object;
+    }
+
+    private function includeNestedObjectData(): void
+    {
+        $properties = $this->root_reflector->getObjectProperties();
+        foreach ($properties as $property) {
             $key = $property->getName();
             $setVal = 'set' . self::processSnakeToPascal($key);
             $child_object_name = $property->getType2();
@@ -62,8 +81,6 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
             $children_objects = $this->getListDataByConstraints($child_object, [self::convertParentClassToForeignKey($this->root_object->getClassName()) => $this->root_object->getId()]);
             $this->root_object->$setVal($children_objects);
         }
-
-        return $this->root_object;
     }
 
     protected function getListDataByConstraints(object $object, $constraints = [], $pagination = [])
