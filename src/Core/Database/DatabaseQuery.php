@@ -24,7 +24,7 @@ class DatabaseQuery extends DatabaseUtil
             if ($where_column)
                 $query .=  ' AND ' . self::convertKeyToColumn($where_column) . ' = ' .  $where_val;
         }
-        if($where_column)
+        if ($where_column)
             $query .= ';';
 
         return $query;
@@ -56,7 +56,7 @@ class DatabaseQuery extends DatabaseUtil
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
             $getValue = 'get' . self::processSnakeToPascal($var);
-            if(!method_exists(get_class($object), $getValue))
+            if (!method_exists(get_class($object), $getValue))
                 continue;
             $value = $object->$getValue();
             if (is_iterable($value))
@@ -129,6 +129,13 @@ class DatabaseQuery extends DatabaseUtil
     {
         $table_name = self::getTableNameByObject($object);
         $query = 'UPDATE ' . $table_name . ' SET `fld_Deleted` = 1 WHERE `fld_Id` = ' . $where_val;
+
+        return $query;
+    }
+
+    public function getCheckIfTableExistsQuery(string $tablename): string
+    {
+        $query = 'SHOW TABLES LIKE \'%' . $tablename . '%\'';
 
         return $query;
     }

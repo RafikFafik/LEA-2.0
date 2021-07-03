@@ -39,7 +39,7 @@ class ServiceLoader
             require_once $filename;
             if (str_contains($filename, "Entity")) {
                 $classes = get_declared_classes();
-                $entity_classes[] = end($classes);
+                self::$entity_classes[] = end($classes);
             }
         }
         $additional = __DIR__ . '/**/*.php';
@@ -47,7 +47,7 @@ class ServiceLoader
             require_once $filename;
             if (str_contains($filename, "Entity")) {
                 $classes = get_declared_classes();
-                $entity_classes[] = end($classes);
+                self::$entity_classes[] = end($classes);
             }
         }
     }
@@ -55,5 +55,14 @@ class ServiceLoader
     public static function getLeaEntityClasses(): array
     {
         return self::$entity_classes;
+    }
+
+    public static function getLeaEntityClass(string $input): ?string
+    {
+        $result = array_filter(self::$entity_classes, function ($item) use ($input) {
+            return (stripos("\\" . $item, "\\" . $input) !== false) ? true : false;
+        });
+
+        return empty($result) ? null : array_values($result)[0];
     }
 }

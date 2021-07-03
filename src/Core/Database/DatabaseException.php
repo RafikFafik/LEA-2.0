@@ -10,6 +10,7 @@ use Lea\Core\Reflection\Reflection;
 use Lea\Core\Database\DatabaseManager;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Response\Response;
+use Lea\ServiceLoader;
 use ReflectionProperty;
 
 class DatabaseException extends DatabaseUtil
@@ -107,7 +108,10 @@ class DatabaseException extends DatabaseUtil
             foreach ($referenced as $key) {
                 $foreign_column = self::convertKeyToColumn($key);
                 $Class = str_replace('_id', '', $key);
+                $entity = ServiceLoader::getLeaEntityClass($Class);
                 $parent_table = self::getTableNameByClass($Class);
+                if ($parent_table !== $tablename && $entity !== null)
+                    $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $entity));
                 $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
             }
         }
@@ -115,7 +119,7 @@ class DatabaseException extends DatabaseUtil
         $ddl .= ') CHARACTER SET utf8 COLLATE utf8_polish_ci';
         $ddl .= self::getEndBracket();
         $queries[] = $ddl;
-        if ($parent_table)
+        if ($parent_table && isset($alter_foreing_constraint))
             $queries[] = $alter_foreing_constraint;
         if ($alter_references ?? false)
             $queries = array_merge($queries, $alter_references);
