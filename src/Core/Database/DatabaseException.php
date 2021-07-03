@@ -14,16 +14,15 @@ use ReflectionProperty;
 
 class DatabaseException extends DatabaseUtil
 {
-    public $uid = 0;
-    const SQL_TABLE_NOT_EXISTS = 1146;
-    const SQL_UNKNOWN_COLUMN = 1054;
-    const SQL_SYMTAMX_ERRORM = 1064;
-    const SQL_MISSING_DEFAULT_VALUE = 1364;
-    const SQL_FOREIGN_KEY_COHESION = 1451;
-    const SQL_INCORRECT_DATE_VALUE = 1292;
-    const SQL_OUT_OF_RANGE = 1264;
-    const SQL_FOREIGN_KEY_CONSTRAINTS_FAIL = 1452;
-    const SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE = 1005;
+    private const SQL_TABLE_NOT_EXISTS = 1146;
+    private const SQL_UNKNOWN_COLUMN = 1054;
+    private const SQL_SYMTAMX_ERRORM = 1064;
+    private const SQL_MISSING_DEFAULT_VALUE = 1364;
+    private const SQL_FOREIGN_KEY_COHESION = 1451;
+    private const SQL_INCORRECT_DATE_VALUE = 1292;
+    private const SQL_OUT_OF_RANGE = 1264;
+    private const SQL_FOREIGN_KEY_CONSTRAINTS_FAIL = 1452;
+    private const SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE = 1005;
 
     public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query, $parent_class = null)
     {
@@ -52,7 +51,7 @@ class DatabaseException extends DatabaseUtil
                 $field = substr($field, 0, strpos($field, "'"));
                 Response::badRequest("Passed value of ``" . $field . "`` out of range - Contact with Administrator to increase it");
             case self::SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE:
-                return ""; /* Workaround / todo */
+                return self::getCreateTableQueryRecursive($object);
             default:
                 Response::internalServerError("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }
@@ -93,7 +92,7 @@ class DatabaseException extends DatabaseUtil
     private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array
     {
         $tablename = DatabaseManager::getTableNameByObject($object);
-        $ddl = 'CREATE TABLE ' . $tablename . ' (';
+        $ddl = 'CREATE TABLE IF NOT EXISTS ' . $tablename . ' (';
         $class = new Reflection($object);
         $primitive = $class->getPrimitiveProperties();
         $referenced = $object->getReferencedProperties();
@@ -102,12 +101,14 @@ class DatabaseException extends DatabaseUtil
         if ($parent_table) {
             $foreign_column = self::getReferencedKeyColumn($parent_table);
             $columns .= ', ' . $foreign_column . ' INT NOT NULL';
-            $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass($parent_table), $foreign_column);
+            $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, self::getTableNameByClass($parent_table), $foreign_column);
         }
         if ($referenced) {
-            foreach ($referenced as $table) {
-                $foreign_column = self::convertKeyToColumn($table);
-                $alter_references[] = self::getForeignKeyConstraint($tablename, DatabaseManager::getTableNameByClass(str_replace('_id', '', $table)), $foreign_column);
+            foreach ($referenced as $key) {
+                $foreign_column = self::convertKeyToColumn($key);
+                $Class = str_replace('_id', '', $key);
+                $parent_table = self::getTableNameByClass($Class);
+                $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
             }
         }
         $ddl .= $columns;
@@ -141,7 +142,7 @@ class DatabaseException extends DatabaseUtil
         return $columns;
     }
 
-    private static function parseReflectProperty(ReflectionProperty $property): string
+    private static function parseReflectProperty(ReflectionProperty $property): string /* TODO - Change to ExtendedProperty */
     {
         $comment = $property->getDocComment();
         /* TODO - DefaultValue */

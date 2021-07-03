@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lea;
-class ServiceLoader {
-    public static function load() {
+
+class ServiceLoader
+{
+    private static $entity_classes = [];
+
+    public static function load()
+    {
         $core = __DIR__ . "/Core/**/*.php";
         $list = glob($core);
         $index2 = array_search(__DIR__ . "/Core/Database/DatabaseConnection.php", $list); /* Workaround */
@@ -30,10 +37,23 @@ class ServiceLoader {
         include $modules[$index]; /* Workaround */
         foreach ($modules as $filename) {
             require_once $filename;
+            if (str_contains($filename, "Entity")) {
+                $classes = get_declared_classes();
+                $entity_classes[] = end($classes);
+            }
         }
         $additional = __DIR__ . '/**/*.php';
         foreach (glob($additional) as $filename) {
             require_once $filename;
+            if (str_contains($filename, "Entity")) {
+                $classes = get_declared_classes();
+                $entity_classes[] = end($classes);
+            }
         }
+    }
+
+    public static function getLeaEntityClasses(): array
+    {
+        return self::$entity_classes;
     }
 }

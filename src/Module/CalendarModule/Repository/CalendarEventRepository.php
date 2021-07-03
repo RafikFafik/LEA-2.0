@@ -14,7 +14,8 @@ final class CalendarEventRepository extends Repository
 {
     public function findCalendarEventListByStartDate(string $date, object $object): iterable
     {
-        $res = $this->getRecordsData($date, 'date_start', $object);
+        $constraints = ['date_start' => $date];
+        $res = $this->getListDataByConstraints($object, $constraints);
 
         return $res;
     }

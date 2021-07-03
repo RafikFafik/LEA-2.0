@@ -10,7 +10,8 @@ final class RoleRepository extends Repository
 {
     public function findListByRoleId(int $role_id): iterable
     {
-        $list = $this->getRecordsData($role_id, 'role_id', $this->object);
+        $constraints = ['role_id' => $role_id ];
+        $list = $this->getListDataByConstraints($this->object, $constraints);
 
         return $list;
     }
