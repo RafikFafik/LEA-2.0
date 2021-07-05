@@ -11,6 +11,11 @@ class ProductOfferProduct extends Entity
     /**
      * @var int
      */
+    private $product_id;
+    
+    /**
+     * @var int
+     */
     private $quantity;
 
     /**
@@ -91,6 +96,30 @@ class ProductOfferProduct extends Entity
     public function setVatRate(int $vat_rate)
     {
         $this->vat_rate = $vat_rate;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of product_id
+     *
+     * @return  int
+     */ 
+    public function getProductId()
+    {
+        return $this->product_id;
+    }
+
+    /**
+     * Set the value of product_id
+     *
+     * @param  int  $product_id
+     *
+     * @return  self
+     */ 
+    public function setProductId(int $product_id)
+    {
+        $this->product_id = $product_id;
 
         return $this;
     }
