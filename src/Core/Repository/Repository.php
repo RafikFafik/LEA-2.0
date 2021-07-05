@@ -44,7 +44,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
 
     public function findById(int $id)
     {
-        $res = $this->getRecordData($id);
+        $res = $this->getNestedRecordData($id);
         return $res;
     }
 

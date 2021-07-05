@@ -118,6 +118,9 @@ abstract class Controller implements ControllerInterface
         try {
             $object = Normalizer::normalize($this->request->getPayload(), $this->repository->getEntityClass());
             $this->repository->updateById($object, $this->params['id']);
+            /* DEBUG */
+            $this->getResource();
+            /* DEBUG */
             Response::noContent();
         } catch (ResourceNotExistsException $e) {
             Response::badRequest();
