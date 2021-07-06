@@ -72,7 +72,7 @@ class DatabaseQuery extends DatabaseUtil
 
             $values .= $value . ', ';
         }
-        if ($parent_class) {
+        if ($parent_class && !str_contains($columns, self::convertKeyToReferencedColumn($parent_class))) {
             $columns .= self::convertKeyToReferencedColumn($parent_class);
             $values .= $parent_id;
         } else {
