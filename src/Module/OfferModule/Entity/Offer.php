@@ -12,6 +12,11 @@ class Offer extends Entity
     /**
      * @var string
      */
+    private $title;
+
+    /**
+     * @var string
+     */
     protected $offer_number = 0;
 
     /**
@@ -265,6 +270,30 @@ class Offer extends Entity
     public function setOfferFiles($offer_files)
     {
         $this->offer_files = $offer_files;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of title
+     *
+     * @return  string
+     */ 
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Set the value of title
+     *
+     * @param  string  $title
+     *
+     * @return  self
+     */ 
+    public function setTitle(string $title)
+    {
+        $this->title = $title;
 
         return $this;
     }

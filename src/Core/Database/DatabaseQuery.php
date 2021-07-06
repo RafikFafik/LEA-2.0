@@ -39,7 +39,7 @@ class DatabaseQuery extends DatabaseUtil
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
             } elseif (str_contains($key, "_LIKE") && $object->hasKey(substr($key, 0, strpos($key, "_LIKE")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
-            } elseif ($object->hasKey($key)) {
+            } elseif ($object->hasKey($key) || $object) {
                 $query .= " AND " . self::convertKeyToColumn($key) . "='" . $val . "'";
             }
         }

@@ -72,13 +72,14 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
     private function includeNestedObjectData(): void
     {
         $properties = $this->root_reflector->getObjectProperties();
+        $constraints = [self::convertParentClassToForeignKey($this->root_object->getClassName()) => $this->root_object->getId()];
         foreach ($properties as $property) {
             $key = $property->getName();
             $setVal = 'set' . self::processSnakeToPascal($key);
             $child_object_name = $property->getType2();
             $child_object = new $child_object_name;
             /* TODO - Currently - Get Record by record -> Get multiple records at once */
-            $children_objects = $this->getListDataByConstraints($child_object, [self::convertParentClassToForeignKey($this->root_object->getClassName()) => $this->root_object->getId()]);
+            $children_objects = $this->getListDataByConstraints($child_object, $constraints);
             $this->root_object->$setVal($children_objects);
         }
     }
