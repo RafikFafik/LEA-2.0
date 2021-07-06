@@ -101,7 +101,8 @@ abstract class Entity implements EntityInterface
                     /* Disposable - End*/
                 }
             } else {
-                $res[$key] = $reflection->getType2() == "Date" && $val !== null ? $val->__toString() : $res[$key] = $val;
+                $type = $reflection->getType2();
+                $res[$key] = (($type == "Date" || $type =="Currency") && $val !== null) ? $val->__toString() : $res[$key] = $val;
             }
         }
         /* Get fields that are not in entity */

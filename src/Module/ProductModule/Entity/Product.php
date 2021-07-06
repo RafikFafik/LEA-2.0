@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lea\Module\ProductModule\Entity;
 
+use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
+use Lea\Core\Type\Currency;
 
 class Product extends Entity
 {
@@ -27,6 +29,11 @@ class Product extends Entity
    * @var int
    */
   private $price;
+
+  /**
+   * @var Date
+   */
+  private $playground;
 
   /**
    * @var int
@@ -323,6 +330,30 @@ class Product extends Entity
   public function setVatRate(int $vat_rate)
   {
     $this->vat_rate = $vat_rate;
+
+    return $this;
+  }
+
+  /**
+   * Get the value of playground
+   *
+   * @return  Date
+   */ 
+  public function getPlayground()
+  {
+    return $this->playground;
+  }
+
+  /**
+   * Set the value of playground
+   *
+   * @param  Date  $playground
+   *
+   * @return  self
+   */ 
+  public function setPlayground(Date $playground)
+  {
+    $this->playground = $playground;
 
     return $this;
   }
