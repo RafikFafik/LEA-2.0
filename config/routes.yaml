@@ -27,6 +27,16 @@ ProductModule:
             url: "/products"
             controller: ProductCollectionController
 
+ProjectModule:
+    prefix: "/projects"
+    endpoints:
+        by-id:
+            url: "/projects/{id}"
+            controller: ProjectController
+        collection:
+            url: "/projects"
+            controller: ProjectCollectionController
+
 ProductOfferModule:
     prefix: "/product-offers"
     endpoints:
