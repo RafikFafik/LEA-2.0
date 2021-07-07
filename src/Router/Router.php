@@ -26,7 +26,7 @@ final class Router extends ExceptionDriver
         if (isset($module['body-params']))
             Validator::validateBodyParams($module['body-params'], $request->getPayload());
         $this->instantiateController($Controller, $request, $module['params'], $module['allow'] ?? []);
-        $this->initializeController();
+        parent::initializeController();
     }
 
     private function getControllerNamespace($module_name, $class_name)
