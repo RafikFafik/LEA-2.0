@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Module\Security\Controller;
+namespace Lea\Core\Security\Controller;
 
 use Lea\Core\Controller\Controller;
 use Lea\Response\Response;
@@ -8,7 +8,7 @@ use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\InactiveAccountException;
 use Lea\Core\Exception\InvalidCredentialsException;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Module\Security\Service\LoginService;
+use Lea\Core\Security\Service\LoginService;
 
 class LoginController extends Controller implements ControllerInterface
 {

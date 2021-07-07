@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Module\Security\Controller;
+namespace Lea\Core\Security\Controller;
 
 use Lea\Response\Response;
 use Lea\Core\Validator\Validator;
@@ -8,8 +8,7 @@ use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\EmailNotSentException;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Module\Security\Service\AccountActivationService;
-use Lea\Module\Security\Service\AccountActivationEmailResendService;
+use Lea\Core\Security\Service\AccountActivationEmailResendService;
 
 class AccountActivationEmailResendController extends Controller implements ControllerInterface
 {

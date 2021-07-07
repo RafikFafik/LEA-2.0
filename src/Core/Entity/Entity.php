@@ -14,7 +14,7 @@ use Lea\Core\Reflection\Reflection;
 use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Core\Type\Currency;
-use Lea\Module\Security\Service\AuthorizedUserService;
+use Lea\Core\Security\Service\AuthorizedUserService;
 
 abstract class Entity implements EntityInterface
 {

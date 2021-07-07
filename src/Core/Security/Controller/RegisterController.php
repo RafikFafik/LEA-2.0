@@ -1,16 +1,12 @@
 <?php
 
-namespace Lea\Module\Security\Controller;
+namespace Lea\Core\Security\Controller;
 
-use Exception;
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\EmailNotSentException;
-use Lea\Module\Security\Service\LoginService;
-use Lea\Module\Security\Service\RegisterService;
-use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Core\Exception\InvalidCredentialsException;
+use Lea\Core\Security\Service\RegisterService;
 
 class RegisterController extends Controller implements ControllerInterface
 {

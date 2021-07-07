@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 use Lea\Response\Response;
 use Lea\Router\Router;
-use Lea\ServiceLoader;
 
-include_once(__DIR__ . '/../src/ServiceLoader.php');
 include_once(__DIR__ . '/../vendor/autoload.php');
 try {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
@@ -21,7 +19,6 @@ header("Access-Control-Allow-Origin: $origin");
 header("Access-Control-Allow-Headers: Accept, Accept-Encoding, Accept-Language, Authorization, Content-Type, Cookie");
 header("Access-Control-Allow-Methods: POST, GET, DELETE, OPTIONS, PUT");
 
-ServiceLoader::load();
 if ($_ENV['DEBUG']) {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     ini_set('display_errors', 'On');

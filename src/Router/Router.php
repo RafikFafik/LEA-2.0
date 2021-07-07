@@ -20,7 +20,6 @@ final class Router extends ExceptionDriver
     {
         $routes = Yaml::parseFile(__DIR__ . '/../../config/routes.yaml');
         $request = new Request();
-        // TODO - Baza danych
         $module = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
         if (isset($module['body-params']))
@@ -31,7 +30,11 @@ final class Router extends ExceptionDriver
 
     private function getControllerNamespace($module_name, $class_name)
     {
-        $namespace = 'Lea\Module\\' . $module_name . '\Controller\\' . $class_name;
+        if ($module_name == "Security" || $module_name == "Gus" || $module_name == "File")
+            $module = "Core";
+        else
+            $module = "Module";
+        $namespace = 'Lea\\' . $module . '\\' . $module_name . '\Controller\\' . $class_name;
 
         return $namespace;
     }

@@ -1,16 +1,13 @@
 <?php
 
-namespace Lea\Module\Gus\Controller;
+namespace Lea\Core\Gus\Controller;
 
 use Exception;
 use GusApi\Exception\NotFoundException;
 use Lea\Response\Response;
-use Lea\Core\Validator\Validator;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Module\Gus\Service\GusService;
-use Lea\Module\Security\Service\AccountActivationService;
+use Lea\Core\Gus\Service\GusService;
 
 class GusController extends Controller implements ControllerInterface
 {

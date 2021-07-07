@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lea\Module\Security\Controller;
+namespace Lea\Core\Security\Controller;
 
 use Lea\Response\Response;
 use Lea\Core\Controller\Controller;

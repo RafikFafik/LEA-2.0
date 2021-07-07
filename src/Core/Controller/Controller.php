@@ -11,7 +11,7 @@ use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Database\DatabaseConnection;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Module\Security\Service\TokenVerificationService;
+use Lea\Core\Security\Service\TokenVerificationService;
 
 abstract class Controller implements ControllerInterface
 {
@@ -78,7 +78,7 @@ abstract class Controller implements ControllerInterface
         $namespace = get_called_class();
         $namespace = str_replace("\Controller", "\Repository", $namespace);
         if (str_contains($namespace, "\Security"))
-            $namespace = str_replace("Module", "Core", $namespace);
+            $namespace = str_replace("Core", "Core", $namespace);
         $namespace = str_replace("CollectionController", "Repository", $namespace);
         $namespace = str_replace("Controller", "Repository", $namespace);
         /* TODO - unique replacement */
