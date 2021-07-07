@@ -7,6 +7,7 @@ namespace Lea\Core\Type;
 
 class Currency
 {
+    const DOT_POS = 2;
     /**
      * @var int
      */
@@ -16,12 +17,12 @@ class Currency
     {
         if (!$value)
             return;
-        $this->value = is_float($value) || is_int($value) ? $value * 100 : (int)$value;
+        $this->value = is_float($value) || is_int($value) || (is_string($value) && strlen($value) > 3 && $value[self::DOT_POS] == ".") ? $value * 100 : (int)$value;
     }
 
-    public function __get($value = null): float
+    public function __get($value = null)
     {
-        return $this->value / 100;
+        return floatval($this->value / 100);
     }
 
     public function __toString()

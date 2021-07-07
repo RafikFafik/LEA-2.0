@@ -31,11 +31,6 @@ class Product extends Entity
   private $price;
 
   /**
-   * @var Date
-   */
-  private $playground;
-
-  /**
    * @var int
    */
   private $vat_rate;
@@ -330,30 +325,6 @@ public function setPrice(Currency $price)
   public function setVatRate(int $vat_rate)
   {
     $this->vat_rate = $vat_rate;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of playground
-   *
-   * @return  Date
-   */ 
-  public function getPlayground()
-  {
-    return $this->playground;
-  }
-
-  /**
-   * Set the value of playground
-   *
-   * @param  Date  $playground
-   *
-   * @return  self
-   */ 
-  public function setPlayground(Date $playground)
-  {
-    $this->playground = $playground;
 
     return $this;
   }
