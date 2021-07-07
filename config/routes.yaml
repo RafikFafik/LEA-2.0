@@ -136,3 +136,4 @@ File:
             url: "/file"
             controller: "FileController"
             params: ['hash']
+            allow: ['all']
