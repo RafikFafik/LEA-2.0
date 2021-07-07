@@ -101,6 +101,8 @@ class DatabaseQuery extends DatabaseUtil
                 continue;
             if (gettype($value) == "string" || $property->getType2() == "Date")
                 $value = "'" . $value . "'";
+            elseif (gettype($value) == "int" || $property->getType2() == "Currency")
+                $value = "'" . $value . "'";
             elseif (gettype($value) == "boolean")
                 $value = (int)$value;
 

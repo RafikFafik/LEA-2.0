@@ -26,7 +26,7 @@ class Product extends Entity
   private $unit_of_measure;
 
   /**
-   * @var int
+   * @var Currency
    */
   private $price;
 
@@ -303,7 +303,7 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setPrice(int $price)
+public function setPrice(Currency $price)
   {
     $this->price = $price;
 

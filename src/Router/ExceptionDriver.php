@@ -56,12 +56,7 @@ abstract class ExceptionDriver
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
             /* TODO - does not work correctly */
-            $message = $e->getMessage();
-            $field = substr($message, strpos($message, "set"));
-            $field = substr($field, 0, strpos($field, "given") + 5);
-            $field = str_replace("()", "", str_replace('set', '', $field));
-            $field = self::pascalToSnake($field);
-            Response::badRequest("Invalid typeof: " . $field);
+            Response::badRequest("Invalid typeof: " . $e->getMessage());
         } catch (InvalidDateFormatException $e) {
             Response::badRequest("Invalid date format of: " . $e->getMessage());
         } catch (UserAlreadyAuthorizedException $e) {

@@ -96,6 +96,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
             case "BOOLEAN":
             case "DATE":
             case "DATETIME":
+            case "CURRENCY":
             case "STRING":
                 return true;
             default:

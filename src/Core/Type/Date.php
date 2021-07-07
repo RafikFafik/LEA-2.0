@@ -20,18 +20,9 @@ class Date extends DateTime
         return $a->diff($b);
     }
 
-    public function __get($name)
-    { // sql format
-        switch ($name) {
-            case "date":
-                return $this->format("Y-m-d");
-            case "time":
-                return $this->format("H:i:s");
-            case "datetime":
-                return $this->date . " " . $this->time;
-            default:
-                return $this->$name;
-        }
+    public function __get($name = false)
+    {
+        return $this->__toString();
     }
 
     public function days2($date)

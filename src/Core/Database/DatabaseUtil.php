@@ -8,6 +8,7 @@ use ArrayIterator;
 use MultipleIterator;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Type\Currency;
 
 abstract class DatabaseUtil extends DatabaseConnection
 {
@@ -163,6 +164,8 @@ abstract class DatabaseUtil extends DatabaseConnection
                 break;
             case "DATE":
                 return new Date($variable);
+            case "CURRENCY":
+                return new Currency($variable);
             default:
                 return $variable;
                 break;

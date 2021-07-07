@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Module\ProductOfferModule\Entity;
 
 use Lea\Core\Entity\Entity;
+use Lea\Core\Type\Currency;
 
 class ProductOfferProduct extends Entity
 {
@@ -19,7 +20,7 @@ class ProductOfferProduct extends Entity
     private $quantity;
 
     /**
-     * @var int
+     * @var Currency
      */
     private $net_price;
 
@@ -74,7 +75,7 @@ class ProductOfferProduct extends Entity
      *
      * @return  self
      */ 
-    public function setNetPrice(int $net_price)
+    public function setNetPrice(Currency $net_price)
     {
         $this->net_price = $net_price;
 
