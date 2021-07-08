@@ -15,7 +15,7 @@ final class ContractorRepository extends Repository
         $user_repository = new UserRepository;
         $list = $this->findFlatList();
         foreach($list as $obj) {
-            $address = $address_repository->findByContractorId($obj->getId());
+            $address = $address_repository->findMainHeadquarterByContractorId($obj->getId());
             $user = $user_repository->findById($obj->getAdvisor());
             $obj->address = $address->getAddress();
             $obj->voivodeship = $address->getVoivodeship();

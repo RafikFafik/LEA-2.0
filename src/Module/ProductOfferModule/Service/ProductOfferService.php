@@ -4,20 +4,34 @@ declare(strict_types=1);
 
 namespace Lea\Module\ProductOfferModule\Service;
 
-use Lea\Response\Response;
 use Lea\Core\Service\Service;
-use Lea\Core\Serializer\Normalizer;
-use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
 class ProductOfferService extends Service
 {
-    public function getFullData($id): void
+    public function getView(): iterable
     {
-        $contractor_repository = new ContractorRepository();
-        $obj = $this->repository->findById($id);
-        $contractor = $contractor_repository->findById($obj->getContractorId());
-        $obj->contractor_fullname = $contractor->getFullName();
-        $res = Normalizer::denormalize($obj);
-        Response::ok($res);
+        $list = $this->repository->findList();
+        foreach ($list as $obj) {
+            $sums = $this->getProductsSums($obj->getProducts());
+            $obj->net_sum = $sums['net_sum'];
+            $obj->gross_sum = $sums['gross_sum'];
+        }
+
+        return $list;
+    }
+
+    private function getProductsSums(iterable $products): array
+    {
+        $net_sum = 0;
+        $gross_sum = 0;
+        foreach ($products as $product) {
+            $price = $product->getNetPrice();
+            $tax = $product->getVatRate();
+            $net = $price->__get();
+            $net_sum += $net;
+            $gross_sum += ($net * ($tax / 100)) + $net;
+        }
+
+        return ['net_sum' => $net_sum, 'gross_sum' => $gross_sum];
     }
 }

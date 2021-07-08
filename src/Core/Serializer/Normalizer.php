@@ -36,14 +36,17 @@ class Normalizer
         return $res ?? [];
     }
 
-    public static function filterSpecificFieldsFromArrayList(array $haystack, array $needles): array
+    public static function removeSpecificFieldsFromArrayList(array $haystack, array $needles): array
     {
-        foreach ($haystack as $key => $val) {
-            // if(in_array($key, $to_get)
-            // $res[$key] = 
+        foreach ($haystack as $obj) {
+            foreach ($obj as $key => $val) {
+                if (in_array($key, $needles))
+                    continue;
+                $res[$key] = $val;
+            }
+            $ress[] = $res ?? [];
         }
-
-        return [];
+        return $ress ?? [];
     }
 
     public static function mapKeyOfArrayList(array $haystack, string $seek, $to_replace): array

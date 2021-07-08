@@ -9,7 +9,7 @@ use Lea\Module\ContractorModule\Entity\Address;
 
 final class AddressRepository extends Repository
 {
-    public function findByContractorId(int $contractor_id): Address
+    public function findMainHeadquarterByContractorId(int $contractor_id): Address
     {
         $result = $this->getRecordData($contractor_id, 'contractor_id');
 

@@ -334,4 +334,9 @@ abstract class Entity implements EntityInterface
     {
         return $this->file ?? false ? true : false;
     }
+
+    public function removeKey(string $key): void
+    {
+        unset($this->$key);
+    }
 }
