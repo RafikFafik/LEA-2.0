@@ -82,6 +82,10 @@ CalendarModule:
             url: "/calendar/monthly"
             params: ["month", "year"]
             controller: "MonthlyScheduleController"
+        send-alerts:
+            url: "/calendar/send-alert"
+            controller: CalendarAlertController
+            allow: ['all']
 
 Security:
     prefix: "/security"

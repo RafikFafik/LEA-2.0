@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Module\Security\Service;
+namespace Lea\Core\Security\Service;
 
 use Lea\Core\Service\ServiceInterface;
 use Lea\Core\Security\Repository\UserRepository;

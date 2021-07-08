@@ -52,6 +52,4 @@ class Cron {
     unset($jobs[array_search($job.' '.$schedule, $jobs)]);
     return self::saveJobs($jobs);
   }
-
-
 }

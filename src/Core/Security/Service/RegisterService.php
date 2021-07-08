@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Module\Security\Service;
+namespace Lea\Core\Security\Service;
 
 use Lea\Response\Response;
 use Lea\Core\Mailer\Mailer;

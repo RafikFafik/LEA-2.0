@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Repository;
 
 use Lea\Core\Database\DatabaseManager;
-use Lea\Module\Security\Service\AuthorizedUserService;
+use Lea\Core\Security\Service\AuthorizedUserService;
 
 abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
