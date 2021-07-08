@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace Lea\Module\ProductOfferModule\Service;
 
 use Lea\Core\Service\Service;
+use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
 class ProductOfferService extends Service
 {
     public function getView(): iterable
     {
         $list = $this->repository->findList();
+        $contractor_repository = new ContractorRepository();
         foreach ($list as $obj) {
             $sums = $this->getProductsSums($obj->getProducts());
+            $contractor = $contractor_repository->findById($obj->getContractorId());
             $obj->net_sum = $sums['net_sum'];
             $obj->gross_sum = $sums['gross_sum'];
+            $obj->contractor_fullname = $contractor->getFullName();
         }
 
         return $list;
@@ -32,6 +36,6 @@ class ProductOfferService extends Service
             $gross_sum += ($net * ($tax / 100)) + $net;
         }
 
-        return ['net_sum' => $net_sum, 'gross_sum' => $gross_sum];
+        return ['net_sum' => floatval(number_format($net_sum, 2)), 'gross_sum' => floatval(number_format($gross_sum, 2))];
     }
 }
