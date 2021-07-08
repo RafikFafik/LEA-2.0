@@ -69,6 +69,8 @@ abstract class ExceptionDriver
             Response::internalServerError("Saving file failed: " . $e->getMessage());
         } catch (DocCommentMissedException $e) {
             Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
+        } catch (Error $e) {
+            Response::internalServerError($e->getMessage());
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");
         }

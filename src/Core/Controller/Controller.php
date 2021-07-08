@@ -37,7 +37,7 @@ abstract class Controller implements ControllerInterface
     }
 
     public function init(): void
-    {
+    { 
         $Repository = $this->getRepositoryClass();
         $this->repository = new $Repository();
 
@@ -66,14 +66,14 @@ abstract class Controller implements ControllerInterface
         }
     }
 
-    private function isCollectionController(): bool
+    protected function isCollectionController(): bool
     {
         $namespace = get_called_class();
 
         return str_contains($namespace, "CollectionController");
     }
 
-    private function getRepositoryClass(): string
+    protected function getRepositoryClass(): string
     {
         $namespace = get_called_class();
         $namespace = str_replace("\Controller", "\Repository", $namespace);
