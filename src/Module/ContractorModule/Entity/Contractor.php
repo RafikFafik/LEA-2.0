@@ -31,6 +31,11 @@ class Contractor extends Entity
     private $email;
 
     /**
+     * @var int
+     */
+    private $advisor;
+
+    /**
      * @var iterable<Address>
      */
     private $addresses;
@@ -196,6 +201,30 @@ class Contractor extends Entity
     public function setContractorFiles($contractor_files)
     {
         $this->contractor_files = $contractor_files;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of advisor
+     *
+     * @return  int
+     */ 
+    public function getAdvisor()
+    {
+        return $this->advisor;
+    }
+
+    /**
+     * Set the value of advisor
+     *
+     * @param  int  $advisor
+     *
+     * @return  self
+     */ 
+    public function setAdvisor(int $advisor)
+    {
+        $this->advisor = $advisor;
 
         return $this;
     }
