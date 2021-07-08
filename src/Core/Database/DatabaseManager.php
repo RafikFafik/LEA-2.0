@@ -63,7 +63,7 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
                 $this->root_object->$setVal(self::castVariable($val, $type));
             }
         }
-        if($is_nested) 
+        if ($is_nested)
             $this->includeNestedObjectData();
 
         return $this->root_object;
@@ -84,7 +84,7 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         }
     }
 
-    protected function getListDataByConstraints(object $object, $constraints = [], $pagination = [])
+    protected function getListDataByConstraints(object $object, $constraints = [], $pagination = [], $nested = true)
     {
         $tableName = self::getTableNameByObject($object);
         $reflector = new Reflection($object);
@@ -102,21 +102,23 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
                     $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
-                    if (method_exists($object, $setVal) && $property->isObject()) {
+                    if (method_exists($object, $setVal) && $property->isObject() && $nested) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {
                         $type = $property->getType2();
                         $object->$setVal(self::castVariable($val, $type));
                     }
                 }
-                foreach ($reflector->getObjectProperties() as $property) {
-                    $key = $property->getName();
-                    $setVal = 'set' . self::processSnakeToPascal($key);
-                    $child_object_name = $property->getType2();
-                    $child_object = new $child_object_name;
-                    /* TODO - Currently - Get Record by record -> Get multiple records at once */
-                    $children_objects = $this->getListDataByConstraints($child_object, [self::convertParentClassToForeignKey($object->getClassName()) => $object->getId()]);
-                    $object->$setVal($children_objects);
+                if ($nested) {
+                    foreach ($reflector->getObjectProperties() as $property) {
+                        $key = $property->getName();
+                        $setVal = 'set' . self::processSnakeToPascal($key);
+                        $child_object_name = $property->getType2();
+                        $child_object = new $child_object_name;
+                        /* TODO - Currently - Get Record by record -> Get multiple records at once */
+                        $children_objects = $this->getListDataByConstraints($child_object, [self::convertParentClassToForeignKey($object->getClassName()) => $object->getId()]);
+                        $object->$setVal($children_objects);
+                    }
                 }
                 $objects[] = $object;
             }

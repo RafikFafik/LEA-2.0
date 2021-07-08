@@ -48,6 +48,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $res;
     }
 
+    
     public function updateById(object $object, int $id)
     {
         $object->setId($id);
@@ -60,8 +61,16 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
     {
         $constraints = [];
         $result = $this->getListDataByConstraints($this->object, $constraints);
-
+        
         return $result;
+    }
+
+    public function findFlatList()
+    {
+        $constraints = [];
+        $res = $this->getListDataByConstraints($this->object, $constraints, [], false);
+
+        return $res;
     }
 
     public function removeById(int $id): void

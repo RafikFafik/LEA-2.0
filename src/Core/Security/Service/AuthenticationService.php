@@ -17,7 +17,7 @@ abstract class AuthenticationService implements ServiceInterface
 
 
 
-    protected function generateJWT(string $email, int $uid): string
+    protected function generateJWT(string $email, int $uid, int $role_id): string
     {
         $exp = 5000; // In minutes
         $payload = [
@@ -27,7 +27,8 @@ abstract class AuthenticationService implements ServiceInterface
             //"nbf" => 1357000000, not before - delay after token activation
             "exp" => strtotime('+' . ($exp + 1) . 'min'), /* Period of validity */
             "uid" => $this->encryptUID($uid),
-            "sec" => $exp * 60
+            "sec" => $exp * 60,
+            "role_id" => $role_id
         ];
         $token = JWT::encode($payload, $this->key);
 
