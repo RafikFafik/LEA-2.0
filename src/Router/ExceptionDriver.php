@@ -22,10 +22,10 @@ abstract class ExceptionDriver
     private const SQL_UNKNOWN_DATABASE = 1049;
     private const SQL_UNKNOWN_HOST = 2002;
 
-    protected function instantiateController(string $Controller, $request, $params, $allow): void
+    protected function instantiateController(string $Controller, $request, $params, $allow, $config): void
     {
         try {
-            $this->controller = new $Controller($request, $params, $allow ?? []);
+            $this->controller = new $Controller($request, $params, $allow ?? [], $config);
         } catch (Error $e) {
             $message = $e->getMessage();
             if (str_contains($message, "Call to undefined method"))

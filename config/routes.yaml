@@ -53,6 +53,7 @@ ContractorModule:
         by-id:
             url: "/contractors/{id}"
             controller: ContractorController
+            allow: [""]
         collection:
             url: "/contractors"
             controller: ContractorCollectionController
@@ -122,6 +123,11 @@ Security:
         users-subordinates:
             url: "/security/users/subordinates"
             controller: UserSubordinateController
+        commercial-advisor:
+            url: "/security/users/commercial-advisors"
+            controller: CommercialAdvisorController
+            config: 
+                advisor-role-id: 5 # ID in DB
 Gus:
     prefix: "/gus"
     endpoints:
