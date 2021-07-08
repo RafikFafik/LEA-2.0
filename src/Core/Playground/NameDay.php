@@ -1,4 +1,7 @@
 <?php
+
+namespace Lea\Core\Playground;
+
 class NameDay
 {
     public static function getNameDay(): string
