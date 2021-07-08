@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Lea\Core\Cron\Cron;
+use Lea\CronJobs\CronJobs;
 use Lea\Response\Response;
 use Lea\Router\Router;
 
@@ -33,5 +35,8 @@ if ($_ENV['DEBUG']) {
 /* Workaround */
 if($_SERVER['REQUEST_METHOD'] === "OPTIONS")
     Response::noContent();
+
+$cron_jobs = new CronJobs();
+$cron_jobs->addJobs();
 
 $router = new Router();

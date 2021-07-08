@@ -3,17 +3,17 @@
 namespace Lea\Module\CalendarModule\Controller;
 
 use Lea\Core\Controller\Controller;
+use Lea\Module\CalendarModule\Cron\AlertCron;
 use Lea\Response\Response;
 
-use function Lea\Module\CalendarModule\Cron\sendAlerts;
 
 class CalendarAlertController extends Controller {
 
   public function init() : void {
     switch($this->request->method()) {
       case "GET":
-        sendAlerts();
-        Response::noContent();
+        AlertCron::sendAlerts();
+        Response::ok();
         break;
     }
   }
