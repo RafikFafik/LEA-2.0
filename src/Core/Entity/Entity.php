@@ -13,6 +13,7 @@ use Lea\Core\Type\Date;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Lea\Core\Type\Currency;
 use Lea\Core\Security\Service\AuthorizedUserService;
 
 abstract class Entity implements EntityInterface
@@ -101,7 +102,8 @@ abstract class Entity implements EntityInterface
                     /* Disposable - End*/
                 }
             } else {
-                $res[$key] = $reflection->getType2() == "Date" && $val !== null ? $val->__toString() : $res[$key] = $val;
+                $type = $reflection->getType2();
+                $res[$key] = (($type == "Date" || $type =="Currency") && $val !== null) ? $val->__get() : $res[$key] = $val;
             }
         }
         /* Get fields that are not in entity */
@@ -301,6 +303,8 @@ abstract class Entity implements EntityInterface
                     throw new InvalidDateFormatException($key);
                 }
                 return $type;
+            case "CURRENCY":
+                return new Currency($variable);
             default:
                 return $variable;
                 break;

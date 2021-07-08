@@ -1,6 +1,6 @@
 <?php
 
-namespace Lea\Module\Gus\Service;
+namespace Lea\Core\Gus\Service;
 
 use GusApi\GusApi;
 use GusApi\ReportTypes;

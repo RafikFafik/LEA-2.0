@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lea\Core\File\Manager;
+namespace Lea\Core\File\Service;
 
 use Lea\Core\Exception\FileNotExistsException;
 use Lea\Core\File\Entity\File;

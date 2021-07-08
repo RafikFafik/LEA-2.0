@@ -22,10 +22,10 @@ abstract class ExceptionDriver
     private const SQL_UNKNOWN_DATABASE = 1049;
     private const SQL_UNKNOWN_HOST = 2002;
 
-    protected function instantiateController(string $Controller, $request, $params, $allow): void
+    protected function instantiateController(string $Controller, $request, $params, $allow, $config): void
     {
         try {
-            $this->controller = new $Controller($request, $params, $allow ?? []);
+            $this->controller = new $Controller($request, $params, $allow ?? [], $config);
         } catch (Error $e) {
             $message = $e->getMessage();
             if (str_contains($message, "Call to undefined method"))
@@ -56,12 +56,7 @@ abstract class ExceptionDriver
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
             /* TODO - does not work correctly */
-            $message = $e->getMessage();
-            $field = substr($message, strpos($message, "set"));
-            $field = substr($field, 0, strpos($field, "given") + 5);
-            $field = str_replace("()", "", str_replace('set', '', $field));
-            $field = self::pascalToSnake($field);
-            Response::badRequest("Invalid typeof: " . $field);
+            Response::badRequest("Invalid typeof: " . $e->getMessage());
         } catch (InvalidDateFormatException $e) {
             Response::badRequest("Invalid date format of: " . $e->getMessage());
         } catch (UserAlreadyAuthorizedException $e) {
@@ -74,6 +69,8 @@ abstract class ExceptionDriver
             Response::internalServerError("Saving file failed: " . $e->getMessage());
         } catch (DocCommentMissedException $e) {
             Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
+        } catch (Error $e) {
+            Response::internalServerError($e->getMessage());
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");
         }

@@ -11,7 +11,7 @@ use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Database\DatabaseConnection;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Module\Security\Service\TokenVerificationService;
+use Lea\Core\Security\Service\TokenVerificationService;
 
 abstract class Controller implements ControllerInterface
 {

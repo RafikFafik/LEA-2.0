@@ -72,7 +72,7 @@ class DatabaseQuery extends DatabaseUtil
 
             $values .= $value . ', ';
         }
-        if ($parent_class) {
+        if ($parent_class && !str_contains($columns, self::convertKeyToReferencedColumn($parent_class))) {
             $columns .= self::convertKeyToReferencedColumn($parent_class);
             $values .= $parent_id;
         } else {
@@ -100,6 +100,8 @@ class DatabaseQuery extends DatabaseUtil
             if ($value === NULL)
                 continue;
             if (gettype($value) == "string" || $property->getType2() == "Date")
+                $value = "'" . $value . "'";
+            elseif (gettype($value) == "int" || $property->getType2() == "Currency")
                 $value = "'" . $value . "'";
             elseif (gettype($value) == "boolean")
                 $value = (int)$value;

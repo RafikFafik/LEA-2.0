@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Repository;
 
-use Lea\Core\Reflection\Reflection;
 use Lea\Core\Validator\Validator;
-use Lea\Core\Repository\Repository;
 use Lea\Core\Serializer\Converter;
-use Lea\Module\Security\Service\AuthorizedUserService;
+use Lea\Core\Reflection\Reflection;
+use Lea\Core\Repository\Repository;
+use Lea\Core\Security\Service\AuthorizedUserService;
 
 final class CalendarEventRepository extends Repository
 {

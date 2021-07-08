@@ -30,6 +30,14 @@ final class UserRepository extends Repository
         return $object;
     }
 
+    public function findListByRoleId(int $role_id): iterable
+    {
+        $constraints['role_id'] = $role_id;
+        $list = $this->getListDataByConstraints($this->object, $constraints);
+
+        return $list;
+    }
+
     public function findListDataByRoleIds(array $role_ids): iterable
     {
         $constraints['role_id_IN'] = $role_ids;

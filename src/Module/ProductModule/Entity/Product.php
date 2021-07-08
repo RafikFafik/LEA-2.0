@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Lea\Module\ProductModule\Entity;
 
+use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
+use Lea\Core\Type\Currency;
 
 class Product extends Entity
 {
@@ -24,7 +26,7 @@ class Product extends Entity
   private $unit_of_measure;
 
   /**
-   * @var int
+   * @var Currency
    */
   private $price;
 
@@ -296,7 +298,7 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setPrice(int $price)
+public function setPrice(Currency $price)
   {
     $this->price = $price;
 
