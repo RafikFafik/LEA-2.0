@@ -19,7 +19,7 @@ final class LoginService extends AuthenticationService implements ServiceInterfa
         if($user->getActive() === false)
             throw new InactiveAccountException;
         $uid = $user->getId();
-        $token = $this->generateJWT($email, $uid);
+        $token = $this->generateJWT($email, $uid, $user->getRoleId());
         $userdata = [
             'name' => $user->getName(),
             'surname' => $user->getSurname(),
@@ -27,7 +27,6 @@ final class LoginService extends AuthenticationService implements ServiceInterfa
             'dzis_obchodzimy_imieniny' => [
                 NameDay::getNameDay()
             ]
-
         ];
 
         return $userdata;

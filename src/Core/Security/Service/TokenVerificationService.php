@@ -31,8 +31,8 @@ class TokenVerificationService extends AuthenticationService implements ServiceI
             $decoded = (array)JWT::decode($TOKEN, $this->key, array('HS256'));
             $credentials = $this->getCredentialsFromToken($decoded);
             $repository = new UserRepository();
-            $user = $repository->findById($credentials['uid'], new User);
-            $fresh_token = $this->generateJWT($credentials['email'], $credentials['uid']);
+            $user = $repository->findById($credentials['uid']);
+            $fresh_token = $this->generateJWT($credentials['email'], $credentials['uid'], $user->getRoleId());
             Header("Authorization: Bearer $fresh_token");
             Header("Access-Control-Expose-Headers: Authorization");
             AuthorizedUserService::setAuthorizedUser($user);
