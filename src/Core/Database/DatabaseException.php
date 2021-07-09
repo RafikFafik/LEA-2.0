@@ -10,7 +10,6 @@ use Lea\Core\Reflection\Reflection;
 use Lea\Core\Database\DatabaseManager;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Response\Response;
-use Lea\ServiceLoader;
 use ReflectionProperty;
 
 class DatabaseException extends DatabaseUtil
@@ -108,10 +107,11 @@ class DatabaseException extends DatabaseUtil
             foreach ($referenced as $key) {
                 $foreign_column = self::convertKeyToColumn($key);
                 $Class = str_replace('_id', '', $key);
-                $entity = ServiceLoader::getLeaEntityClass($Class);
-                $parent_table = self::getTableNameByClass($Class);
-                if ($parent_table !== $tablename && $entity !== null)
-                    $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $entity));
+                $Class = self::getEntityClass($Class);
+                if($Class)
+                    $parent_table = self::getTableNameByClass($Class);
+                // if ($parent_table !== $tablename && $Class !== null) 
+                    // $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $Class));
                 $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
             }
         }
@@ -241,5 +241,21 @@ class DatabaseException extends DatabaseUtil
         }
 
         return "VARCHAR(150)";
+    }
+
+    private static function getEntityClass(string $needle): ?string
+    {
+        $needle = self::processSnakeToPascal($needle);
+        $classes = get_declared_classes();
+        foreach ($classes as $registered_class) {
+            if (!str_contains($registered_class, $needle))
+                continue;
+                $tokens = explode("\\", $registered_class);
+                $Class = end($tokens);
+                if($Class === $needle)
+                    return $registered_class;
+        }
+
+        return null;
     }
 }
