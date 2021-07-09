@@ -84,6 +84,10 @@ abstract class Entity implements EntityInterface
         foreach ($reflection->getProperties() as $property) {
             $recursive_res = [];
             $key = $property->getName();
+            if($specific_fields) {
+                if(!in_array($key, $specific_fields))
+                    continue;
+            }
             $getValue = 'get' . $this->processSnakeToPascal($key);
             if (!method_exists($class, $getValue))
                 continue;
@@ -92,7 +96,7 @@ abstract class Entity implements EntityInterface
             if ($reflection->isObject()) {
                 if (is_iterable($val)) {
                     foreach ($val as $obj) {
-                        $recursive_res[] = $obj->get();
+                        $recursive_res[] = $obj->get($specific_fields);
                     }
                     $res[$key] = $recursive_res;
                     /* Disposable - Begin */
@@ -109,6 +113,10 @@ abstract class Entity implements EntityInterface
         /* Get fields that are not in entity */
         $ovars = get_object_vars($this);
         foreach ($ovars as $key => $val) {
+            if($specific_fields) {
+                if(!in_array($key, $specific_fields))
+                    continue;
+            }
             if (!isset($res[$key]))
                 $fields[$key] = $val;
         }

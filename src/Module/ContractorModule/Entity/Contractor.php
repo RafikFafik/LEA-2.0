@@ -6,7 +6,7 @@ namespace Lea\Module\ContractorModule\Entity;
 
 use Lea\Core\Entity\Entity;
 use Lea\Module\ContractorModule\Entity\Address;
-use Lea\Module\ContractorModule\Entity\Employee;
+use Lea\Module\ContractorModule\Entity\ContractorEmployee;
 use Lea\Module\CalendarModule\Entity\CalendarEvent;
 
 class Contractor extends Entity
@@ -46,7 +46,7 @@ class Contractor extends Entity
     private $addresses;
 
     /**
-     * @var iterable<Employee>
+     * @var iterable<ContractorEmployee>
      */
     private $employees;
 

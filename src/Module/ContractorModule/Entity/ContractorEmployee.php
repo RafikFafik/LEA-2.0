@@ -6,7 +6,7 @@ namespace Lea\Module\ContractorModule\Entity;
 
 use Lea\Core\Entity\Entity;
 
-class Employee extends Entity
+class ContractorEmployee extends Entity
 {
     /**
      * @var string
