@@ -20,7 +20,7 @@ final class OfferService extends Service
             $employee = $employee_repository->findById($obj->getContactPerson());
 
             $obj->fullname = $contractor->getFullname();
-            $obj->fullname = $contractor->getFullname();
+            $obj->contact_person_name = $employee->getName() . " " . $employee->getSurname();
 
         }
 

@@ -35,7 +35,7 @@ class Offer extends Entity
     protected $contractor_id;
 
     /**
-     * @var string
+     * @var int
      */
     protected $contact_person;
 
@@ -171,7 +171,7 @@ class Offer extends Entity
      *
      * @return  self
      */
-    public function setContactPerson(string $contact_person)
+    public function setContactPerson(int $contact_person)
     {
         $this->contact_person = $contact_person;
 
@@ -291,7 +291,7 @@ class Offer extends Entity
      *
      * @return  self
      */ 
-    public function setTitle(string $title)
+    public function setTitle($title)
     {
         $this->title = $title;
 
