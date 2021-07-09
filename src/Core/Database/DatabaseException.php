@@ -112,7 +112,8 @@ class DatabaseException extends DatabaseUtil
                     $parent_table = self::getTableNameByClass($Class);
                 // if ($parent_table !== $tablename && $Class !== null) 
                     // $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $Class));
-                $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
+                if($parent_table)
+                    $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
             }
         }
         $ddl .= $columns;
