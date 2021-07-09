@@ -15,6 +15,7 @@ final class Request
     public $payload;
 
     private static $pagination = null;
+    private static $custom_params = null;
 
     const APPLICATION_JSON = "application/json";
     const MULTIPART_FORM_DATA = "multipart/form-data";
@@ -35,7 +36,8 @@ final class Request
         return null;
     }
 
-    public function getPayload(): array {
+    public function getPayload(): array
+    {
         return $this->payload ?? [];
     }
 
@@ -88,9 +90,9 @@ final class Request
 
     private function parsePOST(): void
     {
-        foreach($_POST as $key => $val) {
+        foreach ($_POST as $key => $val) {
             $parsed = $array = json_decode($val, true);
-            if(is_array($parsed))
+            if (is_array($parsed))
                 $this->payload[$key] = $array;
             else
                 $this->payload[$key] = $val;
@@ -99,7 +101,7 @@ final class Request
 
     public static function setPaginationParams(array $params): void
     {
-        if(self::$pagination !== null)
+        if (self::$pagination !== null)
             Response::internalServerError("Redefining of pagination params is not allowed");
         self::$pagination = $params;
     }
@@ -107,5 +109,17 @@ final class Request
     public static function getPaginationParams(): array
     {
         return self::$pagination;
+    }
+
+    public static function setCustomParams(array $params): void
+    {
+        if (self::$custom_params !== null)
+            Response::internalServerError("Redefining of custom params is not allowed");
+        self::$custom_params = $params;
+    }
+
+    public static function getCustomParams(): array
+    {
+        return self::$custom_params;
     }
 }

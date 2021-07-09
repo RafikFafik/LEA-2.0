@@ -24,6 +24,7 @@ final class Router extends ExceptionDriver
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
         $pagination = $this->getPaginationParams($module['params'] ?? []);
         Request::setPaginationParams($pagination);
+        Request::setCustomParams($module['params']);
         if (isset($module['body-params']))
             Validator::validateBodyParams($module['body-params'], $request->getPayload());
         $this->instantiateController($Controller, $request, $module['params'], $module['allow'] ?? [], $module['config'] ?? []);

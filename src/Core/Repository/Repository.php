@@ -49,7 +49,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $res;
     }
 
-    
+
     public function updateById(object $object, int $id)
     {
         $object->setId($id);
@@ -58,18 +58,17 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $affected_rows;
     }
 
-    public function findList()
+    public function findList(array $constraints = [])
     {
         $constraints = [];
         $pagination = Request::getPaginationParams();
         $result = $this->getListDataByConstraints($this->object, $constraints, $pagination);
-        
+
         return $result;
     }
 
-    public function findFlatList()
+    public function findFlatList(array $constraints = [])
     {
-        $constraints = [];
         $pagination = Request::getPaginationParams();
         $res = $this->getListDataByConstraints($this->object, $constraints, $pagination, false);
 
