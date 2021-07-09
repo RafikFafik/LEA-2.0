@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lea\Request;
 
+use Lea\Response\Response;
+
 final class Request
 {
     private $data;
@@ -11,6 +13,8 @@ final class Request
     private $server;
 
     public $payload;
+
+    private static $pagination = null;
 
     const APPLICATION_JSON = "application/json";
     const MULTIPART_FORM_DATA = "multipart/form-data";
@@ -91,5 +95,17 @@ final class Request
             else
                 $this->payload[$key] = $val;
         }
+    }
+
+    public static function setPaginationParams(array $params): void
+    {
+        if(self::$pagination !== null)
+            Response::internalServerError("Redefining of pagination params is not allowed");
+        self::$pagination = $params;
+    }
+
+    public static function getPaginationParams(): array
+    {
+        return self::$pagination;
     }
 }

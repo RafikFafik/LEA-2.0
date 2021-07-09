@@ -22,10 +22,21 @@ final class Router extends ExceptionDriver
         $request = new Request();
         $module = $this->getEndpointByUrl($routes, $request->url());
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
+        $pagination = $this->getPaginationParams($module['params'] ?? []);
+        Request::setPaginationParams($pagination);
         if (isset($module['body-params']))
             Validator::validateBodyParams($module['body-params'], $request->getPayload());
         $this->instantiateController($Controller, $request, $module['params'], $module['allow'] ?? [], $module['config'] ?? []);
         $this->initializeController();
+    }
+
+    private function getPaginationParams(array $params): array
+    {
+        $pagination['order'] = isset($params['order']) ? $params['order'] : "ASC";
+        $pagination['page'] = isset($params['page']) ? $params['page'] : 0;
+        $pagination['sortby'] = isset($params['sortby']) ? $params['sortby'] : 'id';
+
+        return $pagination;
     }
 
     private function getControllerNamespace($module_name, $class_name)

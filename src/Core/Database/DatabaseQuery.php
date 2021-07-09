@@ -30,7 +30,7 @@ class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public function getQueryWithConstraints(object $object, string $columns, array $constraints): string
+    public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null): string
     {
         $table_name = self::getTableNameByObject($object);
         $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
@@ -42,6 +42,9 @@ class DatabaseQuery extends DatabaseUtil
             } elseif ($object->hasKey($key) || $object) {
                 $query .= " AND " . self::convertKeyToColumn($key) . "='" . $val . "'";
             }
+        }
+        if ($pagination) {
+            $query .= $this->getPaginationQueryConstraints($object, $pagination);
         }
 
         return $query;
@@ -138,6 +141,14 @@ class DatabaseQuery extends DatabaseUtil
     public function getCheckIfTableExistsQuery(string $tablename): string
     {
         $query = 'SHOW TABLES LIKE \'%' . $tablename . '%\'';
+
+        return $query;
+    }
+
+    private function getPaginationQueryConstraints(object $object, array $params): ?string
+    {
+        if($object->hasKey($params['sortby']))
+            $query = ' ORDER BY ' . self::convertKeyToColumn($params['sortby']) . " " . $params['order'];
 
         return $query;
     }
