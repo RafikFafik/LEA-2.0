@@ -36,7 +36,7 @@ class Contractor extends Entity
     private $advisor;
 
     /**
-     * @var int
+     * @var string
      */
     private $register_number;
 
@@ -237,7 +237,7 @@ class Contractor extends Entity
     /**
      * Get the value of register_number
      *
-     * @return  int
+     * @return  string
      */ 
     public function getRegisterNumber()
     {
@@ -251,7 +251,7 @@ class Contractor extends Entity
      *
      * @return  self
      */ 
-    public function setRegisterNumber(int $register_number)
+    public function setRegisterNumber(string $register_number)
     {
         $this->register_number = $register_number;
 
