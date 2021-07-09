@@ -13,9 +13,11 @@ class OfferCollectionController extends Controller implements ControllerInterfac
 {
     public function init(): void
     {
+        $this->repository = new OfferRepository();
+
         switch ($this->http_method) {
             case "GET":
-                $service = new OfferService(new OfferRepository());
+                $service = new OfferService($this->repository);
                 $list = $service->getView();
                 $result = Normalizer::denormalizeList($list);
                 Response::ok($result);

@@ -13,6 +13,8 @@ class ProductOfferCollectionController extends Controller implements ControllerI
 {
     public function init(): void
     {
+        $this->repository = new ProductOfferRepository();
+        
         switch ($this->http_method) {
             case "GET":
                 $service = new ProductOfferService(new ProductOfferRepository());
