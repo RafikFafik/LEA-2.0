@@ -25,6 +25,10 @@ final class Router extends ExceptionDriver
         $pagination = $this->getPaginationParams($module['params'] ?? []);
         Request::setPaginationParams($pagination);
         Request::setCustomParams($module['params']);
+        if (isset($module['params']['filter'])) {
+            $filters = $this->getFilterParams($module['params']['filter']);
+            Request::setFilterParams($filters);
+        }
         if (isset($module['body-params']))
             Validator::validateBodyParams($module['body-params'], $request->getPayload());
         $this->instantiateController($Controller, $request, $module['params'], $module['allow'] ?? [], $module['config'] ?? []);
@@ -33,11 +37,20 @@ final class Router extends ExceptionDriver
 
     private function getPaginationParams(array $params): array
     {
-        $pagination['order'] = isset($params['order']) ? $params['order'] : "ASC";
+        $pagination['order'] = isset($params['order']) && strtoupper($params['order']) == 'DESC' ? $params['order'] : "ASC";
         $pagination['page'] = isset($params['page']) ? $params['page'] : 0;
         $pagination['sortby'] = isset($params['sortby']) ? $params['sortby'] : 'id';
 
         return $pagination;
+    }
+
+    private function getFilterParams(array $filters): array
+    {
+        foreach ($filters as $key => $val) {
+            $result[$key . '_LIKE'] = $val;
+        }
+
+        return $result;
     }
 
     private function getControllerNamespace($module_name, $class_name)
@@ -117,7 +130,9 @@ final class Router extends ExceptionDriver
                 $key = substr($keyval, 0, $index);
                 $val = substr($keyval, $index + 1);
                 $val_casted = (int)$val;
-                if (strlen((string)$val_casted) == strlen($val))
+                if ($key == 'filter')
+                    $query_string_params[$key] = $this->parseFilters($val);
+                else if (strlen((string)$val_casted) == strlen($val))
                     $query_string_params[$key] = $val_casted;
                 else
                     $query_string_params[$key] = $val;
@@ -134,6 +149,17 @@ final class Router extends ExceptionDriver
             Response::badRequest(['Missed query string params' => $not_delivered]);
 
         return array_merge($resource_params, $query_string_params ?? []);
+    }
+
+    private function parseFilters(string $filters): array
+    {
+        $filters = explode(",", $filters);
+        foreach ($filters as $pair) {
+            $keyval = urldecode($pair);
+            $keyval = explode("=", $keyval);
+            $result[$keyval[0]] = $keyval[1];
+        }
+        return $result;
     }
 
     private function getIteratorByUrlPair(string $request_url, string $config_url): ?MultipleIterator

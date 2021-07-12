@@ -60,16 +60,17 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
 
     public function findList(array $constraints = [])
     {
-        $constraints = [];
         $pagination = Request::getPaginationParams();
+        $constraints = Request::getFilterParams();
         $result = $this->getListDataByConstraints($this->object, $constraints, $pagination);
-
+        
         return $result;
     }
 
     public function findFlatList(array $constraints = [])
     {
         $pagination = Request::getPaginationParams();
+        $constraints = Request::getFilterParams();
         $res = $this->getListDataByConstraints($this->object, $constraints, $pagination, false);
 
         return $res;

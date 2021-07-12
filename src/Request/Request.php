@@ -15,6 +15,7 @@ final class Request
     public $payload;
 
     private static $pagination = null;
+    private static $filter = null;
     private static $custom_params = null;
 
     const APPLICATION_JSON = "application/json";
@@ -109,6 +110,18 @@ final class Request
     public static function getPaginationParams(): array
     {
         return self::$pagination;
+    }
+
+    public static function setFilterParams(array $filter): void
+    {
+        if (self::$filter !== null)
+            Response::internalServerError("Redefining of pagination params is not allowed");
+        self::$filter = $filter;
+    }
+
+    public static function getFilterParams(): array
+    {
+        return self::$filter ?? [];
     }
 
     public static function setCustomParams(array $params): void

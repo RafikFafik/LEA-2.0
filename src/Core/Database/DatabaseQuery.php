@@ -32,6 +32,8 @@ class DatabaseQuery extends DatabaseUtil
 
     public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null): string
     {
+        if(isset($constraints['order']))
+            unset($constraints['order']);
         $table_name = self::getTableNameByObject($object);
         $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
         foreach ($constraints as $key => $val) {
@@ -39,7 +41,13 @@ class DatabaseQuery extends DatabaseUtil
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
             } elseif (str_contains($key, "_LIKE") && $object->hasKey(substr($key, 0, strpos($key, "_LIKE")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
-            } elseif ($object->hasKey($key) || $object) {
+            } elseif (str_contains($key, "_BETWEEN") && $object->hasKey(substr($key, 0, strpos($key, "_BETWEEN")))) {
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to']. '\'';
+            } elseif ($key == "filter" && is_array($val)) {
+                foreach($val as $k => $v) {
+                    $query .= " AND " . self::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
+                }
+            } elseif ($object->hasKey($key)) {
                 $query .= " AND " . self::convertKeyToColumn($key) . "='" . $val . "'";
             }
         }

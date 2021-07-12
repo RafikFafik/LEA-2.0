@@ -15,6 +15,14 @@ final class CalendarEventRepository extends Repository
     public function findCalendarEventListByStartDate(string $date, object $object): iterable
     {
         $constraints = ['date_start' => $date];
+        $reflector = new Reflection($this->object);
+        if($reflector->hasSubClassDependency()) {
+            $subclass = $reflector->getSubClass();
+            $subkey = $reflector->getSubKey();
+            $objs = $this->getListDataByConstraints(new $subclass, [$subkey => $user_id ?? AuthorizedUserService::getAuthorizedUserId()]);
+            $ids = Converter::getValuesFromObjectListByKey($objs, 'calendar_event_id');
+            $constraints['id_IN'] = $ids;
+        }
         $res = $this->getListDataByConstraints($object, $constraints);
 
         return $res;
@@ -24,7 +32,9 @@ final class CalendarEventRepository extends Repository
     {
         $month = Validator::parseMonth($month);
         $constraint = $year . '-' . $month;
-        $constraints = ['date_start_LIKE' => $constraint];
+        $between['from'] = $year . '-' . Validator::parseMonth($month - 1) . '-01';
+        $between['to'] = $year . '-' . Validator::parseMonth($month + 1) . '-31';
+        $constraints = ['date_start_BETWEEN' => $between];
         $reflector = new Reflection($this->object);
         if($reflector->hasSubClassDependency()) {
             $subclass = $reflector->getSubClass();
