@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Core\Type;
 
-use Lea\Core\Exception\InvalidCurrencyValueException;
-
-
 class Currency
 {
     /**
@@ -17,7 +14,8 @@ class Currency
     public function __construct($value = null, $from_db = false)
     {
         if (!$value)
-            throw new InvalidCurrencyValueException($value);
+            $this->value = 0;
+            // throw new InvalidCurrencyValueException($value);
         $this->value = $from_db ? (int)$value : $this->formatDenormalizedCurrency((string)$value);
     }
 

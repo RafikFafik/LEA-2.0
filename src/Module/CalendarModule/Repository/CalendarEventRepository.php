@@ -12,7 +12,7 @@ use Lea\Core\Security\Service\AuthorizedUserService;
 
 final class CalendarEventRepository extends Repository
 {
-    public function findCalendarEventListByStartDate(string $date, object $object): iterable
+    public function findCalendarEventListByStartDate(string $date, int $user_id = null): iterable
     {
         $constraints = ['date_start' => $date];
         $reflector = new Reflection($this->object);
@@ -23,7 +23,7 @@ final class CalendarEventRepository extends Repository
             $ids = Converter::getValuesFromObjectListByKey($objs, 'calendar_event_id');
             $constraints['id_IN'] = $ids;
         }
-        $res = $this->getListDataByConstraints($object, $constraints);
+        $res = $this->getListDataByConstraints($this->object, $constraints);
 
         return $res;
     }

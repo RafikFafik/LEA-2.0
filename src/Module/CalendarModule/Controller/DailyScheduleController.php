@@ -8,7 +8,6 @@ use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Module\CalendarModule\Entity\CalendarEvent;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
 class DailyScheduleController extends Controller implements ControllerInterface
@@ -18,7 +17,7 @@ class DailyScheduleController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 $repo = new CalendarEventRepository;
-                $list = $repo->findCalendarEventListByStartDate($this->params['date'], new CalendarEvent);
+                $list = $repo->findCalendarEventListByStartDate($this->params['date'], $this->params['user_id'] ?? null);
                 $res = Normalizer::denormalizeList($list);
                 $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
