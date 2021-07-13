@@ -8,7 +8,9 @@ use Lea\Response\Response;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Controller\ControllerInterface;
+use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
+use Lea\Module\CalendarModule\Service\CalendarService;
 
 class DailyScheduleController extends Controller implements ControllerInterface
 {
@@ -16,8 +18,8 @@ class DailyScheduleController extends Controller implements ControllerInterface
     {
         switch ($this->request->method()) {
             case "GET":
-                $repo = new CalendarEventRepository;
-                $list = $repo->findCalendarEventListByStartDate($this->params['date'], $this->params['user_id'] ?? null);
+                $service = new CalendarService();
+                $list = $service->getDailyEvents($this->params['date'], $this->params['user_id'] ?? AuthorizedUserService::getAuthorizedUserId());
                 $res = Normalizer::denormalizeList($list);
                 $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);

@@ -43,6 +43,10 @@ class DatabaseQuery extends DatabaseUtil
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
             } elseif (str_contains($key, "_BETWEEN") && $object->hasKey(substr($key, 0, strpos($key, "_BETWEEN")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to']. '\'';
+            } elseif (str_contains($key, "_<=") && $object->hasKey(substr($key, 0, strpos($key, "_<=")))) {
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_<="))) . " <= '" . $val . "'";
+            } elseif (str_contains($key, "_>=") && $object->hasKey(substr($key, 0, strpos($key, "_>=")))) {
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_>="))) . " >= '" . $val . "'";
             } elseif ($key == "filter" && is_array($val)) {
                 foreach($val as $k => $v) {
                     $query .= " AND " . self::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
