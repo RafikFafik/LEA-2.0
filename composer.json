@@ -15,8 +15,8 @@
         "symfony/yaml": "^5.3"
     },
     "autoload": {
-        "psr-4": {
-            "Lea\\": "src/"
-        }
+      "psr-4": {
+        "Lea\\": "src/"
+      }
     }
 }

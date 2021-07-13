@@ -3,3 +3,5 @@ vendor
 handy.sql
 composer.lock
 files
+.vscode
+log/*

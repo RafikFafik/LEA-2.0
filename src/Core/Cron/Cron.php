@@ -28,16 +28,16 @@ class Cron {
     return $output;
   }
 
-  static public function jobExists(string $job = '') : bool {
+  static public function jobExists(string $job = '', string $schedule = '') : bool {
     $jobs = self::getJobs();
 
-   return in_array($job, $jobs);
+   return in_array($schedule.' '.$job. '>/dev/null 2>&1', $jobs);
 
   }
 
   static public function addJob(string $job, string $schedule) {
 
-    if (self::jobExists($schedule.' '.$job . ' >/dev/null 2>&1'))
+    if (self::jobExists($job, $schedule))
       return false;
       
 
