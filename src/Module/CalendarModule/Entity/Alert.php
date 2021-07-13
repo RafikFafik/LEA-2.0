@@ -19,6 +19,11 @@ class Alert extends Entity
     private $time;
 
     /**
+     * @var integer
+     */
+    private $calendar_event_id;
+
+    /**
      * Get the value of type
      *
      * @return  string
@@ -62,6 +67,30 @@ class Alert extends Entity
     public function setTime($time)
     {
         $this->time = $time;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of calendar_event_id
+     *
+     * @return  integer
+     */ 
+    public function getCalendarEventId()
+    {
+        return $this->calendar_event_id;
+    }
+
+    /**
+     * Set the value of calendar_event_id
+     *
+     * @param  integer  $calendar_event_id
+     *
+     * @return  self
+     */ 
+    public function setCalendarEventId($calendar_event_id)
+    {
+        $this->calendar_event_id = $calendar_event_id;
 
         return $this;
     }

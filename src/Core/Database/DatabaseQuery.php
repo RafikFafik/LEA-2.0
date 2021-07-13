@@ -30,8 +30,10 @@ class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public function getQueryWithConstraints(object $object, string $columns, array $constraints): string
+    public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null): string
     {
+        if(isset($constraints['order']))
+            unset($constraints['order']);
         $table_name = self::getTableNameByObject($object);
         $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
         foreach ($constraints as $key => $val) {
@@ -39,9 +41,18 @@ class DatabaseQuery extends DatabaseUtil
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
             } elseif (str_contains($key, "_LIKE") && $object->hasKey(substr($key, 0, strpos($key, "_LIKE")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
-            } elseif ($object->hasKey($key) || $object) {
+            } elseif (str_contains($key, "_BETWEEN") && $object->hasKey(substr($key, 0, strpos($key, "_BETWEEN")))) {
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to']. '\'';
+            } elseif ($key == "filter" && is_array($val)) {
+                foreach($val as $k => $v) {
+                    $query .= " AND " . self::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
+                }
+            } elseif ($object->hasKey($key)) {
                 $query .= " AND " . self::convertKeyToColumn($key) . "='" . $val . "'";
             }
+        }
+        if ($pagination) {
+            $query .= $this->getPaginationQueryConstraints($object, $pagination);
         }
 
         return $query;
@@ -138,6 +149,14 @@ class DatabaseQuery extends DatabaseUtil
     public function getCheckIfTableExistsQuery(string $tablename): string
     {
         $query = 'SHOW TABLES LIKE \'%' . $tablename . '%\'';
+
+        return $query;
+    }
+
+    private function getPaginationQueryConstraints(object $object, array $params): ?string
+    {
+        if($object->hasKey($params['sortby']))
+            $query = ' ORDER BY ' . self::convertKeyToColumn($params['sortby']) . " " . $params['order'];
 
         return $query;
     }

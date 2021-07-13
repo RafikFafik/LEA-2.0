@@ -6,6 +6,7 @@ namespace Lea\Core\Repository;
 
 use Lea\Core\Database\DatabaseManager;
 use Lea\Core\Security\Service\AuthorizedUserService;
+use Lea\Request\Request;
 
 abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
@@ -48,7 +49,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $res;
     }
 
-    
+
     public function updateById(object $object, int $id)
     {
         $object->setId($id);
@@ -57,18 +58,20 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $affected_rows;
     }
 
-    public function findList()
+    public function findList(array $constraints = [])
     {
-        $constraints = [];
-        $result = $this->getListDataByConstraints($this->object, $constraints);
+        $pagination = Request::getPaginationParams();
+        $constraints = Request::getFilterParams();
+        $result = $this->getListDataByConstraints($this->object, $constraints, $pagination);
         
         return $result;
     }
 
-    public function findFlatList()
+    public function findFlatList(array $constraints = [])
     {
-        $constraints = [];
-        $res = $this->getListDataByConstraints($this->object, $constraints, [], false);
+        $pagination = Request::getPaginationParams();
+        $constraints = Request::getFilterParams();
+        $res = $this->getListDataByConstraints($this->object, $constraints, $pagination, false);
 
         return $res;
     }

@@ -15,9 +15,12 @@ class ContractorCollectionController extends Controller implements ControllerInt
 {
     public function init(): void
     {
+        $this->repository = new ContractorRepository();
+
         switch ($this->http_method) {
+            
             case "GET":
-                $service = new ContractorService(new ContractorRepository());
+                $service = new ContractorService($this->repository);
                 $list = $service->getView();
                 $result = Normalizer::denormalizeList($list);
                 Response::ok($result);

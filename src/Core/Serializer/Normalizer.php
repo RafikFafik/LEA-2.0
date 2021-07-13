@@ -20,17 +20,24 @@ class Normalizer
 
     public static function denormalizeSpecificFields(object $object, array $needles): array
     {
-        $res = $object->get();
+        $res = $object->get($needles);
 
         return $res;
     }
-
-
 
     public static function denormalizeList(iterable $list): array
     {
         foreach ($list as $object) {
             $res[] = $object->get();
+        }
+
+        return $res ?? [];
+    }
+
+    public static function denormalizeSpecificFieldsList(iterable $list, array $needles): array
+    {
+        foreach ($list as $object) {
+            $res[] = $object->get($needles);
         }
 
         return $res ?? [];

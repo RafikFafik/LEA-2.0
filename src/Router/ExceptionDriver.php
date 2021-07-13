@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Router;
 
 use Error;
+use Exception;
 use TypeError;
 use mysqli_sql_exception;
 use Lea\Response\Response;
@@ -70,6 +71,8 @@ abstract class ExceptionDriver
         } catch (DocCommentMissedException $e) {
             Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
         } catch (Error $e) {
+            Response::internalServerError($e->getMessage());
+        } catch (Exception $e) {
             Response::internalServerError($e->getMessage());
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");

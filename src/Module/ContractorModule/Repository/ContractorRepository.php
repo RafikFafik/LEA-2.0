@@ -6,6 +6,7 @@ namespace Lea\Module\ContractorModule\Repository;
 
 use Lea\Core\Repository\Repository;
 use Lea\Core\Security\Repository\UserRepository;
+use Lea\Request\Request;
 
 final class ContractorRepository extends Repository
 {
@@ -13,8 +14,12 @@ final class ContractorRepository extends Repository
     {
         $address_repository = new AddressRepository;
         $user_repository = new UserRepository;
-        $list = $this->findFlatList();
-        foreach($list as $obj) {
+        $constraints = Request::getCustomParams();
+        if (isset($constraints['nested']) && filter_var($constraints['nested'], FILTER_VALIDATE_BOOLEAN))
+            $list = $this->findList();
+        else
+            $list = $this->findFlatList();
+        foreach ($list as $obj) {
             $address = $address_repository->findMainHeadquarterByContractorId($obj->getId());
             $user = $user_repository->findById($obj->getAdvisor());
             $obj->address = $address->getAddress();

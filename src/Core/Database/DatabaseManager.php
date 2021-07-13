@@ -84,12 +84,12 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         }
     }
 
-    protected function getListDataByConstraints(object $object, $constraints = [], $pagination = [], $nested = true)
+    protected function getListDataByConstraints(object $object, $constraints = [], $pagination = null, $nested = true)
     {
         $tableName = self::getTableNameByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
-        $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints);
+        $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints, $pagination);
 
         $result = self::executeQuery($query, $tableName, $columns, $object);
         if ($result) {

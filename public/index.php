@@ -23,7 +23,7 @@ header("Access-Control-Allow-Methods: POST, GET, DELETE, OPTIONS, PUT");
 
 if ($_ENV['DEBUG']) {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-    ini_set('display_errors', 'On');
+    ini_set('display_errors', 'Off');
     error_reporting(E_ALL);
     ini_set("log_errors", 'On');
     ini_set("error_log", __DIR__ . "/../log/error.log");

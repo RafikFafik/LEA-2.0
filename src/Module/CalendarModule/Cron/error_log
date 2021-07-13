@@ -1,0 +1,5 @@
+[07-Jul-2021 12:56:51 Europe/Warsaw] PHP Fatal error:  Uncaught Error: Call to a member function getUserId() on int in /home/semprelea/public_html/api.sempre.lea24.pl/src/Module/CalendarModule/Cron/AlertCron.php:40
+Stack trace:
+#0 {main}
+  thrown in /home/semprelea/public_html/api.sempre.lea24.pl/src/Module/CalendarModule/Cron/AlertCron.php on line 40
+[07-Jul-2021 12:58:22 Europe/Warsaw] PHP Recoverable fatal error:  Object of class Lea\Core\Security\Entity\User could not be converted to string in /home/semprelea/public_html/api.sempre.lea24.pl/src/Module/CalendarModule/Cron/AlertCron.php on line 41
