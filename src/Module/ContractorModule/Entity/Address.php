@@ -54,6 +54,11 @@ class Address extends Entity
      */
     private $country;
 
+    /**
+     * @var int
+     */
+    private $contractor_id;
+
 
     public function getIsDefault()
     {
@@ -220,6 +225,30 @@ class Address extends Entity
     public function setComment($comment)
     {
         $this->comment = $comment;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor_id
+     *
+     * @return  int
+     */ 
+    public function getContractorId()
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * Set the value of contractor_id
+     *
+     * @param  int  $contractor_id
+     *
+     * @return  self
+     */ 
+    public function setContractorId(int $contractor_id)
+    {
+        $this->contractor_id = $contractor_id;
 
         return $this;
     }

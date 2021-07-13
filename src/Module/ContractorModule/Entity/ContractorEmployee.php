@@ -28,6 +28,11 @@ class ContractorEmployee extends Entity
      */
     private $phone;
 
+    /**
+     * @var int
+     */
+    private $contractor_id;
+
     public function getName()
     {
         return $this->name;
@@ -71,6 +76,30 @@ class ContractorEmployee extends Entity
     public function setPhone(string $phone)
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor_id
+     *
+     * @return  int
+     */ 
+    public function getContractorId()
+    {
+        return $this->contractor_id;
+    }
+
+    /**
+     * Set the value of contractor_id
+     *
+     * @param  int  $contractor_id
+     *
+     * @return  self
+     */ 
+    public function setContractorId(int $contractor_id)
+    {
+        $this->contractor_id = $contractor_id;
 
         return $this;
     }
