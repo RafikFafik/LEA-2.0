@@ -312,7 +312,7 @@ abstract class Entity implements EntityInterface
                 }
                 return $type;
             case "CURRENCY":
-                return new Currency($variable);
+                return new Currency($variable, false);
             default:
                 return $variable;
                 break;

@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Lea\Core\Type;
 
+use Lea\Core\Exception\InvalidCurrencyValueException;
+
 
 class Currency
 {
-    const DOT_POS = -3;
     /**
      * @var int
      */
     private $value;
 
-    public function __construct($value = null)
+    public function __construct($value = null, $from_db = false)
     {
         if (!$value)
-            return;
-        if(is_string($value))
-            $value = str_replace(" ", "", $value);
-        $this->value = is_float($value) || is_int($value) || (is_string($value) && strlen($value) > 3 && $value[self::DOT_POS] == ".") ? $value * 100 : (int)$value;
+            throw new InvalidCurrencyValueException($value);
+        $this->value = $from_db ? (int)$value : $this->formatDenormalizedCurrency((string)$value);
     }
 
     public function __get($value = null)
@@ -30,5 +29,24 @@ class Currency
     public function __toString()
     {
         return (string)$this->value;
+    }
+
+    private function formatDenormalizedCurrency(string $value): float
+    {
+        if(!(str_contains($value, ".") || str_contains($value, ",") || str_contains($value, " ")))
+            return (float)$value * 100;
+
+        $value = str_replace(" ", "", $value);
+        $value = str_replace(",", ".", $value);
+        $pos = strpos($value, ".");
+        if(!$pos)
+            return (float)$value * 100;
+
+        if (strlen($value) - $pos == 2)
+            $value .= "0";
+        elseif(strlen($value) - $pos > 3)
+            $value = substr($value, 0, $pos + 3);
+
+        return (float)$value * 100;
     }
 }

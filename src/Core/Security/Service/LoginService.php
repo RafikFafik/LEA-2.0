@@ -21,6 +21,7 @@ final class LoginService extends AuthenticationService implements ServiceInterfa
         $uid = $user->getId();
         $token = $this->generateJWT($email, $uid, $user->getRoleId());
         $userdata = [
+            'id' => $uid,
             'name' => $user->getName(),
             'surname' => $user->getSurname(),
             'token' => $token,

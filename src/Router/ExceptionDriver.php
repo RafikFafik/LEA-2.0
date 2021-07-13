@@ -15,6 +15,7 @@ use Lea\Core\Exception\DocCommentMissedException;
 use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
+use Lea\Core\Exception\InvalidCurrencyValueException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 
 abstract class ExceptionDriver
@@ -70,6 +71,8 @@ abstract class ExceptionDriver
             Response::internalServerError("Saving file failed: " . $e->getMessage());
         } catch (DocCommentMissedException $e) {
             Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
+        } catch (InvalidCurrencyValueException $e) {
+            Response::internalServerError("Invalid Currency Value: " . $e->getMessage());
         } catch (Error $e) {
             Response::internalServerError($e->getMessage());
         } catch (Exception $e) {

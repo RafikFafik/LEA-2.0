@@ -165,7 +165,7 @@ abstract class DatabaseUtil extends DatabaseConnection
             case "DATE":
                 return new Date($variable);
             case "CURRENCY":
-                return new Currency($variable);
+                return new Currency($variable, true);
             default:
                 return $variable;
                 break;
