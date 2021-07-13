@@ -25,8 +25,8 @@ final class Router extends ExceptionDriver
         $pagination = $this->getPaginationParams($module['params'] ?? []);
         Request::setPaginationParams($pagination);
         Request::setCustomParams($module['params']);
-        if (isset($module['params']['filter'])) {
-            $filters = $this->getFilterParams($module['params']['filter']);
+        if (isset($module['params']['filters'])) {
+            $filters = $this->getFilterParams($module['params']['filters']);
             Request::setFilterParams($filters);
         }
         if (isset($module['body-params']))
@@ -130,7 +130,7 @@ final class Router extends ExceptionDriver
                 $key = substr($keyval, 0, $index);
                 $val = substr($keyval, $index + 1);
                 $val_casted = (int)$val;
-                if ($key == 'filter')
+                if ($key == 'filters')
                     $query_string_params[$key] = $this->parseFilters($val);
                 else if (strlen((string)$val_casted) == strlen($val))
                     $query_string_params[$key] = $val_casted;
