@@ -73,6 +73,16 @@ final class Reflection extends ReflectionClass
         return $this->namespace . "\\" . $this->type;
     }
 
+    public function getTypeByKey(string $key): ?string
+    {
+        foreach($this->properties as $property) {
+            if(str_contains($key, $property->getName()))
+                return $property->getType2();
+        }
+
+        return null;
+    }
+
     private function genericToExtendedPropertyReflection(array $properties, $objectOrClass): array
     {
         $class = is_object($objectOrClass) ? $objectOrClass->getNamespace() : $objectOrClass;

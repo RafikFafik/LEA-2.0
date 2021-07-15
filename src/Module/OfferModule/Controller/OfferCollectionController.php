@@ -14,15 +14,17 @@ class OfferCollectionController extends Controller implements ControllerInterfac
     public function init(): void
     {
         $this->repository = new OfferRepository();
+        $service = new OfferService($this->repository);
 
         switch ($this->http_method) {
             case "GET":
-                $service = new OfferService($this->repository);
                 $list = $service->getView();
                 $result = Normalizer::denormalizeList($list);
                 Response::ok($result);
             case "POST":
-                $this->postResource();
+                $id = $service->saveOffer($this->request->getPayload());
+                $response = $service->getOfferById($id);
+                Response::ok($response);
                 break;
             default:
                 Response::methodNotAllowed();

@@ -40,7 +40,7 @@ final class GusService implements ServiceInterface
                 'nip' => $gusReport->getNip(),
                 'activity_end_date' => $gusReport->getActivityEndDate(),
                 'regon' => $gusReport->getRegon(),
-                'voivodeship' => strtolower($gusReport->getProvince()),
+                'voivodeship' => mb_strtolower($gusReport->getProvince()),
                 'address' => $gusReport->getStreet() . ' ' . $gusReport->getPropertyNumber() . (strlen($gusReport->getApartmentNumber()) > 0 ? "/" . $gusReport->getApartmentNumber() : ""),
                 'postcode' => $gusReport->getZipCode(),
                 'city' => $gusReport->getCity()

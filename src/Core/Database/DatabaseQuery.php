@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 class DatabaseQuery extends DatabaseUtil
 {
@@ -30,8 +31,9 @@ class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null): string
+    public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null, $reflector = null): string
     {
+        $constraints = $this->matchCurrencyFields($constraints, $reflector);
         if(isset($constraints['order']))
             unset($constraints['order']);
         $table_name = self::getTableNameByObject($object);
@@ -60,6 +62,16 @@ class DatabaseQuery extends DatabaseUtil
         }
 
         return $query;
+    }
+
+    private function matchCurrencyFields(array $constraints, $reflector): array
+    {
+        foreach($constraints as $key => $val) {
+            $type = $reflector->getTypeByKey($key);
+            $result[$key] = $type == "Currency" ? $val * 100 : $val;
+        }
+
+        return $result ?? [];
     }
 
     public function getInsertIntoQuery(object $object, string $parent_class = NULL, int $parent_id = NULL): string

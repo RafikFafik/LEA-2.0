@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Router;
 
+use DateTime;
 use ArrayIterator;
 use MultipleIterator;
 use Lea\Request\Request;
@@ -21,6 +22,7 @@ final class Router extends ExceptionDriver
         $routes = Yaml::parseFile(__DIR__ . '/../../config/routes.yaml');
         $request = new Request();
         $module = $this->getEndpointByUrl($routes, $request->url());
+        $this->module = $module;
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
         $pagination = $this->getPaginationParams($module['params'] ?? []);
         Request::setPaginationParams($pagination);
@@ -46,11 +48,28 @@ final class Router extends ExceptionDriver
 
     private function getFilterParams(array $filters): array
     {
+        $config = $this->module['filters'];
         foreach ($filters as $key => $val) {
-            $result[$key . '_LIKE'] = $val;
+            if (in_array($key, $config['match'])) {
+                $result[$key . '_LIKE'] = $val;
+            } else if (in_array($key, $config['range']) && str_contains($val,  "-")) {
+                $tokens = explode("-", $val);
+                if (!empty($tokens[0])) {
+                    if ($date = DateTime::createFromFormat("d/m/Y", $tokens[0]))
+                        $result[$key . '_>='] = $date->format("Y-m-d");
+                    else
+                        $result[$key . '_>='] = $tokens[0];
+                }
+                if (!empty($tokens[1])) {
+                    if ($date = DateTime::createFromFormat("d/m/Y", $tokens[1]))
+                        $result[$key . '_<='] = $date->format("Y-m-d");
+                    else
+                        $result[$key . '_<='] = $tokens[1];
+                }
+            }
         }
 
-        return $result;
+        return $result ?? [];
     }
 
     private function getControllerNamespace($module_name, $class_name)

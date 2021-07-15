@@ -89,6 +89,11 @@ class CalendarEvent extends Entity
     private $contractor_id;
 
     /**
+     * @var int
+     */
+    private $project_id;
+
+    /**
      * @var iterable<Alert>
      */
     private $alerts;
@@ -504,6 +509,18 @@ class CalendarEvent extends Entity
     public function setStatus(string $status)
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+    public function setProjectId(int $project_id)
+    {
+        $this->project_id = $project_id;
 
         return $this;
     }

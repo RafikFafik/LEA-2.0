@@ -26,6 +26,9 @@ ProductModule:
         collection:
             url: "/products"
             controller: ProductCollectionController
+            filters:
+                match: [product_name, product_model, unit_of_measure, producent]
+                range: [price]
 
 ProjectModule:
     prefix: "/projects"
@@ -36,6 +39,9 @@ ProjectModule:
         collection:
             url: "/projects"
             controller: ProjectCollectionController
+            filters:
+                match: [description, name]
+                range: [issue_date, expiration_date]
 
 ProductOfferModule:
     prefix: "/product-offers"
@@ -64,6 +70,9 @@ ContractorModule:
         nutshell:
             url: "/contractors/nutshell"
             controller: ContractorNutshellCollectionController
+        projects:
+            url: "/contractors/{id}/projects"
+            controller: ContractorProjectController
 
 CalendarModule:
     prefix: "/calendar"

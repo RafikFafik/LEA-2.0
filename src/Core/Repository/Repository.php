@@ -32,7 +32,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return new $namespace;
     }
 
-    public function save(object $object)
+    public function save(object &$object)
     {
         $object->saveFiles();
         if ($object->hasId())
@@ -61,7 +61,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
     public function findList(array $constraints = [])
     {
         $pagination = Request::getPaginationParams();
-        $constraints = Request::getFilterParams();
+        $constraints = array_merge(Request::getFilterParams(), $constraints);
         $result = $this->getListDataByConstraints($this->object, $constraints, $pagination);
         
         return $result;
@@ -70,7 +70,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
     public function findFlatList(array $constraints = [])
     {
         $pagination = Request::getPaginationParams();
-        $constraints = Request::getFilterParams();
+        $constraints = array_merge($constraints, Request::getFilterParams());
         $res = $this->getListDataByConstraints($this->object, $constraints, $pagination, false);
 
         return $res;

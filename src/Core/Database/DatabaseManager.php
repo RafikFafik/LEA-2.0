@@ -89,7 +89,7 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         $tableName = self::getTableNameByObject($object);
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
-        $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints, $pagination);
+        $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints, $pagination, $reflector);
 
         $result = self::executeQuery($query, $tableName, $columns, $object);
         if ($result) {
@@ -101,7 +101,7 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
                         continue;
                     $key = self::convertToKey($key);
                     $setVal = 'set' . self::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key, $reflector->getNamespaceName());
+                    $property = new ReflectionPropertyExtended(get_class($object), $key);
                     if (method_exists($object, $setVal) && $property->isObject() && $nested) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } else if (method_exists($object, $setVal)) {

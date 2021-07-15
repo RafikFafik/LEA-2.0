@@ -41,7 +41,7 @@ class Product extends Entity
   private $producent;
 
   /**
-   * @var int
+   * @var string
    */
   private $product_code;
 
@@ -164,7 +164,7 @@ class Product extends Entity
   /**
    * Get the value of product_code
    *
-   * @return  int
+   * @return  string
    */ 
   public function getProductCode()
   {
@@ -174,11 +174,11 @@ class Product extends Entity
   /**
    * Set the value of product_code
    *
-   * @param  int  $product_code
+   * @param  string  $product_code
    *
    * @return  self
    */ 
-  public function setProductCode(int $product_code)
+  public function setProductCode(string $product_code)
   {
     $this->product_code = $product_code;
 

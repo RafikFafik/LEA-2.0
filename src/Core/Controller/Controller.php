@@ -17,9 +17,10 @@ abstract class Controller implements ControllerInterface
 {
   protected $request;
 
-  public function __construct(Request $request, array $params = NULL, array $allow = NULL)
+  public function __construct(Request $request, array $params = NULL, array $allow = NULL, array $config = null)
   {
     $this->request = $request;
+    $this->config = $config;
     $this->params = $params;
     $this->allow = $allow;
     $this->http_method = $request->method();
