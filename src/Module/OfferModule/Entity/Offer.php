@@ -33,6 +33,11 @@ class Offer extends Entity
      * @var int
      */
     protected $contractor_id;
+    /**
+     * 
+     * @var int
+     */
+    protected $project_id;
 
     /**
      * @var int
@@ -150,6 +155,30 @@ class Offer extends Entity
     public function setContractorId(int $contractor_id)
     {
         $this->contractor_id = $contractor_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of contractor
+     *
+     * @return  string
+     */
+    public function getProjectId()
+    {
+        return $this->project_id;
+    }
+
+    /**
+     * Set the value of contractor
+     *
+     * @param  string  $contractor
+     *
+     * @return  self
+     */
+    public function setProjectId(int $project_id)
+    {
+        $this->project_id = $project_id;
 
         return $this;
     }

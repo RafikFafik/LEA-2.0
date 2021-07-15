@@ -16,6 +16,9 @@ OfferModule:
         collection:
             url: "/offers"
             controller: OfferCollectionController
+            filters:
+                match: [offer_number, fullname, title]
+                range: [issue_date, expiration_date, price_netto, price_brutto]
 
 ProductModule:
     prefix: "/products"

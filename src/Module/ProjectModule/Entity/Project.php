@@ -53,6 +53,16 @@ class Project extends Entity
    * @var iterable<ProjectFile>
    */
   private $project_files;
+  
+  /**
+   * @var iterable<Lea\Module\CalendarModule\Entity\CalendarEvent>
+   */
+  private $calendar_events;
+
+  /**
+   * @var iterable<Lea\Module\OfferModule\Entity\Offer>
+   */
+  private $offers;
 
   /**
    * Get the value of contractor_id
@@ -266,6 +276,37 @@ class Project extends Entity
   public function setProjectFiles($project_files)
   {
     $this->project_files = $project_files;
+
+    return $this;
+  }
+
+  public function getCalendarEvents()
+  {
+    return $this->calendar_events;
+  }
+
+  /**
+   * Set the value of project_files
+   *
+   * @param  iterable<ProjectFile>  $project_files
+   *
+   * @return  self
+   */ 
+  public function setCalendarEvents($calendar_events)
+  {
+    $this->calendar_events = $calendar_events;
+
+    return $this;
+  }
+
+  public function getOffers()
+  {
+    return $this->offers;
+  }
+
+  public function setOffers($offers)
+  {
+    $this->offers = $offers;
 
     return $this;
   }

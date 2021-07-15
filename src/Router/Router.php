@@ -48,6 +48,8 @@ final class Router extends ExceptionDriver
 
     private function getFilterParams(array $filters): array
     {
+        if(!isset($this->module['filters']))
+            return [];
         $config = $this->module['filters'];
         foreach ($filters as $key => $val) {
             if (in_array($key, $config['match'])) {
