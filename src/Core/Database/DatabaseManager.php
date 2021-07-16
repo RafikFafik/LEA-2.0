@@ -90,6 +90,8 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         $reflector = new Reflection($object);
         $columns = self::getTableColumnsByReflector($reflector);
         $query = DatabaseQuery::getQueryWithConstraints($object, $columns, $constraints, $pagination, $reflector);
+        if ($pagination)
+            $this->handlePaginationHeaders($pagination);
 
         $result = self::executeQuery($query, $tableName, $columns, $object);
         if ($result) {
@@ -125,6 +127,18 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         }
 
         return $objects ?? [];
+    }
+
+    private function handlePaginationHeaders($pagination): void
+    {
+        $query = DatabaseQuery::getCountQuery($this->object);
+        $result = self::executeQuery($query, $this->tableName);
+        $row = mysqli_fetch_assoc($result);
+        $start_record = $pagination['start'] * $pagination['limit'];
+        $end_record = $start_record + $pagination['limit'];
+        header("Accept-Ranges: Yes");
+        $ranges = "Content-Range: records " . $start_record . "-" . $end_record . '/' . $row['count'];
+        header($ranges);
     }
 
     protected function insertRecordData(object $object, string $parent_class = NULL, $parent_id = NULL)

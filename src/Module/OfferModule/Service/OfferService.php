@@ -43,7 +43,7 @@ final class OfferService extends Service
     public function saveOffer(array $payload): int
     {
         $contractor_employee = new ContractorEmployee($payload['contractor_employee']);
-        $contractor_employee->setContractorId($payload['contractor_id']);
+        $contractor_employee->setContractorId((int)$payload['contractor_id']);
         $repository =  new ContractorEmployeeRepository();
         $id = $repository->save($contractor_employee);
         $payload['contact_person'] = $id;

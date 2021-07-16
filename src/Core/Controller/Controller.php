@@ -43,27 +43,27 @@ abstract class Controller implements ControllerInterface
     $this->repository = new $Repository();
 
     switch ($this->http_method) {
-    case "GET":
-      if ($this->isCollectionController())
-        $this->getCollection();
-      else
-        $this->getResource();
-      break;
-    case "POST":
-    case "PUT":
-      if ($this->isCollectionController())
-        $this->postResource();
-      else
-        $this->updateResource();
-      break;
-    case "DELETE":
-      if ($this->isCollectionController())
+      case "GET":
+        if ($this->isCollectionController())
+          $this->getCollection();
+        else
+          $this->getResource();
+        break;
+      case "POST":
+      case "PUT":
+        if ($this->isCollectionController())
+          $this->postResource();
+        else
+          $this->updateResource();
+        break;
+      case "DELETE":
+        if ($this->isCollectionController())
+          Response::methodNotAllowed();
+        else
+          $this->deleteResource();
+        break;
+      default:
         Response::methodNotAllowed();
-      else
-        $this->deleteResource();
-      break;
-    default:
-      Response::methodNotAllowed();
     }
   }
 

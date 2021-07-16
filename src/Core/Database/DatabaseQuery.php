@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Reflection\Reflection;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 class DatabaseQuery extends DatabaseUtil
 {
@@ -13,6 +12,7 @@ class DatabaseQuery extends DatabaseUtil
     {
         $this->object = $object;
     }
+
     public function getSelectRecordDataQuery(string $tableName, string $columns, $where_val = null, $where_column = "id"): string
     {
         $query = "SELECT $columns ";
@@ -34,7 +34,7 @@ class DatabaseQuery extends DatabaseUtil
     public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null, $reflector = null): string
     {
         $constraints = $this->matchCurrencyFields($constraints, $reflector);
-        if(isset($constraints['order']))
+        if (isset($constraints['order']))
             unset($constraints['order']);
         $table_name = self::getTableNameByObject($object);
         $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
@@ -44,13 +44,13 @@ class DatabaseQuery extends DatabaseUtil
             } elseif (str_contains($key, "_LIKE") && $object->hasKey(substr($key, 0, strpos($key, "_LIKE")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
             } elseif (str_contains($key, "_BETWEEN") && $object->hasKey(substr($key, 0, strpos($key, "_BETWEEN")))) {
-                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to']. '\'';
+                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to'] . '\'';
             } elseif (str_contains($key, "_<=") && $object->hasKey(substr($key, 0, strpos($key, "_<=")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_<="))) . " <= '" . $val . "'";
             } elseif (str_contains($key, "_>=") && $object->hasKey(substr($key, 0, strpos($key, "_>=")))) {
                 $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_>="))) . " >= '" . $val . "'";
             } elseif ($key == "filters" && is_array($val)) {
-                foreach($val as $k => $v) {
+                foreach ($val as $k => $v) {
                     $query .= " AND " . self::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
                 }
             } elseif ($object->hasKey($key)) {
@@ -66,7 +66,7 @@ class DatabaseQuery extends DatabaseUtil
 
     private function matchCurrencyFields(array $constraints, $reflector): array
     {
-        foreach($constraints as $key => $val) {
+        foreach ($constraints as $key => $val) {
             $type = $reflector->getTypeByKey($key);
             $result[$key] = $type == "Currency" ? $val * 100 : $val;
         }
@@ -146,11 +146,13 @@ class DatabaseQuery extends DatabaseUtil
         return $query;
     }
 
-    public function getCountQuery(object $object, $where_val, string $where_column): string
+    public function getCountQuery(object $object, $where_val = null, string $where_column = 'id'): string
     {
         $table_name = self::getTableNameByObject($object);
-        $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
-        $query .= ' AND `fld_Deleted` = 0';
+        $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE `fld_Deleted` = 0';
+        if ($where_val)
+            $query .= ' AND ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
+
         return $query;
     }
 
@@ -171,8 +173,9 @@ class DatabaseQuery extends DatabaseUtil
 
     private function getPaginationQueryConstraints(object $object, array $params): ?string
     {
-        if($object->hasKey($params['sortby']))
+        if ($object->hasKey($params['sortby']))
             $query = ' ORDER BY ' . self::convertKeyToColumn($params['sortby']) . " " . $params['order'];
+        $query .= ' LIMIT ' . ($params['start'] ?? ' 0 ') . ', ' . ($params['limit'] ?? ' 10 ');
 
         return $query;
     }
