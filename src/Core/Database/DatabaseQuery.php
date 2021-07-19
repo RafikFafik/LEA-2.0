@@ -173,9 +173,11 @@ class DatabaseQuery extends DatabaseUtil
 
     private function getPaginationQueryConstraints(object $object, array $params): ?string
     {
+        $query = "";
         if ($object->hasKey($params['sortby']))
-            $query = ' ORDER BY ' . self::convertKeyToColumn($params['sortby']) . " " . $params['order'];
-        $query .= ' LIMIT ' . ($params['start'] ?? ' 0 ') . ', ' . ($params['limit'] ?? ' 10 ');
+            $query .= ' ORDER BY ' . self::convertKeyToColumn($params['sortby']) . " " . $params['order'];
+        if($params['limit'])
+            $query .= ' LIMIT ' . ($params['page'] * $params['limit']) . ', ' . $params['limit'];
 
         return $query;
     }

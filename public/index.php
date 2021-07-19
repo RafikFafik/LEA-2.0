@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Lea\Core\Cron\Cron;
 use Lea\CronJobs\CronJobs;
 use Lea\Response\Response;
 use Lea\Router\Router;

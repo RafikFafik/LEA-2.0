@@ -10,9 +10,9 @@ use Lea\Request\Request;
 
 abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
-    public function __construct()
+    public function __construct($view = false)
     {
-        $this->object = $this->getObjectInstance();
+        $this->object = $view ? $this->getViewInstance() :  $this->getObjectInstance();
         $user_id = AuthorizedUserService::getAuthorizedUserId();
         parent::__construct($this->object, $user_id);
     }
@@ -26,6 +26,16 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
     {
         $namespace = get_called_class();
         $namespace = str_replace("\Repository", "\Entity", $namespace);
+        $namespace = str_replace("Repository", "", $namespace);
+        $this->entity_class = $namespace;
+
+        return new $namespace;
+    }
+
+    private function getViewInstance(): object
+    {
+        $namespace = get_called_class();
+        $namespace = str_replace("\Repository", "\View", $namespace);
         $namespace = str_replace("Repository", "", $namespace);
         $this->entity_class = $namespace;
 
