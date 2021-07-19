@@ -90,4 +90,11 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
     {
         $this->removeRecordData($this->object, $id);
     }
+
+    public function findCountData(): int 
+    {
+        $result = $this->getCountData();
+
+        return $result;
+    }
 }

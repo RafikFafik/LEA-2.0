@@ -7,8 +7,6 @@ namespace Lea\Core\Entity;
 use Exception;
 use Generator;
 use TypeError;
-use ArrayIterator;
-use MultipleIterator;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Exception\InvalidDateFormatException;
