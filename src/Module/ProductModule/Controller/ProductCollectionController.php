@@ -8,11 +8,5 @@ use Lea\Module\ProductModule\Repository\ProductRepository;
 
 class ProductCollectionController extends Controller implements ControllerInterface
 {
-    public function init(): void
-    {
-        switch($this->http_method) {
-            case "GET":
-                $repository = new ProductRepository();
-        }
-    }
+   
 }

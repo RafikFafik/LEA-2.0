@@ -135,6 +135,8 @@ abstract class DatabaseManager extends DatabaseQuery // implements DatabaseManag
         $result = self::executeQuery($query, $this->tableName);
         $row = mysqli_fetch_assoc($result);
         $page = (int)$pagination['page'] + 1;
+        if(!$pagination['limit'])
+            $pagination['limit'] = $row['count'];
         $all_pages = ceil(($row['count'] / $pagination['limit']));
         header("Accept-Ranges: Yes");
         $ranges = "Content-Range: pages " . $page . "-" . $pagination['limit'] . '/' . $all_pages;

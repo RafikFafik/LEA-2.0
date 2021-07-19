@@ -41,7 +41,7 @@ final class Router extends ExceptionDriver
     {
         $pagination['order'] = isset($params['order']) && strtoupper($params['order']) == 'DESC' ? $params['order'] : "ASC";
         $pagination['page'] = isset($params['page']) && $params['page'] > 0 ? $params['page'] - 1 : 0;
-        $pagination['limit'] = isset($params['limit']) && $params['limit'] > 0 ? $params['limit'] : 10;
+        $pagination['limit'] = isset($params['limit']) && $params['limit'] > 0 ? $params['limit'] : null;
         $pagination['sortby'] = isset($params['sortby']) ? $params['sortby'] : 'id';
 
         return $pagination;
