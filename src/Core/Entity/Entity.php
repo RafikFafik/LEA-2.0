@@ -14,8 +14,25 @@ use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Core\Type\Currency;
 use Lea\Core\Security\Service\AuthorizedUserService;
 
+trait NamespaceProvider
+{
+    public static function getNamespace(): string
+    {
+        return get_called_class();
+    }
+
+    public function getClassName(): string
+    {
+        $tokens = explode('\\', get_class($this));
+        $class = end($tokens);
+
+        return $class;
+    }
+}
+
 abstract class Entity implements EntityInterface
 {
+    use NamespaceProvider;
     /**
      * @var int
      */
@@ -44,7 +61,6 @@ abstract class Entity implements EntityInterface
 
     public function set(array $data): void
     {
-        $class = get_called_class();
         $reflection = new Reflection($this);
         foreach ($reflection->getProperties() as $property) {
             $key = $property->getName();
@@ -259,18 +275,6 @@ abstract class Entity implements EntityInterface
         return $this;
     }
 
-    public static function getNamespace(): string
-    {
-        return get_called_class();
-    }
-
-    public function xd(): Generator
-    {
-        for ($i = 0; $i <= 10; $i++) {
-            yield $i;
-        }
-    }
-
     private function processSnakeToPascal(string $text): string
     {
         $result = str_replace('_', '', ucwords($text, '_'));
@@ -283,13 +287,6 @@ abstract class Entity implements EntityInterface
         return $this->id ? TRUE : FALSE;
     }
 
-    public function getClassName(): string
-    {
-        $tokens = explode('\\', get_class($this));
-        $class = end($tokens);
-
-        return $class;
-    }
 
     protected static function castVariable($variable, string $type_to_cast, $key)
     {

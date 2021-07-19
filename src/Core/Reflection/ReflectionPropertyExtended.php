@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Core\Reflection;
 
-use Exception;
 use ReflectionClass;
 use ReflectionProperty;
 use Lea\Core\Exception\DocCommentMissedException;
