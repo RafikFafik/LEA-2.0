@@ -19,6 +19,7 @@ final class CommercialAdvisorController extends Controller implements Controller
                $service = new CommercialAdvisorService();
                $list = $service->getCommercialAdvisors($this->config['advisor-role-id']);
                $result = Normalizer::denormalizeList($list);
+               $result = Normalizer::removeSpecificFieldsFromArrayList($result, ['password', 'active', 'deleted', 'token', 'phone']);
                Response::ok($result);
             default:
                 Response::methodNotAllowed();

@@ -6,7 +6,7 @@ namespace Lea\Module\OfferModule\Service;
 
 use Lea\Core\Service\Service;
 use Lea\Core\Serializer\Normalizer;
-use Lea\Module\OfferModule\Entity\Offer;
+use Lea\Core\View\ViewGenerator;
 use Lea\Module\ContractorModule\Entity\ContractorEmployee;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 use Lea\Module\ContractorModule\Repository\ContractorEmployeeRepository;
@@ -27,7 +27,10 @@ final class OfferService extends Service
 
         }
 
-        return $list;
+        $view = new ViewGenerator($this->repository);
+        $array = Normalizer::denormalizeList($list);
+
+        return $view->formatPagination($array);
     }
 
     public function getOfferById(int $id): array

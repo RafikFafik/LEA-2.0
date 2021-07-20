@@ -26,6 +26,7 @@ class UserSubordinateController extends Controller implements ControllerInterfac
                     // $objects = $service->findSubordinateUsersRecursive($role_id);
                     $objects = $service->findSubordinateUsersFlat($role_id);
                     $result = Normalizer::denormalizeList($objects);
+                    $result = Normalizer::removeSpecificFieldsFromArrayList($result, ['password', 'active', 'deleted', 'token', 'phone']);
                     Response::ok($result);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest();

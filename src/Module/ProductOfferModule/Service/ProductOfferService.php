@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Lea\Module\ProductOfferModule\Service;
 
 use Lea\Core\Service\Service;
+use Lea\Core\Serializer\Normalizer;
+use Lea\Core\View\ViewGenerator;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
 class ProductOfferService extends Service
@@ -21,7 +23,12 @@ class ProductOfferService extends Service
             $obj->contractor_fullname = $contractor->getFullName();
         }
 
-        return $list;
+        $list = Normalizer::denormalizeList($list);
+        $list = Normalizer::removeSpecificFieldsFromArrayList($list, ["products"]);
+        $view = new ViewGenerator($this->repository);
+        $array = $view->formatPagination($list);
+
+        return $array;
     }
 
     private function getProductsSums(iterable $products): array

@@ -21,11 +21,9 @@ class ContractorCollectionController extends Controller implements ControllerInt
             
             case "GET":
                 $service = new ContractorService($this->repository);
-                $list = $service->getView();
-                $result = Normalizer::denormalizeList($list);
-                Response::ok($result);
+                Response::ok($service->getView());
             case "POST":
-                $this->postResource();
+                $this->postResource(new ContractorRepository());
                 break;
             default:
                 Response::methodNotAllowed();

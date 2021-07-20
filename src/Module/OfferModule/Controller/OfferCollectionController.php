@@ -18,9 +18,7 @@ class OfferCollectionController extends Controller implements ControllerInterfac
 
         switch ($this->http_method) {
             case "GET":
-                $list = $service->getView();
-                $result = Normalizer::denormalizeList($list);
-                Response::ok($result);
+                Response::ok($service->getView());
             case "POST":
                 $id = $service->saveOffer($this->request->getPayload());
                 $response = $service->getOfferById($id);

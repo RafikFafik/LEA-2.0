@@ -35,7 +35,7 @@ class UserController extends Controller implements ControllerInterface
                     $payload = $this->request->getPayload();
                     unset($payload['email']);
                     $object = Normalizer::normalize($payload, User::getNamespace());
-                    if($object->getEmail())
+                    if ($object->getEmail())
                         Response::badRequest("Cannot change email");
                     $affected_rows = $repository->updateById($object, $this->params['id']);
                 } catch (ResourceNotExistsException $e) {
@@ -45,7 +45,7 @@ class UserController extends Controller implements ControllerInterface
                 $result = Normalizer::denormalize($object);
                 Response::ok($result);
                 break;
-               
+
             case "DELETE":
                 $repository = new UserRepository();
                 $repository->removeById($this->params['id']);

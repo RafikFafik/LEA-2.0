@@ -26,6 +26,14 @@ final class ViewGenerator implements ViewInterface
         return $result;
     }
 
+    public function formatPagination(array $data): array
+    {
+        $result['data'] = $data;
+        $result['pagination'] = $this->getPaginationData();
+
+        return $result;
+    }
+
     private function getPaginationData(): array
     {
         $count_data = $this->repository->findCountData();
