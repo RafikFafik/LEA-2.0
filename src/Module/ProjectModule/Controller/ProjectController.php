@@ -21,14 +21,16 @@ class ProjectController extends Controller implements ControllerInterface
             case "GET":
                 $service = new ProjectService();
                 $result = $service->getById($this->params['id']);
-                
+
                 Response::ok($result);
             case "POST":
             case "PUT":
-                $this->updateResource();
+                $repository = new ProjectRepository();
+                $this->updateResource($repository);
                 break;
             case "DELETE":
-                $this->deleteResource();
+                $repository = new ProjectRepository();
+                $this->deleteResource($repository);
                 break;
             default:
                 Response::methodNotAllowed();

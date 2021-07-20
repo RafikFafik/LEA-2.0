@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Lea\Core\Entity;
 
 use Exception;
-use Generator;
 use TypeError;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\Reflection;
@@ -14,6 +13,15 @@ use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Core\Type\Currency;
 use Lea\Core\Security\Service\AuthorizedUserService;
 
+trait Parser
+{
+    private function processSnakeToPascal(string $text): string
+    {
+        $result = str_replace('_', '', ucwords($text, '_'));
+
+        return $result;
+    }
+}
 trait NamespaceProvider
 {
     public static function getNamespace(): string
@@ -28,67 +36,17 @@ trait NamespaceProvider
 
         return $class;
     }
-}
-
-abstract class Entity implements EntityInterface
-{
-    use NamespaceProvider;
-    /**
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * @var bool
-     */
-    protected $active = 1;
-
-    /**
-     * @var bool
-     */
-    protected $deleted = 0;
-
-    public function __construct(array $data = NULL)
-    {
-        if ($data !== NULL)
-            $this->set($data);
-    }
 
     public function hasKey(string $key): bool
     {
         return property_exists($this, $key);
     }
 
-    public function set(array $data): void
-    {
-        $reflection = new Reflection($this);
-        foreach ($reflection->getProperties() as $property) {
-            $key = $property->getName();
-            if (!array_key_exists($key, $data) && $key != 'user_id')
-                continue;
-            $setValue = 'set' . $this->processSnakeToPascal($key);
-            if ($property->isObject()) {
-                if (is_iterable($data[$key])) {
-                    $children = [];
-                    foreach ($data[$key] as $obj) {
-                        $ChildClass = $property->getType2();
-                        /* Disposable - begin */
-                        if (str_contains($ChildClass, "File") && !isset($obj['id']) && !isset($_FILES[$obj['file_key']]))
-                            continue;
-                        /* Disposable - end */
-                        $children[] = new $ChildClass($obj);
-                    }
-                    $this->$setValue($children);
-                }
-            } else {
-                if ($setValue == 'setUserId' && !isset($data[$key]))
-                    $val = AuthorizedUserService::getAuthorizedUserId();
-                else
-                    $val = self::castVariable($data[$key], $property->getType2(), $key);
-                $this->$setValue($val);
-            }
-        }
-    }
+}
+
+trait Getter
+{
+    use Parser;
 
     public function get(array $specific_fields = null): array
     {
@@ -156,6 +114,44 @@ abstract class Entity implements EntityInterface
 
         return $getters ?? [];
     }
+}
+
+trait Setter
+{
+    use Parser;
+
+    public function set(array $data): void
+    {
+        $reflection = new Reflection($this);
+        foreach ($reflection->getProperties() as $property) {
+            $key = $property->getName();
+            if (!array_key_exists($key, $data) && $key != 'user_id')
+                continue;
+            $setValue = 'set' . $this->processSnakeToPascal($key);
+            if ($property->isObject()) {
+                if (is_iterable($data[$key])) {
+                    $children = [];
+                    foreach ($data[$key] as $obj) {
+                        $ChildClass = $property->getType2();
+                        /* Disposable - begin */
+                        if (str_contains($ChildClass, "File") && !isset($obj['id']) && !isset($_FILES[$obj['file_key']]))
+                            continue;
+                        /* Disposable - end */
+                        $children[] = new $ChildClass($obj);
+                    }
+                    $this->$setValue($children);
+                }
+            } else {
+                if ($setValue == 'setUserId' && !isset($data[$key]))
+                    $val = AuthorizedUserService::getAuthorizedUserId();
+                else
+                    $val = self::castVariable($data[$key], $property->getType2(), $key);
+                $this->$setValue($val);
+            }
+        }
+    }
+
+    
 
     public function getSetters(): array
     {
@@ -166,6 +162,33 @@ abstract class Entity implements EntityInterface
 
         return $setters ?? [];
     }
+}
+
+abstract class Entity implements EntityInterface
+{
+    use NamespaceProvider, Getter, Setter;
+    /**
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @var bool
+     */
+    protected $active = 1;
+
+    /**
+     * @var bool
+     */
+    protected $deleted = 0;
+
+    public function __construct(array $data = NULL)
+    {
+        if ($data !== NULL)
+            $this->set($data);
+    }
+
+    
 
     public function getChildObjects(): iterable
     {
@@ -273,13 +296,6 @@ abstract class Entity implements EntityInterface
         $this->deleted = $deleted;
 
         return $this;
-    }
-
-    private function processSnakeToPascal(string $text): string
-    {
-        $result = str_replace('_', '', ucwords($text, '_'));
-
-        return $result;
     }
 
     public function hasId(): bool

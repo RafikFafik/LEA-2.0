@@ -12,6 +12,7 @@ use Lea\Core\Serializer\Normalizer;
 use Lea\Core\Database\DatabaseConnection;
 use Lea\Core\Controller\ControllerInterface;
 use Lea\Core\Exception\ResourceNotExistsException;
+use Lea\Core\Repository\Repository;
 use Lea\Core\Security\Service\TokenVerificationService;
 
 abstract class Controller implements ControllerInterface
@@ -45,27 +46,37 @@ abstract class Controller implements ControllerInterface
                 if ($this->isCollectionController()) {
                     $Repository = $this->getRepositoryClass();
                     $repository = new $Repository(true);
-                    $view = new ViewGenerator($repository, $this->pagination);
-                    $result = $view->getView($this->repository);
+                    $view = new ViewGenerator($repository);
+                    $result = $view->getView();
                     Response::ok($result);
                 } else {
-                    $object = $this->getResource();
+                    $Repository = $this->getRepositoryClass();
+                    $repository = new $Repository();
+                    $object = $this->getResource($repository);
                     $result = Normalizer::denormalize($object);
                     Response::ok($result);
                 }
                 break;
             case "POST":
             case "PUT":
-                if ($this->isCollectionController())
-                    $this->postResource();
-                else
-                    $this->updateResource();
+                if ($this->isCollectionController()) {
+                    $Repository = $this->getRepositoryClass();
+                    $repository = new $Repository();
+                    $this->postResource($repository);
+                } else {
+                    $Repository = $this->getRepositoryClass();
+                    $repository = new $Repository();
+                    $this->updateResource($repository);
+                }
                 break;
             case "DELETE":
-                if ($this->isCollectionController())
+                if ($this->isCollectionController()) {
                     Response::methodNotAllowed();
-                else
-                    $this->deleteResource();
+                } else {
+                    $Repository = $this->getRepositoryClass();
+                    $repository = new $Repository();
+                    $this->deleteResource($repository);
+                }
                 break;
             default:
                 Response::methodNotAllowed();
@@ -92,10 +103,10 @@ abstract class Controller implements ControllerInterface
         return $namespace;
     }
 
-    public function getResource(): object
+    public function getResource(Repository $repository): object
     {
         try {
-            $object = $this->repository->findById($this->params['id']);
+            $object = $repository->findById($this->params['id']);
 
             return $object;
         } catch (ResourceNotExistsException $e) {
@@ -110,32 +121,33 @@ abstract class Controller implements ControllerInterface
         return $list;
     }
 
-    public function postResource(): void
+    public function postResource(Repository $repository): void
     {
-        $object = Normalizer::normalize($this->request->getPayload(), $this->repository->getEntityClass());
-        $id = $this->repository->save($object);
-        $result = $this->repository->findById($id);
+        $object = Normalizer::normalize($this->request->getPayload(), $repository->getEntityClass());
+        $id = $repository->save($object);
+        $result = $repository->findById($id);
         $result = Normalizer::denormalize($result);
         Response::ok($result);
     }
 
-    public function updateResource(): void
+    public function updateResource(Repository $repository): void
     {
         try {
-            $object = Normalizer::normalize($this->request->getPayload(), $this->repository->getEntityClass());
-            $this->repository->updateById($object, $this->params['id']);
+            $object = Normalizer::normalize($this->request->getPayload(), $repository->getEntityClass());
+            $repository->updateById($object, $this->params['id']);
             /* DEBUG */
-            $this->getResource();
+            $object = $this->getResource($repository);
+            $result = Normalizer::denormalize($object);
             /* DEBUG */
-            Response::noContent();
+            Response::noContent($result);
         } catch (ResourceNotExistsException $e) {
             Response::badRequest();
         }
     }
 
-    public function deleteResource(): void
+    public function deleteResource(Repository $repository): void
     {
-        $this->repository->removeById($this->params['id']);
+        $repository->removeById($this->params['id']);
         Response::noContent();
     }
 }

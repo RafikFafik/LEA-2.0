@@ -17,6 +17,7 @@ use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\InvalidCurrencyValueException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
+use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class ExceptionDriver
 {
@@ -57,8 +58,17 @@ abstract class ExceptionDriver
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
         } catch (TypeError $e) {
-            /* TODO - does not work correctly */
-            Response::badRequest("Invalid typeof: " . $e->getMessage());
+            $NamespaceClass = $e->getTrace()[0]['class'];
+            $property = $e->getTrace()[0]['function'];
+            $property = self::pascalToSnake(str_replace("set", "", $property));
+            $arg = $e->getTrace()[0]['args'][0];
+            $reflector = new ReflectionPropertyExtended($NamespaceClass, $property);
+            $obj = new $NamespaceClass;
+            $Class = $obj->getClassName();
+            $message = "$property in $Class | ";
+            $message .= "Given: " . ($arg === null ? "null" : $arg);
+            $message .= ", Expected: " . $reflector->getType2();
+            Response::badRequest("Invalid typeof: " . $message);
         } catch (InvalidDateFormatException $e) {
             Response::badRequest("Invalid date format of: " . $e->getMessage());
         } catch (UserAlreadyAuthorizedException $e) {

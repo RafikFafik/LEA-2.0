@@ -23,7 +23,7 @@ final class ViewGenerator implements ViewInterface
         $result['data'] = $list;
         $result['pagination'] = $this->getPaginationData();
 
-        return $list;
+        return $result;
     }
 
     private function getPaginationData(): array
