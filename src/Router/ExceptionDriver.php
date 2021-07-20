@@ -61,6 +61,9 @@ abstract class ExceptionDriver
             $NamespaceClass = $e->getTrace()[0]['class'];
             $property = $e->getTrace()[0]['function'];
             $property = self::pascalToSnake(str_replace("set", "", $property));
+            if(str_starts_with($property, "get")) {
+                Response::internalServerError("Getter failure of: " . str_replace("get_", "", $property));
+            }
             $arg = $e->getTrace()[0]['args'][0];
             $reflector = new ReflectionPropertyExtended($NamespaceClass, $property);
             $obj = new $NamespaceClass;
