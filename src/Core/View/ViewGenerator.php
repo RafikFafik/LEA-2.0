@@ -13,7 +13,7 @@ final class ViewGenerator implements ViewInterface
     function __construct(Repository $repository)
     {
         $this->repository = $repository;
-        $this->pagination = Request::getPaginationParams();;
+        $this->pagination = Request::getPaginationParams();
     }
     
     public function getView(): iterable

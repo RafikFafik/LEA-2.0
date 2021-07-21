@@ -110,6 +110,7 @@ Security:
         register:
             url: "/security/register"
             controller: RegisterController
+            body-params: ['email', 'name', 'surname', 'role_id']
             allow: ['admin']
         activate-account:
             url: "/security/account-activation"

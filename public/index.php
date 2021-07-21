@@ -12,7 +12,7 @@ try {
     $dotenv->load();
 } catch(Throwable $e) {
     http_response_code(500);
-    die("Błąd konfiguracji - skontaktuj się z administratorem");
+    die("Configuration issue - contact with an administrator");
 }
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? "http://insomnia.local";

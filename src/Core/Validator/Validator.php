@@ -5,7 +5,6 @@ namespace Lea\Core\Validator;
 use DateTime;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Response\Response;
-use Lea\Core\Security\Entity\Role;
 use Lea\Core\Security\Repository\RoleRepository;
 
 class Validator implements ValidatorInterface
@@ -74,11 +73,11 @@ class Validator implements ValidatorInterface
 
     public static function validateRegisterParams(array $params): void
     {
-        $required = ['email', 'name', 'surname', 'role_id'];
-        self::validateBodyParams($required, $params);
+        
         self::validateEmail($params['email']);
         try {
-            RoleRepository::findById($params['role_id'], new Role);
+            $repository = new RoleRepository();
+            $repository->findById($params['role_id']);
         } catch (ResourceNotExistsException $e) {
             Response::badRequest("Role with given ID does not exists");
         }

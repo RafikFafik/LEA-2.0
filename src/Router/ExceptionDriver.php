@@ -18,6 +18,7 @@ use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\InvalidCurrencyValueException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
+use Lea\Core\Exception\ViewNotImplementedException;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class ExceptionDriver
@@ -36,6 +37,8 @@ abstract class ExceptionDriver
                 Response::internalServerError("Something went wrong - contact with Administrator");
             else if (str_contains($message, "Call to undefined method"))
                 Response::internalServerError("Controller not found - contact with Administrator");
+            else if (str_contains($message, "syntax error"))
+                Response::internalServerError("Symtamx Errorm in: " . $Controller);
             else
                 Response::internalServerError("Something went wrong - contact with Administrator");
         }
@@ -68,7 +71,11 @@ abstract class ExceptionDriver
                 Response::internalServerError("Getter failure of: " . str_replace("get_", "", $property));
             }
             $arg = $e->getTrace()[0]['args'][0];
-            $reflector = new ReflectionPropertyExtended($NamespaceClass, $property);
+            try {
+                $reflector = new ReflectionPropertyExtended($NamespaceClass, $property);
+            } catch (Exception $f) {
+                Response::internalServerError("Reflector error");
+            }
             $obj = new $NamespaceClass;
             $Class = $obj->getClassName();
             $message = "$property in $Class | ";
@@ -89,6 +96,8 @@ abstract class ExceptionDriver
             Response::internalServerError("DocComment not defined for field: " . $e->getMessage());
         } catch (InvalidCurrencyValueException $e) {
             Response::internalServerError("Invalid Currency Value: " . $e->getMessage());
+        } catch (ViewNotImplementedException $e) {
+            Response::notImplemented("View not available for: " . $e->getMessage());
         } catch (Error $e) {
             Response::internalServerError($e->getMessage());
         } catch (Exception $e) {

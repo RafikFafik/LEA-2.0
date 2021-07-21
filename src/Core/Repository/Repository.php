@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Lea\Core\Repository;
 
-use Lea\Core\Database\DatabaseManager;
-use Lea\Core\Security\Service\AuthorizedUserService;
+use Error;
 use Lea\Request\Request;
+use Lea\Core\Database\DatabaseManager;
+use Lea\Core\Exception\ViewNotImplementedException;
+use Lea\Core\Security\Service\AuthorizedUserService;
 
 abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
-    public function __construct($view = false)
+    public function __construct($is_view = false)
     {
-        $this->object = $view ? $this->getViewInstance() :  $this->getObjectInstance();
+        $this->object = $is_view ? $this->getViewInstance() :  $this->getObjectInstance();
         $user_id = AuthorizedUserService::getAuthorizedUserId();
         parent::__construct($this->object, $user_id);
     }
@@ -39,7 +41,11 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         $namespace = str_replace("Repository", "", $namespace);
         $this->entity_class = $namespace;
 
-        return new $namespace;
+        try {
+            return new $namespace;
+        } catch (Error $e) {
+            throw new ViewNotImplementedException($namespace);
+        }
     }
 
     public function save(object &$object)

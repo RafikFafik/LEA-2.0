@@ -75,8 +75,8 @@ final class Reflection extends ReflectionClass
 
     public function getTypeByKey(string $key): ?string
     {
-        foreach($this->properties as $property) {
-            if(str_contains($key, $property->getName()))
+        foreach ($this->properties as $property) {
+            if (str_contains($key, $property->getName()))
                 return $property->getType2();
         }
 

@@ -6,7 +6,7 @@ namespace Lea\Core\Database;
 
 use Lea\Core\Reflection\Reflection;
 
-class DatabaseQuery extends DatabaseUtil
+final class QueryProvider
 {
     public function __construct(object $object)
     {
@@ -23,7 +23,7 @@ class DatabaseQuery extends DatabaseUtil
             if ($type == "string")
                 $where_val = "'" . $where_val . "'";
             if ($where_column)
-                $query .=  ' AND ' . self::convertKeyToColumn($where_column) . ' = ' .  $where_val;
+                $query .=  ' AND ' . KeyFormatter::convertKeyToColumn($where_column) . ' = ' .  $where_val;
         }
         if ($where_column)
             $query .= ';';
@@ -36,25 +36,25 @@ class DatabaseQuery extends DatabaseUtil
         $constraints = $this->matchCurrencyFields($constraints, $reflector);
         if (isset($constraints['order']))
             unset($constraints['order']);
-        $table_name = self::getTableNameByObject($object);
+        $table_name = KeyFormatter::getTableNameByObject($object);
         $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
         foreach ($constraints as $key => $val) {
             if (str_contains($key, "_IN") && $object->hasKey(substr($key, 0, strpos($key, "_IN")))) {
-                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
             } elseif (str_contains($key, "_LIKE") && $object->hasKey(substr($key, 0, strpos($key, "_LIKE")))) {
-                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_LIKE"))) . " LIKE '%" . $val . "%'";
             } elseif (str_contains($key, "_BETWEEN") && $object->hasKey(substr($key, 0, strpos($key, "_BETWEEN")))) {
-                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to'] . '\'';
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_BETWEEN"))) . " BETWEEN '" . $val['from'] . "' AND '" . $val['to'] . '\'';
             } elseif (str_contains($key, "_<=") && $object->hasKey(substr($key, 0, strpos($key, "_<=")))) {
-                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_<="))) . " <= '" . $val . "'";
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_<="))) . " <= '" . $val . "'";
             } elseif (str_contains($key, "_>=") && $object->hasKey(substr($key, 0, strpos($key, "_>=")))) {
-                $query .= " AND " . self::convertKeyToColumn(substr($key, 0, strpos($key, "_>="))) . " >= '" . $val . "'";
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_>="))) . " >= '" . $val . "'";
             } elseif ($key == "filters" && is_array($val)) {
                 foreach ($val as $k => $v) {
-                    $query .= " AND " . self::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
+                    $query .= " AND " . KeyFormatter::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
                 }
             } elseif ($object->hasKey($key)) {
-                $query .= " AND " . self::convertKeyToColumn($key) . "='" . $val . "'";
+                $query .= " AND " . KeyFormatter::convertKeyToColumn($key) . "='" . $val . "'";
             }
         }
         if ($pagination) {
@@ -76,13 +76,13 @@ class DatabaseQuery extends DatabaseUtil
 
     public function getInsertIntoQuery(object $object, string $parent_class = NULL, int $parent_id = NULL): string
     {
-        $table_name = self::getTableNameByObject($object);
+        $table_name = KeyFormatter::getTableNameByObject($object);
         $columns = "";
         $values = "";
         $reflection = new Reflection($object);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
-            $getValue = 'get' . self::processSnakeToPascal($var);
+            $getValue = 'get' . KeyFormatter::processSnakeToPascal($var);
             if (!method_exists(get_class($object), $getValue))
                 continue;
             $value = $object->$getValue();
@@ -90,7 +90,7 @@ class DatabaseQuery extends DatabaseUtil
                 continue;
             if ($value === NULL)
                 continue;
-            $columns .= self::convertKeyToColumn($var) . ', ';
+            $columns .= KeyFormatter::convertKeyToColumn($var) . ', ';
 
             if (gettype($value) == "string" || $property->getType2() == "Date")
                 $value = "'" . $value . "'";
@@ -99,8 +99,8 @@ class DatabaseQuery extends DatabaseUtil
 
             $values .= $value . ', ';
         }
-        if ($parent_class && !str_contains($columns, self::convertKeyToReferencedColumn($parent_class))) {
-            $columns .= self::convertKeyToReferencedColumn($parent_class);
+        if ($parent_class && !str_contains($columns, KeyFormatter::convertKeyToReferencedColumn($parent_class))) {
+            $columns .= KeyFormatter::convertKeyToReferencedColumn($parent_class);
             $values .= $parent_id;
         } else {
             $columns = rtrim($columns, ', ');
@@ -113,14 +113,14 @@ class DatabaseQuery extends DatabaseUtil
 
     public function getUpdateQuery(object $object, $where_val, string $where_column, $parent_where_val = NULL, string $parent_key = NULL): string
     {
-        $table_name = self::getTableNameByObject($object);
+        $table_name = KeyFormatter::getTableNameByObject($object);
         $changes = "";
         $reflection = new Reflection($object);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
             if ($var == 'id')
                 continue;
-            $getValue = 'get' . self::processSnakeToPascal($var);
+            $getValue = 'get' . KeyFormatter::processSnakeToPascal($var);
             $value = $object->$getValue();
             if (is_iterable($value))
                 continue;
@@ -133,32 +133,32 @@ class DatabaseQuery extends DatabaseUtil
             elseif (gettype($value) == "boolean")
                 $value = (int)$value;
 
-            $changes .= self::convertKeyToColumn($var) . ' = ' . $value . ', ';
+            $changes .= KeyFormatter::convertKeyToColumn($var) . ' = ' . $value . ', ';
         }
         $changes = rtrim($changes, ', ');
         $query = 'UPDATE ' . $table_name .
             ' SET ' . $changes .
-            ' WHERE ' . self::convertKeyToColumn($where_column) . " = " . $where_val;
+            ' WHERE ' . KeyFormatter::convertKeyToColumn($where_column) . " = " . $where_val;
         // TODO - Deleted 0 - verify
         if ($parent_where_val && $parent_key)
-            $query .= ' AND ' . self::convertKeyToColumn($parent_key) . " = " . $parent_where_val;
+            $query .= ' AND ' . KeyFormatter::convertKeyToColumn($parent_key) . " = " . $parent_where_val;
 
         return $query;
     }
 
     public function getCountQuery(object $object, $where_val = null, string $where_column = 'id'): string
     {
-        $table_name = self::getTableNameByObject($object);
+        $table_name = KeyFormatter::getTableNameByObject($object);
         $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE `fld_Deleted` = 0';
         if ($where_val)
-            $query .= ' AND ' . self::convertKeyToColumn($where_column) . ' = ' . $where_val;
+            $query .= ' AND ' . KeyFormatter::convertKeyToColumn($where_column) . ' = ' . $where_val;
 
         return $query;
     }
 
     public function getSoftDeleteQuery(object $object, $where_val): string
     {
-        $table_name = self::getTableNameByObject($object);
+        $table_name = KeyFormatter::getTableNameByObject($object);
         $query = 'UPDATE ' . $table_name . ' SET `fld_Deleted` = 1 WHERE `fld_Id` = ' . $where_val;
 
         return $query;
@@ -175,7 +175,7 @@ class DatabaseQuery extends DatabaseUtil
     {
         $query = "";
         if ($object->hasKey($params['sortby']))
-            $query .= ' ORDER BY ' . self::convertKeyToColumn($params['sortby']) . " " . $params['order'];
+            $query .= ' ORDER BY ' . KeyFormatter::convertKeyToColumn($params['sortby']) . " " . $params['order'];
         if($params['limit'])
             $query .= ' LIMIT ' . ($params['page'] * $params['limit']) . ', ' . $params['limit'];
 

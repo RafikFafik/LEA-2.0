@@ -4,7 +4,7 @@ namespace Lea\Module\OfferModule\Controller;
 
 use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Core\Serializer\Normalizer;
+use Lea\Core\View\ViewGenerator;
 use Lea\Module\OfferModule\Repository\OfferRepository;
 use Lea\Module\OfferModule\Service\OfferService;
 use Lea\Response\Response;
@@ -18,6 +18,8 @@ class OfferCollectionController extends Controller implements ControllerInterfac
 
         switch ($this->http_method) {
             case "GET":
+                $view = new ViewGenerator(new OfferRepository(true));
+                // Response::ok($view->getView());
                 Response::ok($service->getView());
             case "POST":
                 $id = $service->saveOffer($this->request->getPayload());

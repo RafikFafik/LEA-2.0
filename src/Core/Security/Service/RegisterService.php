@@ -17,7 +17,8 @@ final class RegisterService extends AuthenticationService implements ServiceInte
     {
         Validator::validateRegisterParams($data);
         try {
-            $user = UserRepository::findByEmail($data['email']);
+            $repository = new UserRepository();
+            $user = $repository->findByEmail($data['email']);
             Response::badRequest("User with given email address already exists");
         } catch (ResourceNotExistsException $e) {
         }

@@ -13,31 +13,54 @@ class ReflectionPropertyExtended extends ReflectionProperty
     private $is_object;
     private $type;
     private $namespace;
-    private $comment;
+    private $annotation;
 
     public function __construct($class, $property)
     {
         parent::__construct($class, $property);
         $this->loadDocComment();
-        $a = new $class;
-        $b = new ReflectionClass($a);
-        $this->namespace = $b->getNamespaceName();
-        $type = $this->getTypePHP7($this);
-        if ($this->isPrimitiveType($type)) {
+        $reflector = new ReflectionClass($class);
+        $this->namespace = $reflector->getNamespaceName();
+        $this->type = $this->getTypePHP7($this);
+        if($this->isEntity())
+            $this->loadType();
+        else if($this->isView())
+            $this->loadView();
+    }
+
+    private function isEntity(): bool
+    {
+        return str_contains($this->annotation, "@var");
+    }
+    
+    private function isView(): bool
+    {
+        return str_contains($this->annotation, "@from");
+    }
+
+    
+    private function loadType(): void
+    {
+        if ($this->isPrimitiveType($this->type)) {
             $this->is_object = FALSE;
-            $this->type = $type;
+            $this->type = $this->type;
         } else {
             $this->is_object = TRUE;
-            if (str_contains($type, "\\"))
-                $this->type = $type;
+            if (str_contains($this->type, "\\"))
+                $this->type = $this->type;
             else
-                $this->type = $this->getNamespaceName() . "\\" . $type;
+                $this->type = $this->getNamespaceName() . "\\" . $this->type;
         }
+    }
+
+    private function loadView(): void
+    {
+        $this->is_object = false;
     }
 
     public function isObject(): bool
     {
-        return $this->is_object ? TRUE : FALSE;
+        return $this->is_object;
     }
 
     public function getType2()
@@ -47,9 +70,9 @@ class ReflectionPropertyExtended extends ReflectionProperty
 
     public function getTypePHP7()
     {
-        if (!(int)strpos($this->comment, "@var"))
+        if (!(int)strpos($this->annotation, "@var"))
             return null;
-        $tokens = explode(" ", $this->comment);
+        $tokens = explode(" ", $this->annotation);
         $index = array_search("@var", $tokens);
 
         $var = trim($tokens[$index + 1]);
@@ -59,8 +82,8 @@ class ReflectionPropertyExtended extends ReflectionProperty
 
     private function loadDocComment(): void
     {
-        $this->comment = $this->getDocComment();
-        if (!$this->comment)
+        $this->annotation = $this->getDocComment();
+        if (!$this->annotation)
             throw new DocCommentMissedException($this->getName());
     }
 
@@ -94,22 +117,5 @@ class ReflectionPropertyExtended extends ReflectionProperty
             default:
                 return false;
         }
-    }
-
-    private function hasManyToManyRelation(): bool
-    {
-        if (!(int)strpos($this->comment, "@many-to-many"))
-            return false;
-        return true;
-    }
-
-    private function getManyToManyClass(): string
-    {
-        $tokens = explode(" ", $this->comment);
-        $index = array_search("@many-to-many", $tokens);
-
-        $class = trim($tokens[$index + 1]);
-
-        return $class;
     }
 }

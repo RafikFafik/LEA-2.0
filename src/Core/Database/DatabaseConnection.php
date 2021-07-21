@@ -9,7 +9,7 @@ use Lea\Response\Response;
 use mysqli;
 use mysqli_sql_exception;
 
-abstract class DatabaseConnection
+final class DatabaseConnection
 {
     public $uid = 0;
 
@@ -44,7 +44,7 @@ abstract class DatabaseConnection
         return self::$connection->affected_rows;
     }
 
-    protected static function executeQuery(string $query, string $tableName = null, string $columns = null, object $object = null, $parent_class = null) // PHP8: mysqli_result|bool
+    public static function executeQuery(string $query, string $tableName = null, string $columns = null, object $object = null, $parent_class = null) // PHP8: mysqli_result|bool
     {
         try {
             if(self::$connection === null)

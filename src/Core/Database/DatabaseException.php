@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use mysqli_sql_exception;
-use Lea\Core\Database\DatabaseUtil;
 use Lea\Core\Reflection\Reflection;
-use Lea\Core\Database\DatabaseManager;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Response\Response;
 use ReflectionProperty;
 
-class DatabaseException extends DatabaseUtil
+final class DatabaseException
 {
     private const SQL_TABLE_NOT_EXISTS = 1146;
     private const SQL_UNKNOWN_COLUMN = 1054;
@@ -40,7 +38,7 @@ class DatabaseException extends DatabaseUtil
                 $field = substr($substr, 0, (int)strpos($substr, "REFERENCES") - 1);
                 $field = ltrim($field, '(`');
                 $field = rtrim($field, '`)');
-                $field = self::convertToKey($field);
+                $field = KeyFormatter::convertToKey($field);
                 Response::badRequest("Invalid value of field that has reference: " . $field);
             case self::SQL_INCORRECT_DATE_VALUE:
                 Response::internalServerError("Incorrect date value: " . $e->getCode() . "\n" . $e->getMessage());
@@ -62,11 +60,11 @@ class DatabaseException extends DatabaseUtil
     private static function getAlterTableQuery(object $object, $connection, string $parent_class = null): array
     {
         $described = self::describeTable($object, $connection);
-        $table_keys = self::convertArrayToKeys($described);
+        $table_keys = KeyFormatter::convertArrayToKeys($described);
         $entity_methods = $object->getGetters();
         $last = false;
         foreach ($entity_methods as $method) {
-            $key = self::processPascalToSnake(str_replace('get', '', $method));
+            $key = KeyFormatter::processPascalToSnake(str_replace('get', '', $method));
             if (in_array($key, $table_keys)) {
                 $last = $key;
                 continue;
@@ -74,15 +72,15 @@ class DatabaseException extends DatabaseUtil
             $reflector = new ReflectionPropertyExtended(get_class($object), $key);
             if ($reflector->isObject())
                 continue;
-            $query = 'ALTER TABLE ' . self::getTableNameByObject($object) . ' ADD ';
+            $query = 'ALTER TABLE ' . KeyFormatter::getTableNameByObject($object) . ' ADD ';
             $query .= self::parseReflectProperty($reflector);
-            $query .= $last ?  ' AFTER ' . self::convertKeyToColumn($last) . ';' : ";";
+            $query .= $last ?  ' AFTER ' . KeyFormatter::convertKeyToColumn($last) . ';' : ";";
             $queries[] = $query;
         }
         if ($parent_class) {
-            $query = 'ALTER TABLE ' . self::getTableNameByObject($object) . ' ADD ';
+            $query = 'ALTER TABLE ' . KeyFormatter::getTableNameByObject($object) . ' ADD ';
             $queries[] = $query . self::getReferencedKeyColumn($parent_class) . ' INT NOT NULL';
-            $queries[] = self::getForeignKeyConstraint(self::getTableNameByObject($object), self::getTableNameByClass($parent_class), self::getReferencedKeyColumn($parent_class));
+            $queries[] = self::getForeignKeyConstraint(KeyFormatter::getTableNameByObject($object), KeyFormatter::getTableNameByClass($parent_class), self::getReferencedKeyColumn($parent_class));
         }
         // TODO - polish collate
 
@@ -91,28 +89,28 @@ class DatabaseException extends DatabaseUtil
 
     private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array
     {
-        $tablename = DatabaseManager::getTableNameByObject($object);
+        $tablename = KeyFormatter::getTableNameByObject($object);
         $ddl = 'CREATE TABLE IF NOT EXISTS ' . $tablename . ' (';
         $class = new Reflection($object);
         $primitive = $class->getPrimitiveProperties();
         $referenced = $object->getReferencedProperties();
-        $referenced = self::processListOfGettersToToSnakeCase($referenced);
+        $referenced = KeyFormatter::processListOfGettersToToSnakeCase($referenced);
         $columns = self::parseReflectProperties($primitive);
         if ($parent_table) {
             $foreign_column = self::getReferencedKeyColumn($parent_table);
             $columns .= ', ' . $foreign_column . ' INT NOT NULL';
-            $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, self::getTableNameByClass($parent_table), $foreign_column);
+            $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, KeyFormatter::getTableNameByClass($parent_table), $foreign_column);
         }
         if ($referenced) {
             foreach ($referenced as $key) {
-                $foreign_column = self::convertKeyToColumn($key);
+                $foreign_column = KeyFormatter::convertKeyToColumn($key);
                 $Class = str_replace('_id', '', $key);
                 $Class = self::getEntityClass($Class);
-                if($Class)
-                    $parent_table = self::getTableNameByClass($Class);
+                if ($Class)
+                    $parent_table = KeyFormatter::getTableNameByClass($Class);
                 // if ($parent_table !== $tablename && $Class !== null) 
-                    // $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $Class));
-                if($parent_table)
+                // $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $Class));
+                if ($parent_table)
                     $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
             }
         }
@@ -151,7 +149,7 @@ class DatabaseException extends DatabaseUtil
     {
         $comment = $property->getDocComment();
         /* TODO - DefaultValue */
-        $column_name = DatabaseManager::convertKeyToColumn($property->getName());
+        $column_name = KeyFormatter::convertKeyToColumn($property->getName());
         $column_properties = self::getVarTypeFromComment($comment);
         if ($column_name == '`fld_Id`') {
             $column_properties = $column_properties . ' NOT NULL PRIMARY KEY AUTO_INCREMENT';
@@ -183,7 +181,7 @@ class DatabaseException extends DatabaseUtil
 
     private static function getReferencedKeyColumn(string $parent): string
     {
-        $column = self::convertKeyToColumn($parent);
+        $column = KeyFormatter::convertKeyToColumn($parent);
         $column = rtrim($column, '`');
         $column .= 'Id`';
 
@@ -193,7 +191,7 @@ class DatabaseException extends DatabaseUtil
     private static function describeTable(object $object, $connection): array
     {
         $query = "DESCRIBE ";
-        $query .= DatabaseManager::getTableNameByObject($object);
+        $query .= KeyFormatter::getTableNameByObject($object);
         $result = mysqli_query($connection, $query);
         while ($row = mysqli_fetch_assoc($result)) {
             $list[] = $row['Field'];
@@ -246,15 +244,15 @@ class DatabaseException extends DatabaseUtil
 
     private static function getEntityClass(string $needle): ?string
     {
-        $needle = self::processSnakeToPascal($needle);
+        $needle = KeyFormatter::processSnakeToPascal($needle);
         $classes = get_declared_classes();
         foreach ($classes as $registered_class) {
             if (!str_contains($registered_class, $needle))
                 continue;
-                $tokens = explode("\\", $registered_class);
-                $Class = end($tokens);
-                if($Class === $needle)
-                    return $registered_class;
+            $tokens = explode("\\", $registered_class);
+            $Class = end($tokens);
+            if ($Class === $needle)
+                return $registered_class;
         }
 
         return null;

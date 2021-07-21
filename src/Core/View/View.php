@@ -26,5 +26,4 @@ abstract class View
     {
         $this->id = $id;
     }
-
 }
