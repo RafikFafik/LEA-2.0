@@ -31,7 +31,7 @@ class Cron {
   static public function jobExists(string $job = '', string $schedule = '') : bool {
     $jobs = self::getJobs();
 
-   return in_array($schedule.' '.$job. '>/dev/null 2>&1', $jobs);
+   return in_array($schedule.' '.$job. ' >/dev/null 2>&1', $jobs);
 
   }
 
