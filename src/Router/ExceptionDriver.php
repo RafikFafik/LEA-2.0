@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Router;
 
+use ArgumentCountError;
 use Error;
 use Exception;
 use TypeError;
@@ -57,11 +58,13 @@ abstract class ExceptionDriver
             }
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
+        } catch (ArgumentCountError $e) {
+            Response::internalServerError($e->getMessage());
         } catch (TypeError $e) {
             $NamespaceClass = $e->getTrace()[0]['class'];
             $property = $e->getTrace()[0]['function'];
             $property = self::pascalToSnake(str_replace("set", "", $property));
-            if(str_starts_with($property, "get")) {
+            if (str_starts_with($property, "get")) {
                 Response::internalServerError("Getter failure of: " . str_replace("get_", "", $property));
             }
             $arg = $e->getTrace()[0]['args'][0];

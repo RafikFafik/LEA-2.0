@@ -20,7 +20,7 @@ class OfferController extends Controller implements ControllerInterface
                 $result = $service->getOfferById($this->params['id']);
                 Response::ok($result);
             case "POST":
-                $this->updateResource();
+                $this->updateResource($this->repository);
                 break;
             default:
                 Response::methodNotAllowed();

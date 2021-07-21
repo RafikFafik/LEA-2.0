@@ -33,69 +33,69 @@ class ContractorEmployee extends Entity
      */
     private $workplace;
 
-    
+
     /**
      * @var int
      */
     private $contractor_id;
-    
+
     public function getName()
     {
         return $this->name;
     }
-    
+
     public function setName(string $name)
     {
         $this->name = $name;
-        
+
         return $this;
     }
     public function getSurname()
     {
         return $this->surname;
     }
-    
+
     public function setSurname(string $surname)
     {
         $this->surname = $surname;
-        
+
         return $this;
     }
-    
+
     public function getEmail()
     {
         return $this->email;
     }
-    
+
     public function setEmail(string $email)
     {
         $this->email = $email;
-        
+
         return $this;
     }
-    
+
     public function getPhone()
     {
         return $this->phone;
     }
-    
+
     public function setPhone(string $phone)
     {
         $this->phone = $phone;
-        
+
         return $this;
     }
-    
-    public function getWorkplace(): string
+
+    public function getWorkplace(): ?string
     {
         return $this->workplace;
     }
-    
+
     public function setWorkplace(string $workplace)
     {
         $this->workplace = $workplace;
     }
-    
+
     /**
      * Get the value of contractor_id
      *
@@ -105,7 +105,7 @@ class ContractorEmployee extends Entity
     {
         return $this->contractor_id;
     }
-    
+
     /**
      * Set the value of contractor_id
      *
@@ -116,7 +116,7 @@ class ContractorEmployee extends Entity
     public function setContractorId(int $contractor_id)
     {
         $this->contractor_id = $contractor_id;
-        
+
         return $this;
     }
 }

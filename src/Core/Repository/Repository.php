@@ -68,12 +68,13 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $affected_rows;
     }
 
-    public function findList(array $constraints = [])
+    public function findList(array $constraints = [], bool $nested = true)
     {
         $pagination = Request::getPaginationParams();
         $constraints = array_merge(Request::getFilterParams(), $constraints);
-        $result = $this->getListDataByConstraints($this->object, $constraints, $pagination);
-        
+        if (isset($this))
+            $result = $this->getListDataByConstraints($this->object, $constraints, $pagination, $nested);
+
         return $result;
     }
 
@@ -91,7 +92,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         $this->removeRecordData($this->object, $id);
     }
 
-    public function findCountData(): int 
+    public function findCountData(): int
     {
         $result = $this->getCountData();
 
