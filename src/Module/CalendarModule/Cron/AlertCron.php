@@ -6,7 +6,6 @@ namespace Lea\Module\CalendarModule\Cron;
 
 use Lea\Core\Mailer\Mailer;
 use Lea\Core\Security\Repository\UserRepository;
-use Lea\Module\CalendarModule\Entity\CalendarEvent;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
 class AlertCron {
@@ -15,11 +14,11 @@ class AlertCron {
     $cer = new CalendarEventRepository();
     $user_repository = new UserRepository();
 
-    $events = $cer->findCalendarEventListByStartDate(date('Y-m-d'), new CalendarEvent);
+    $events = $cer->findCalendarEventListByStartDate(date('Y-m-d'));
 
     foreach ($events as $event) {
       foreach ($event->getAlerts() as $alert) {
-        if ($alert->getType() != 'email') 
+        if ($alert->getKind() != 'email') 
           continue;
 
         if ($event->getTimeStart() != date('H:i', strtotime('+'.$alert->getTime().' minutes')))
