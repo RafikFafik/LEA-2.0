@@ -17,7 +17,7 @@ class MonthlyScheduleController extends Controller implements ControllerInterfac
         switch ($this->request->method()) {
             case "GET":
                 $repository = new CalendarEventRepository;
-                $list = $repository->findCalendarEventListByConstraints($this->params['month'], $this->params['year'], $this->params['user_id'] ?? null);
+                $list = $repository->findCalendarEventListByConstraints($this->params['month'], $this->params['year'], (int)$this->params['user_id'] ?? null);
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
             default:
