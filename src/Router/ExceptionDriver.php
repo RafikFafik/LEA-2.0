@@ -19,6 +19,7 @@ use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\InvalidCurrencyValueException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Core\Exception\ViewNotImplementedException;
+use Lea\Core\Logger\Logger;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 
 abstract class ExceptionDriver
@@ -51,6 +52,7 @@ abstract class ExceptionDriver
         try {
             $this->controller->init();
         } catch (mysqli_sql_exception $e) {
+            Logger::save($e);
             switch ($e->getCode()) {
                 case self::SQL_ACCESS_DENIED:
                     Response::internalServerError("Could not connect to database - check configuration");
@@ -66,6 +68,7 @@ abstract class ExceptionDriver
         } catch (ArgumentCountError $e) {
             Response::internalServerError($e->getMessage());
         } catch (TypeError $e) {
+            Logger::save($e);
             $NamespaceClass = $e->getTrace()[0]['class'];
             $property = $e->getTrace()[0]['function'];
             $property = self::pascalToSnake(str_replace("set", "", $property));
@@ -101,8 +104,10 @@ abstract class ExceptionDriver
         } catch (ViewNotImplementedException $e) {
             Response::notImplemented("View not available for: " . $e->getMessage());
         } catch (Error $e) {
+            Logger::save($e);
             Response::internalServerError($e->getMessage());
         } catch (Exception $e) {
+            Logger::save($e);
             Response::internalServerError($e->getMessage());
         } finally {
             Response::internalServerError("Fatal Error - Contact with Administrator");

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Request;
 
+use Lea\Core\Logger\Logger;
 use Lea\Response\Response;
 
 final class Request
@@ -19,7 +20,8 @@ final class Request
     private static $custom_params = null;
 
     const APPLICATION_JSON = "application/json";
-    const MULTIPART_FORM_DATA = "multipart/form-data";
+    const MULTIPART_FORM_DATA_WEB = "multipart/form-data; boundary=----WebKitFormBoundary";
+    const MULTIPART_FORM_DATA_APP = "multipart/form-data; boundary=--dio-boundary";
 
     public function __construct()
     {
@@ -74,14 +76,25 @@ final class Request
 
     private function parseRequestPayload(): void
     {
-        switch ($_SERVER['CONTENT_TYPE'] ?? self::APPLICATION_JSON) {
-            case self::APPLICATION_JSON:
-                $this->parseJSON();
-                break;
-            default:
-                $this->parsePOST();
+        if (strtoupper($this->server['REQUEST_METHOD']) == "GET") {
+            $this->payload = null;
+            return;
+        }
+
+        if (str_starts_with($_SERVER['CONTENT_TYPE'], self::MULTIPART_FORM_DATA_WEB)) {
+            $this->parsePOST();
+            Logger::primitiveLog("request-web");
+        } else if (str_starts_with($_SERVER['CONTENT_TYPE'], self::MULTIPART_FORM_DATA_APP)) {
+            Logger::primitiveLog("request-app");
+            $this->parsePOST();
+        } else if (str_starts_with($_SERVER['CONTENT_TYPE'], self::APPLICATION_JSON)) {
+            $this->parseJSON();
+        } else {
+            Response::badRequest("Content-Type " . $_SERVER['CONTENT_TYPE'] . " not allowed");
         }
     }
+
+
 
     private function parseJSON(): void
     {
