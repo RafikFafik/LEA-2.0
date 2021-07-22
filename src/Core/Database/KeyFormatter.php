@@ -48,7 +48,7 @@ final class KeyFormatter
 
         if (substr($table, -1) == 's')
             $result = sprintf('`tbl_%ses`', $table);
-        else if (substr($table, -1) == 'y') {
+        elseif (substr($table, -1) == 'y') {
             $result = sprintf('`tbl_%sies`', rtrim($table, 'y'));
         }
         else
@@ -65,7 +65,7 @@ final class KeyFormatter
 
         if (substr($table, -1) == 's')
             $result = sprintf('`view_%ses`', $table);
-        else if (substr($table, -1) == 'y') {
+        elseif (substr($table, -1) == 'y') {
             $result = sprintf('`view_%sies`', rtrim($table, 'y'));
         }
         else

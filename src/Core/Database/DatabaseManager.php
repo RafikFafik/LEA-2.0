@@ -57,7 +57,7 @@ abstract class DatabaseManager
             $property = new ReflectionPropertyExtended(get_class($this->root_object), $key, $this->root_reflector->getNamespaceName());
             if (method_exists($this->root_object, $setVal) && $property->isObject()) {
                 $children[] = $setVal;
-            } else if (method_exists($this->root_object, $setVal)) {
+            } elseif (method_exists($this->root_object, $setVal)) {
                 $type = $property->getType2();
                 $this->root_object->$setVal(KeyFormatter::castVariable($val, $type));
             }
@@ -103,7 +103,7 @@ abstract class DatabaseManager
                     $property = new ReflectionPropertyExtended(get_class($object), $key);
                     if (method_exists($object, $setVal) && $property->isObject() && $nested) {
                         $children[] = $setVal; /* TODO - Nested Objects */
-                    } else if (method_exists($object, $setVal)) {
+                    } elseif (method_exists($object, $setVal)) {
                         $type = $property->getType2();
                         $object->$setVal(KeyFormatter::castVariable($val, $type));
                     }

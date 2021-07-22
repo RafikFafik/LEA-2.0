@@ -36,11 +36,11 @@ abstract class ExceptionDriver
             $message = $e->getMessage();
             if (str_contains($message, "Call to undefined method"))
                 Response::internalServerError("Something went wrong - contact with Administrator");
-            else if (str_contains($message, "Call to undefined method"))
+            elseif (str_contains($message, "Call to undefined method"))
                 Response::internalServerError("Controller not found - contact with Administrator");
-            else if (str_contains($message, "syntax error"))
+            elseif (str_contains($message, "syntax error"))
                 Response::internalServerError("Symtamx Errorm in: " . $Controller);
-            else if (str_contains($message, "not found"))
+            elseif (str_contains($message, "not found"))
                 Response::notImplemented($Controller);
             else
                 Response::internalServerError("Something went wrong - contact with Administrator");

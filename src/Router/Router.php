@@ -55,7 +55,7 @@ final class Router extends ExceptionDriver
         foreach ($filters as $key => $val) {
             if (in_array($key, $config['match'])) {
                 $result[$key . '_LIKE'] = $val;
-            } else if (in_array($key, $config['range']) && str_contains($val,  "-")) {
+            } elseif (in_array($key, $config['range']) && str_contains($val,  "-")) {
                 $tokens = explode("-", $val);
                 if (!empty($tokens[0])) {
                     if ($date = DateTime::createFromFormat("d/m/Y", $tokens[0]))
@@ -154,7 +154,7 @@ final class Router extends ExceptionDriver
                 $val_casted = (int)$val;
                 if ($key == 'filters')
                     $query_string_params[$key] = $this->parseFilters($val);
-                else if (strlen((string)$val_casted) == strlen($val))
+                elseif (strlen((string)$val_casted) == strlen($val))
                     $query_string_params[$key] = $val_casted;
                 else
                     $query_string_params[$key] = $val;

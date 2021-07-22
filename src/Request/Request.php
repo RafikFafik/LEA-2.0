@@ -20,8 +20,9 @@ final class Request
     private static $custom_params = null;
 
     const APPLICATION_JSON = "application/json";
-    const MULTIPART_FORM_DATA_WEB = "multipart/form-data; boundary=----WebKitFormBoundary";
     const MULTIPART_FORM_DATA_APP = "multipart/form-data; boundary=--dio-boundary";
+    // const MULTIPART_FORM_DATA_WEB = "multipart/form-data; boundary=----WebKitFormBoundary"; <-- Only for Edge
+    const MULTIPART_FORM_DATA_WEB = "multipart/form-data;"; /* Workaround for all browsers */
 
     public function __construct()
     {
@@ -81,20 +82,18 @@ final class Request
             return;
         }
 
-        if (str_starts_with($_SERVER['CONTENT_TYPE'], self::MULTIPART_FORM_DATA_WEB)) {
-            $this->parsePOST();
-            Logger::primitiveLog("request-web");
-        } else if (str_starts_with($_SERVER['CONTENT_TYPE'], self::MULTIPART_FORM_DATA_APP)) {
+        if (str_starts_with($_SERVER['CONTENT_TYPE'], self::MULTIPART_FORM_DATA_APP)) {
             Logger::primitiveLog("request-app");
             $this->parsePOST();
-        } else if (str_starts_with($_SERVER['CONTENT_TYPE'], self::APPLICATION_JSON)) {
+        } elseif (str_starts_with($_SERVER['CONTENT_TYPE'], self::MULTIPART_FORM_DATA_WEB)) {
+            $this->parsePOST();
+            Logger::primitiveLog("request-web");
+        } elseif (str_starts_with($_SERVER['CONTENT_TYPE'], self::APPLICATION_JSON)) {
             $this->parseJSON();
         } else {
             Response::badRequest("Content-Type " . $_SERVER['CONTENT_TYPE'] . " not allowed");
         }
     }
-
-
 
     private function parseJSON(): void
     {

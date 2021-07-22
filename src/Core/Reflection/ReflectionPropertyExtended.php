@@ -24,7 +24,7 @@ class ReflectionPropertyExtended extends ReflectionProperty
         $this->type = $this->getTypePHP7($this);
         if($this->isEntity())
             $this->loadType();
-        else if($this->isView())
+        elseif($this->isView())
             $this->loadView();
     }
 
