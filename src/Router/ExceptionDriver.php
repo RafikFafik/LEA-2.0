@@ -39,6 +39,8 @@ abstract class ExceptionDriver
                 Response::internalServerError("Controller not found - contact with Administrator");
             else if (str_contains($message, "syntax error"))
                 Response::internalServerError("Symtamx Errorm in: " . $Controller);
+            else if (str_contains($message, "not found"))
+                Response::notImplemented($Controller);
             else
                 Response::internalServerError("Something went wrong - contact with Administrator");
         }

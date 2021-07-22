@@ -99,6 +99,10 @@ CalendarModule:
             url: "/calendar/send-alert"
             controller: CalendarAlertController
             allow: ['all']
+        playground:
+            url: "/calendar/playground"
+            controller: CalendarPlaygroundController
+            allow: ['all']
 
 Security:
     prefix: "/security"
