@@ -18,6 +18,12 @@ use Lea\Core\Security\Service\TokenVerificationService;
 abstract class Controller implements ControllerInterface
 {
     protected $request;
+    /**
+     * @var array|null
+     */
+    protected $config;
+    protected $repository;
+    protected $http_method;
 
     public function __construct(Request $request, array $params = NULL, array $allow = NULL, array $config = null)
     {
@@ -116,9 +122,7 @@ abstract class Controller implements ControllerInterface
 
     public function getCollection(): iterable
     {
-        $list = $this->repository->findList();
-
-        return $list;
+        return $this->repository->findList();
     }
 
     public function postResource(Repository $repository): void

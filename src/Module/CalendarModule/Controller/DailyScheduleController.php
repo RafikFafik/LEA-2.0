@@ -23,6 +23,7 @@ class DailyScheduleController extends Controller implements ControllerInterface
                 $res = Normalizer::denormalizeList($list);
                 $res = Normalizer::jsonToArrayList($res, 'employees');
                 Response::ok($res);
+                break;
             default:
                 Response::methodNotAllowed();
         }

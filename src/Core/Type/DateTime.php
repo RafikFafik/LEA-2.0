@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Lea\Core\Type;
 
-use DateTime as DateTimeBuildin;
+use DateTime as DateTimeBuiltin;
 
-class DateTime extends DateTimeBuildin
+class DateTime extends DateTimeBuiltin
 {
     public function __toString()
     {
@@ -15,8 +15,8 @@ class DateTime extends DateTimeBuildin
 
     private static function __diff($dt1, $dt2 = NULL)
     {
-        $a = gettype($dt1) === "string" ? new DateTimeBuildin($dt1) : $dt1;
-        $b = gettype($dt2) === "string" ? new DateTimeBuildin($dt2) : $dt2 ?? new DateTimeBuildin();
+        $a = gettype($dt1) === "string" ? new DateTimeBuiltin($dt1) : $dt1;
+        $b = gettype($dt2) === "string" ? new DateTimeBuiltin($dt2) : $dt2 ?? new DateTimeBuiltin();
         return $a->diff($b);
     }
 
@@ -27,7 +27,7 @@ class DateTime extends DateTimeBuildin
 
     public function days2($date)
     {
-        $to = gettype($date) === "string" ? new DateTimeBuildin($date) : $date;
+        $to = gettype($date) === "string" ? new DateTimeBuiltin($date) : $date;
         return (int)$this->__diff($this->date, $to)->format('%R%a');
     }
 }

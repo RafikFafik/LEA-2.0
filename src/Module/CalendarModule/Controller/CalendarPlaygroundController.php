@@ -15,6 +15,7 @@ class CalendarPlaygroundController extends Controller implements ControllerInter
         switch ($this->http_method) {
             case "POST":
                 Response::ok($this->request->getPayload());
+                break;
             default:
                 Response::methodNotAllowed();
         }

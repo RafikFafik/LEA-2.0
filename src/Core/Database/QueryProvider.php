@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionClass;
 
 final class QueryProvider
 {
+    /**
+     * @var object
+     */
+    private $object;
+
     public function __construct(object $object)
     {
         $this->object = $object;
@@ -79,7 +84,7 @@ final class QueryProvider
         $table_name = KeyFormatter::getTableNameByObject($object);
         $columns = "";
         $values = "";
-        $reflection = new Reflection($object);
+        $reflection = new ReflectionClass($object);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
             $getValue = 'get' . KeyFormatter::processSnakeToPascal($var);
@@ -115,7 +120,7 @@ final class QueryProvider
     {
         $table_name = KeyFormatter::getTableNameByObject($object);
         $changes = "";
-        $reflection = new Reflection($object);
+        $reflection = new ReflectionClass($object);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
             if ($var == 'id')
@@ -159,9 +164,7 @@ final class QueryProvider
     public function getSoftDeleteQuery(object $object, $where_val): string
     {
         $table_name = KeyFormatter::getTableNameByObject($object);
-        $query = 'UPDATE ' . $table_name . ' SET `fld_Deleted` = 1 WHERE `fld_Id` = ' . $where_val;
-
-        return $query;
+        return 'UPDATE ' . $table_name . ' SET `fld_Deleted` = 1 WHERE `fld_Id` = ' . $where_val;
     }
 
     public function getCheckIfTableExistsQuery(string $tablename): string

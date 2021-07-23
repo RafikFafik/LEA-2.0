@@ -20,7 +20,7 @@ use Lea\Core\Exception\InvalidCurrencyValueException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Core\Exception\ViewNotImplementedException;
 use Lea\Core\Logger\Logger;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Lea\Core\Reflection\ReflectionProperty;
 
 abstract class ExceptionDriver
 {
@@ -77,7 +77,7 @@ abstract class ExceptionDriver
             }
             $arg = $e->getTrace()[0]['args'][0];
             try {
-                $reflector = new ReflectionPropertyExtended($NamespaceClass, $property);
+                $reflector = new ReflectionProperty($NamespaceClass, $property);
             } catch (Exception $f) {
                 Response::internalServerError("Reflector error");
             }

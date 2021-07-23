@@ -10,6 +10,7 @@ class Offer extends View
 {
     /**
      * @from Offer
+     * @psalm-var
      */
     private $title;
 

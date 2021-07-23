@@ -15,7 +15,7 @@ try {
     die("Configuration issue - contact with an administrator");
 }
 
-$origin = $_SERVER['HTTP_ORIGIN'] ?? "http://insomnia.local";
+$origin = $_SERVER['HTTP_ORIGIN'] ?? "https://insomnia.local";
 header("Access-Control-Allow-Origin: $origin");
 header("Access-Control-Allow-Headers: Accept, Accept-Encoding, Accept-Language, Authorization, Content-Type, Cookie");
 header("Access-Control-Allow-Methods: POST, GET, DELETE, OPTIONS, PUT");

@@ -4,4 +4,5 @@ handy.sql
 composer.lock
 files
 .vscode
+.idea
 logs/

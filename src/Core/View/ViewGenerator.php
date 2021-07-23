@@ -10,6 +10,15 @@ use Lea\Core\Serializer\Normalizer;
 
 final class ViewGenerator implements ViewInterface
 {
+    /**
+     * @var Repository
+     */
+    private $repository;
+    /**
+     * @var array|null
+     */
+    private $pagination;
+
     function __construct(Repository $repository)
     {
         $this->repository = $repository;

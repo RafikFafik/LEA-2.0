@@ -24,8 +24,7 @@ class Cron {
   }
 
   static public function saveJobs(array $jobs = array()) {
-    $output = shell_exec('printf "'. self::arrayToString($jobs) . '\n" | crontab -');
-    return $output;
+      return shell_exec('printf "'. self::arrayToString($jobs) . '\n" | crontab -');
   }
 
   static public function jobExists(string $job = '', string $schedule = '') : bool {

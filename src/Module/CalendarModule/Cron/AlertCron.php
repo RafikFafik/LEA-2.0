@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Cron;
 
+use Lea\Core\Exception\EmailNotSentException;
 use Lea\Core\Logger\Logger;
 use Lea\Core\Mailer\Mailer;
 use Lea\Core\Security\Repository\UserRepository;
@@ -31,13 +32,16 @@ class AlertCron
                 foreach ($event->getEmployees() as $employee) {
                     $user = $user_repository->findById($employee->getUserId());
                     $time_info = $event->getDateStart() . ' ' . $event->getTimeStart() . ' - ' . $event->getTimeEnd();
-                    Mailer::sendMail(
-                        $user->getEmail(),
-                        'Powiadomienie: ' .  $event->getTitle() . ' - ' . $time_info,
-                        '<p><strong>' . $event->getTitle() . '</strong><p>' .
+                    try {
+                        Mailer::sendMail(
+                            $user->getEmail(),
+                            'Powiadomienie: ' . $event->getTitle() . ' - ' . $time_info,
+                            '<p><strong>' . $event->getTitle() . '</strong><p>' .
                             "<p>Kiedy: $time_info</p>" .
                             "<p>Organizator: $organizer</p>"
-                    );
+                        );
+                    } catch (EmailNotSentException $e) {
+                    }
                 }
                 Logger::save("Alert about event " . $event->getId() . ": " .  $event->getTitle() . " was sent");
             }

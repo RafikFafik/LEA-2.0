@@ -8,7 +8,7 @@ use DateInterval;
 use Lea\Core\Type\DateTime;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Serializer\Converter;
-use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Repository\Repository;
 use Lea\Core\Security\Service\AuthorizedUserService;
 
@@ -32,7 +32,7 @@ final class CalendarEventRepository extends Repository
     {
         $constraints['date_start_<='] = $date;
         $constraints['date_end_>='] = $date;
-        $reflector = new Reflection($this->object);
+        $reflector = new ReflectionClass($this->object);
         if ($reflector->hasSubClassDependency()) {
             $subclass = $reflector->getSubClass();
             $subkey = $reflector->getSubKey();
@@ -66,7 +66,7 @@ final class CalendarEventRepository extends Repository
         $between['from'] = $year . '-' . Validator::parseMonth($month - 1) . '-01';
         $between['to'] = $year . '-' . Validator::parseMonth($month + 1) . '-31';
         $constraints = ['date_start_BETWEEN' => $between];
-        $reflector = new Reflection($this->object);
+        $reflector = new ReflectionClass($this->object);
         if ($reflector->hasSubClassDependency()) {
             $subclass = $reflector->getSubClass();
             $subkey = $reflector->getSubKey();

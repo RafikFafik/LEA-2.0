@@ -6,7 +6,7 @@ namespace Lea\Core\Database;
 
 use Lea\Core\Type\Date;
 use Lea\Core\Type\Currency;
-use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Type\DateTime;
 
 final class KeyFormatter
@@ -91,7 +91,7 @@ final class KeyFormatter
         return $res;
     }
 
-    public static function getTableColumnsByReflector(Reflection $reflection): string
+    public static function getTableColumnsByReflector(ReflectionClass $reflection): string
     {
         $res = "";
         foreach ($reflection->getPrimitiveProperties() as $property) {
@@ -107,12 +107,10 @@ final class KeyFormatter
         return $res;
     }
 
-    public static function convertToKey(string $tableField)
+    public static function convertToKey(string $tableField): string
     {
         $tableField = str_replace('fld_', '', $tableField);
-        $tableField = self::processPascalToSnake($tableField);
-
-        return $tableField;
+        return self::processPascalToSnake($tableField);
     }
 
     public function getObjectSetters($object): array
@@ -129,17 +127,14 @@ final class KeyFormatter
 
     public static function processSnakeToPascal(string $text): string
     {
-        $result = str_replace('_', '', ucwords($text, '_'));
-
-        return $result;
+        return str_replace('_', '', ucwords($text, '_'));
     }
 
     public static function processPascalToSnake(string $PascalCase): string
     {
-        $cammelCase = lcfirst($PascalCase);
-        $snake_case = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $cammelCase));
+        $camelCase = lcfirst($PascalCase);
 
-        return $snake_case;
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $camelCase));
     }
 
     public static function processListOfGettersToToSnakeCase(iterable $list): iterable
@@ -160,6 +155,9 @@ final class KeyFormatter
         return $keys ?? [];
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function castVariable($variable, string $type_to_cast)
     {
         switch (strtoupper($type_to_cast)) {

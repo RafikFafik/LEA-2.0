@@ -6,10 +6,9 @@ namespace Lea\Core\Database;
 
 use Lea\Core\Logger\Logger;
 use mysqli_sql_exception;
-use Lea\Core\Reflection\Reflection;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Lea\Core\Reflection\ReflectionClass;
+use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Response\Response;
-use ReflectionProperty;
 
 final class DatabaseException
 {
@@ -28,12 +27,14 @@ final class DatabaseException
     {
         $message = $e->getMessage();
         switch ($e->getCode()) {
+            case self::SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE:
             case self::SQL_TABLE_NOT_EXISTS:
                 return self::getCreateTableQueryRecursive($object);
             case self::SQL_UNKNOWN_COLUMN:
                 return self::getAlterTableQuery($object, $connection, $parent_class);
             case self::SQL_MISSING_DEFAULT_VALUE:
                 Response::internalServerError("TODO - Default Value failure: " . $e->getCode() . "\n" . $e->getMessage());
+                break;
             case self::SQL_FOREIGN_KEY_CONSTRAINTS_FAIL:
             case self::SQL_FOREIGN_KEY_COHESION:
                 $substr = substr($message, (int)strpos($message, "FOREIGN KEY") + 12);
@@ -42,19 +43,22 @@ final class DatabaseException
                 $field = rtrim($field, '`)');
                 $field = KeyFormatter::convertToKey($field);
                 Response::badRequest("Invalid value of field that has reference: " . $field);
+                break;
             case self::SQL_INCORRECT_DATE_VALUE:
                 Response::internalServerError($e->getMessage());
+                break;
             case self::SQL_SYMTAMX_ERRORM:
                 Response::internalServerError("Symtamx error \n $query");
+                break;
             case self::SQL_OUT_OF_RANGE:
                 $field = substr($message, strpos($message, "'") + 1);
                 $field = substr($field, 0, strpos($field, "'"));
                 Response::badRequest("Passed value of ``" . $field . "`` out of range - Contact with Administrator to increase it");
-            case self::SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE:
-                return self::getCreateTableQueryRecursive($object);
+                break;
             case self::SQL_DUPLICATE_COLUMN_NAME:
                 Logger::save($e);
-                return Response::notImplemented("SQL_ExceptionNotImplemented");
+                Response::notImplemented("SQL_ExceptionNotImplemented");
+                break;
             default:
                 Response::internalServerError("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }
@@ -74,9 +78,12 @@ final class DatabaseException
                 $last = $key;
                 continue;
             }
-            $reflector = new ReflectionPropertyExtended(get_class($object), $key);
-            if ($reflector->isObject())
-                continue;
+            try {
+                $reflector = new ReflectionProperty(get_class($object), $key);
+                if ($reflector->isObject())
+                    continue;
+            } catch (\ReflectionException $e) {
+            }
             $query = 'ALTER TABLE ' . KeyFormatter::getTableNameByObject($object) . ' ADD ';
             $query .= self::parseReflectProperty($reflector);
             $query .= $last ?  ' AFTER ' . KeyFormatter::convertKeyToColumn($last) . ';' : ";";
@@ -94,17 +101,20 @@ final class DatabaseException
 
     private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array
     {
-        $tablename = KeyFormatter::getTableNameByObject($object);
-        $ddl = 'CREATE TABLE IF NOT EXISTS ' . $tablename . ' (';
-        $class = new Reflection($object);
-        $primitive = $class->getPrimitiveProperties();
-        $referenced = $object->getReferencedProperties();
-        $referenced = KeyFormatter::processListOfGettersToToSnakeCase($referenced);
+        $table_name = KeyFormatter::getTableNameByObject($object);
+        $ddl = 'CREATE TABLE IF NOT EXISTS ' . $table_name . ' (';
+        try {
+            $class = new ReflectionClass($object);
+            $primitive = $class->getPrimitiveProperties();
+            $referenced = $object->getReferencedProperties();
+            $referenced = KeyFormatter::processListOfGettersToToSnakeCase($referenced);
+        } catch (\ReflectionException $e) {
+        }
         $columns = self::parseReflectProperties($primitive);
         if ($parent_table) {
             $foreign_column = self::getReferencedKeyColumn($parent_table);
             $columns .= ', ' . $foreign_column . ' INT NOT NULL';
-            $alter_foreing_constraint = self::getForeignKeyConstraint($tablename, KeyFormatter::getTableNameByClass($parent_table), $foreign_column);
+            $alter_foreing_constraint = self::getForeignKeyConstraint($table_name, KeyFormatter::getTableNameByClass($parent_table), $foreign_column);
         }
         if ($referenced) {
             foreach ($referenced as $key) {
@@ -116,7 +126,7 @@ final class DatabaseException
                 // if ($parent_table !== $tablename && $Class !== null) 
                 // $alter_references = array_merge($alter_references ?? [], self::getCreateTableQueryRecursive(new $Class));
                 if ($parent_table)
-                    $alter_references[] = self::getForeignKeyConstraint($tablename, $parent_table, $foreign_column);
+                    $alter_references[] = self::getForeignKeyConstraint($table_name, $parent_table, $foreign_column);
             }
         }
         $ddl .= $columns;
@@ -134,9 +144,7 @@ final class DatabaseException
             $obj = new $Class;
             $children_queries = array_merge($children_queries ?? [], self::getCreateTableQueryRecursive($obj, $parent));
         }
-        $queries = array_merge($queries, $children_queries ?? []);
-
-        return $queries;
+        return array_merge($queries, $children_queries ?? []);
     }
 
     private static function parseReflectProperties(iterable $properties): string
@@ -145,9 +153,7 @@ final class DatabaseException
         foreach ($properties as $property) {
             $columns .= self::parseReflectProperty($property) . ", ";
         }
-        $columns = rtrim($columns, ", ");
-
-        return $columns;
+        return rtrim($columns, ", ");
     }
 
     private static function parseReflectProperty(ReflectionProperty $property): string /* TODO - Change to ExtendedProperty */
@@ -170,18 +176,14 @@ final class DatabaseException
 
     private static function getAlterTableAddPrimaryKey(string $tablename): string
     {
-        $constraint = 'ALTER TABLE ' . $tablename . ' ADD CONSTRAINT PK_' . $tablename . ' PRIMARY KEY (`fld_Id`);';
-
-        return $constraint;
+        return 'ALTER TABLE ' . $tablename . ' ADD CONSTRAINT PK_' . $tablename . ' PRIMARY KEY (`fld_Id`);';
     }
 
     private static function getForeignKeyConstraint(string $tbl_tablename, string $tbl_parent_table_name, string $fld_Parent): string
     {
         $formatted_parent = rtrim(ltrim($tbl_tablename, '`'), '`');
         $formatted_field = rtrim(ltrim($fld_Parent, '`'), '`');
-        $constraint = 'ALTER TABLE ' . $tbl_tablename . ' ADD CONSTRAINT FK_' . $formatted_parent . '_' . $formatted_field . ' FOREIGN KEY (' . $fld_Parent .  ') REFERENCES ' . $tbl_parent_table_name . ' (`fld_Id`);';
-
-        return $constraint;
+        return 'ALTER TABLE ' . $tbl_tablename . ' ADD CONSTRAINT FK_' . $formatted_parent . '_' . $formatted_field . ' FOREIGN KEY (' . $fld_Parent .  ') REFERENCES ' . $tbl_parent_table_name . ' (`fld_Id`);';
     }
 
     private static function getReferencedKeyColumn(string $parent): string
@@ -202,7 +204,7 @@ final class DatabaseException
             $list[] = $row['Field'];
         }
 
-        return $list;
+        return $list ?? [];
     }
 
     private static function getVarTypeFromComment($comment): string
@@ -212,15 +214,11 @@ final class DatabaseException
         $lines = explode("\n", $comment);
         $strictType = self::getStrictTypeFromTokenArray($lines);
         switch ($strictType) {
+            case "INT":
             case "INTEGER":
                 return "INT";
-            case "INT":
-                return "INT";
-            case "STRING":
-                return "VARCHAR(150)";
-            case "JSON":
-                return "TEXT";
             case "TEXT":
+            case "JSON":
                 return "TEXT";
             case "DATE":
                 return "DATE";

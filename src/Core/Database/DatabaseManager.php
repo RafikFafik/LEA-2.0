@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
-use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Lea\Core\Reflection\ReflectionProperty;
 
 abstract class DatabaseManager
 {
@@ -18,12 +18,16 @@ abstract class DatabaseManager
     private $root_object;
     private $root_reflector;
     private $tableName;
+    /**
+     * @var QueryProvider
+     */
+    private $query_provider;
 
     protected function __construct(object $object, $user_id = null)
     {
         $this->query_provider = new QueryProvider($object);
         $this->root_object = $object;
-        $this->root_reflector = new Reflection($object);
+        $this->root_reflector = new ReflectionClass($object);
         $this->tableName = KeyFormatter::getTableNameByObject($object);
         if ($user_id)
             $this->user_id = $user_id;
@@ -54,7 +58,7 @@ abstract class DatabaseManager
                 continue;
             $key = KeyFormatter::convertToKey($key);
             $setVal = 'set' . KeyFormatter::processSnakeToPascal($key);
-            $property = new ReflectionPropertyExtended(get_class($this->root_object), $key, $this->root_reflector->getNamespaceName());
+            $property = new ReflectionProperty(get_class($this->root_object), $key, $this->root_reflector->getNamespaceName());
             if (method_exists($this->root_object, $setVal) && $property->isObject()) {
                 $children[] = $setVal;
             } elseif (method_exists($this->root_object, $setVal)) {
@@ -86,7 +90,7 @@ abstract class DatabaseManager
     protected function getListDataByConstraints(object $object, $constraints = [], $pagination = null, $nested = true)
     {
         $tableName = KeyFormatter::getTableNameByObject($object);
-        $reflector = new Reflection($object);
+        $reflector = new ReflectionClass($object);
         $columns = KeyFormatter::getTableColumnsByReflector($reflector);
         $query = $this->query_provider->getQueryWithConstraints($object, $columns, $constraints, $pagination, $reflector);
 
@@ -100,7 +104,7 @@ abstract class DatabaseManager
                         continue;
                     $key = KeyFormatter::convertToKey($key);
                     $setVal = 'set' . KeyFormatter::processSnakeToPascal($key);
-                    $property = new ReflectionPropertyExtended(get_class($object), $key);
+                    $property = new ReflectionProperty(get_class($object), $key);
                     if (method_exists($object, $setVal) && $property->isObject() && $nested) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } elseif (method_exists($object, $setVal)) {

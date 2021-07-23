@@ -7,169 +7,12 @@ namespace Lea\Core\Entity;
 use Exception;
 use TypeError;
 use Lea\Core\Type\Date;
-use Lea\Core\Reflection\Reflection;
+use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Exception\InvalidDateFormatException;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
+use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Type\Currency;
 use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Core\Type\DateTime;
-
-trait Parser
-{
-    private function processSnakeToPascal(string $text): string
-    {
-        $result = str_replace('_', '', ucwords($text, '_'));
-
-        return $result;
-    }
-}
-trait NamespaceProvider
-{
-    public static function getNamespace(): string
-    {
-        return get_called_class();
-    }
-
-    public function getClassName(): string
-    {
-        $tokens = explode('\\', get_class($this));
-        $class = end($tokens);
-
-        return $class;
-    }
-
-    public function hasKey(string $key): bool
-    {
-        return property_exists($this, $key);
-    }
-
-}
-
-trait Getter
-{
-    use Parser;
-
-    public function get(array $specific_fields = null): array
-    {
-        $res = [];
-        $class = get_called_class();
-        $reflection = new Reflection($class);
-        foreach ($reflection->getProperties() as $property) {
-            $recursive_res = [];
-            $key = $property->getName();
-            if($specific_fields) {
-                if(!in_array($key, $specific_fields))
-                    continue;
-            }
-            $getValue = 'get' . $this->processSnakeToPascal($key);
-            if (!method_exists($class, $getValue))
-                continue;
-            $val = $this->$getValue();
-            $reflection = new ReflectionPropertyExtended($class, $key);
-            if ($reflection->isObject()) {
-                if (is_iterable($val)) {
-                    foreach ($val as $obj) {
-                        $recursive_res[] = $obj->get($specific_fields);
-                    }
-                    $res[$key] = $recursive_res;
-                    /* Disposable - Begin */
-                    if (str_contains($reflection->getName(), "files")) {
-                        $res[$key][] = ['file_key' => "", 'deleted' => false];
-                    }
-                    /* Disposable - End*/
-                }
-            } else {
-                $type = $reflection->getType2();
-                $res[$key] = (($type == "Date" || $type =="Currency" || $type =="DateTime") && $val !== null) ? $val->__get() : $res[$key] = $val;
-            }
-        }
-        /* Get fields that are not in entity */
-        $ovars = get_object_vars($this);
-        foreach ($ovars as $key => $val) {
-            if($specific_fields) {
-                if(!in_array($key, $specific_fields))
-                    continue;
-            }
-            if (!isset($res[$key]))
-                $fields[$key] = $val;
-        }
-        foreach ($fields ?? [] as $key => $val) {
-            if (is_iterable($val)) {
-                foreach ($val as $obj) {
-                    $recursive_res[] = $obj->get();
-                }
-                $res[$key] = $recursive_res;
-            } else {
-                $res[$key] = $val;
-            }
-        }
-        return $res;
-    }
-
-    public function getGetters(): array
-    {
-        foreach (get_class_methods($this) as $method) {
-            if ($this->hasPropertyCorrespondingToMethod($method))
-                $getters[] = $method;
-        }
-
-        return $getters ?? [];
-    }
-}
-
-trait Setter
-{
-    use Parser;
-
-    public function set(array $data): void
-    {
-        $reflection = new Reflection($this);
-        foreach ($reflection->getProperties() as $property) {
-            $key = $property->getName();
-            if (!array_key_exists($key, $data) && $key != 'user_id')
-                continue;
-            $setValue = 'set' . $this->processSnakeToPascal($key);
-            if ($property->isObject()) {
-                if (is_iterable($data[$key])) {
-                    $children = [];
-                    foreach ($data[$key] as $obj) {
-                        $ChildClass = $property->getType2();
-                        /* Disposable - begin */
-                        if (str_contains($ChildClass, "File") && !isset($obj['id']) && !isset($_FILES[$obj['file_key']]))
-                            continue;
-                        /* Disposable - end */
-                        $children[] = new $ChildClass($obj);
-                    }
-                    $this->$setValue($children);
-                }
-            } else {
-                if ($setValue == 'setUserId' && !isset($data[$key]))
-                    $val = AuthorizedUserService::getAuthorizedUserId();
-                else
-                    $val = self::castVariable($data[$key], $property->getType2(), $key);
-
-                $this->strictSet($setValue, $val, $property);
-            }
-        }
-    }
-
-    private function strictSet(string $setValue, $value, ReflectionPropertyExtended $property): void
-    {
-        // if($property->getType2() != gettype($value) && (!($property->getName() != 'id' || $property->getName() != 'active' || $property->getName() != 'deleted')))
-            // throw new TypeError($property->getName());
-        $this->$setValue($value);
-    }
-
-    public function getSetters(): array
-    {
-        foreach (get_class_methods($this) as $method) {
-            if ($this->hasPropertyCorrespondingToMethod($method, TRUE))
-                $setters[] = $method;
-        }
-
-        return $setters ?? [];
-    }
-}
 
 abstract class Entity implements EntityInterface
 {
@@ -195,14 +38,14 @@ abstract class Entity implements EntityInterface
             $this->set($data);
     }
 
-    
+
 
     public function getChildObjects(): iterable
     {
         $class = get_called_class();
         $obj = new $class;
 
-        $reflection = new Reflection($obj);
+        $reflection = new ReflectionClass($obj);
         foreach ($reflection->getProperties() as $property) {
             $var = $property->getName();
             if (!$property->isObject())
@@ -242,7 +85,7 @@ abstract class Entity implements EntityInterface
         $varName = lcfirst($VarName);
         $var_name = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $varName));
 
-        return property_exists(get_called_class(), $var_name) ? TRUE : FALSE;
+        return property_exists(get_called_class(), $var_name);
     }
 
     /**
@@ -307,10 +150,13 @@ abstract class Entity implements EntityInterface
 
     public function hasId(): bool
     {
-        return $this->id ? TRUE : FALSE;
+        return (bool)$this->id;
     }
 
 
+    /**
+     * @throws InvalidDateFormatException
+     */
     protected static function castVariable($variable, string $type_to_cast, $key)
     {
         switch (strtoupper($type_to_cast)) {

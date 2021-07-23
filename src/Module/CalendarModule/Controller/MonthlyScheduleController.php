@@ -20,6 +20,7 @@ class MonthlyScheduleController extends Controller implements ControllerInterfac
                 $list = $repository->findCalendarEventListByConstraints($this->params['month'], $this->params['year'], (int)$this->params['user_id'] ?? null);
                 $res = Normalizer::denormalizeList($list);
                 Response::ok($res);
+                break;
             default:
                 Response::methodNotAllowed();
         }

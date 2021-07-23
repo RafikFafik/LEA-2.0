@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Lea\Core\Reflection;
 
-use ReflectionClass;
-use ReflectionProperty;
-use Lea\Core\Reflection\ReflectionPropertyExtended;
+use ReflectionClass as ReflectionClassBuiltin;
+use Lea\Core\Reflection\ReflectionProperty;
 
-final class Reflection extends ReflectionClass
+final class ReflectionClass extends ReflectionClassBuiltin
 {
     private $namespace;
     private $properties = [];
@@ -21,7 +20,7 @@ final class Reflection extends ReflectionClass
         $this->comment = $this->getDocComment();
         $protected_properties = $this->getProperties(ReflectionProperty::IS_PROTECTED);
         $private_properties = $this->getProperties(ReflectionProperty::IS_PRIVATE);
-        /* TODO getProperties(ReflectionPropertyExtended::WITH_LOG_DOC); */
+        /* TODO getProperties(ReflectionProperty::WITH_LOG_DOC); */
         $properties = array_merge($protected_properties, $private_properties);
         $this->properties = $this->genericToExtendedPropertyReflection($properties, $objectOrClass);
 
@@ -87,7 +86,7 @@ final class Reflection extends ReflectionClass
     {
         $class = is_object($objectOrClass) ? $objectOrClass->getNamespace() : $objectOrClass;
         foreach ($properties as $property) {
-            $result[] = new ReflectionPropertyExtended($class, $property->getName());
+            $result[] = new ReflectionProperty($class, $property->getName());
         }
 
         return $result ?? [];
@@ -95,21 +94,17 @@ final class Reflection extends ReflectionClass
 
     public function hasSubClassDependency(): bool
     {
-        return str_contains($this->comment, "@dependency") ? true : false;
+        return str_contains($this->comment, "@dependency");
     }
 
     public function getSubClass(): ?string
     {
-        $Class = $this->extractDocCommentValue("@dependency");
-
-        return $Class;
+        return $this->extractDocCommentValue("@dependency");
     }
 
     public function getSubKey(): ?string
     {
-        $key = $this->extractDocCommentValue("@property");
-
-        return $key;
+        return $this->extractDocCommentValue("@property");
     }
 
     private function extractDocCommentValue(string $param): ?string

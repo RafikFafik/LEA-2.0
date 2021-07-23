@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Lea\Core\Reflection;
 
-use ReflectionClass;
-use ReflectionProperty;
 use Lea\Core\Exception\DocCommentMissedException;
+use ReflectionClass;
+use ReflectionProperty as ReflectionPropertyBuiltin;
 
-class ReflectionPropertyExtended extends ReflectionProperty
+class ReflectionProperty extends ReflectionPropertyBuiltin
 {
     private $is_object;
     private $type;
@@ -19,8 +19,10 @@ class ReflectionPropertyExtended extends ReflectionProperty
     {
         parent::__construct($class, $property);
         $this->loadDocComment();
+        /* \/ Remove - Dangerous */
         $reflector = new ReflectionClass($class);
         $this->namespace = $reflector->getNamespaceName();
+        /* /\ Remove - Dangerous */
         $this->type = $this->getTypePHP7($this);
         if($this->isEntity())
             $this->loadType();
