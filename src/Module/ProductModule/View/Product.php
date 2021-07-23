@@ -31,11 +31,6 @@ class Product extends View
   private $price;
 
   /**
-   * @var int
-   */
-  private $vat_rate;
-
-  /**
    * @var string
    */
   private $producent;
@@ -44,21 +39,7 @@ class Product extends View
    * @var string
    */
   private $product_code;
-
-  /**
-   * @var string
-   */
-  private $product_categories;
-
-  /**
-   * @var string
-   */
-  private $type;
-
-  /**
-   * @var string
-   */
-  private $description;
+  
 
   /**
    * Get the value of product_name
@@ -176,150 +157,6 @@ class Product extends View
   public function setProductCode(string $product_code)
   {
     $this->product_code = $product_code;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of product_categories
-   *
-   * @return  string
-   */ 
-  public function getProductCategories()
-  {
-    return $this->product_categories;
-  }
-
-  /**
-   * Set the value of product_categories
-   *
-   * @param  string  $product_categories
-   *
-   * @return  self
-   */ 
-  public function setProductCategories(string $product_categories)
-  {
-    $this->product_categories = $product_categories;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of type
-   *
-   * @return  string
-   */ 
-  public function getType()
-  {
-    return $this->type;
-  }
-
-  /**
-   * Set the value of type
-   *
-   * @param  string  $type
-   *
-   * @return  self
-   */ 
-  public function setType(string $type)
-  {
-    $this->type = $type;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of description
-   *
-   * @return  string
-   */ 
-  public function getDescription()
-  {
-    return $this->description;
-  }
-
-  /**
-   * Set the value of description
-   *
-   * @param  string  $description
-   *
-   * @return  self
-   */ 
-  public function setDescription(string $description)
-  {
-    $this->description = $description;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of product_files
-   *
-   * @return  iterable<ProductFile>
-   */ 
-  public function getProductFiles()
-  {
-    return $this->product_files;
-  }
-
-  /**
-   * Set the value of product_files
-   *
-   * @param  iterable<ProductFile>  $product_files
-   *
-   * @return  self
-   */ 
-  public function setProductFiles($product_files)
-  {
-    $this->product_files = $product_files;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of price
-   *
-   * @return  int
-   */ 
-  public function getPrice()
-  {
-    return $this->price;
-  }
-
-  /**
-   * Set the value of price
-   *
-   * @param  int  $price
-   *
-   * @return  self
-   */ 
-public function setPrice(Currency $price)
-  {
-    $this->price = $price;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of vat_rate
-   *
-   * @return  int
-   */ 
-  public function getVatRate()
-  {
-    return $this->vat_rate;
-  }
-
-  /**
-   * Set the value of vat_rate
-   *
-   * @param  int  $vat_rate
-   *
-   * @return  self
-   */ 
-  public function setVatRate(int $vat_rate)
-  {
-    $this->vat_rate = $vat_rate;
 
     return $this;
   }

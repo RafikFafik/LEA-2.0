@@ -5,8 +5,9 @@ namespace Lea\Core\Entity;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Security\Service\AuthorizedUserService;
+use Lea\Core\Validator\AnnotationValidator;
 
-trait Setter
+trait EntitySetter
 {
     use Parser;
 
@@ -52,7 +53,7 @@ trait Setter
     public function getSetters(): array
     {
         foreach (get_class_methods($this) as $method) {
-            if ($this->hasPropertyCorrespondingToMethod($method, TRUE))
+            if (AnnotationValidator::hasPropertyCorrespondingToMethod($method, TRUE))
                 $setters[] = $method;
         }
 

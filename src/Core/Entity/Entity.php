@@ -9,14 +9,12 @@ use TypeError;
 use Lea\Core\Type\Date;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Exception\InvalidDateFormatException;
-use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Type\Currency;
-use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Core\Type\DateTime;
 
 abstract class Entity implements EntityInterface
 {
-    use NamespaceProvider, Getter, Setter;
+    use NamespaceProvider, EntityGetter, EntitySetter;
     /**
      * @var int
      */
@@ -37,8 +35,6 @@ abstract class Entity implements EntityInterface
         if ($data !== NULL)
             $this->set($data);
     }
-
-
 
     public function getChildObjects(): iterable
     {
@@ -73,19 +69,6 @@ abstract class Entity implements EntityInterface
         }
 
         return $referenced ?? [];
-    }
-
-    public function hasPropertyCorrespondingToMethod(string $method_name, bool $is_setter = FALSE): bool
-    {
-        $prefix = substr($method_name, 0, 3);
-        $type = $is_setter ? 'set' : 'get';
-        if ($prefix != $type)
-            return FALSE;
-        $VarName = substr($method_name, 3);
-        $varName = lcfirst($VarName);
-        $var_name = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $varName));
-
-        return property_exists(get_called_class(), $var_name);
     }
 
     /**

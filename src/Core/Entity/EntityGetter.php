@@ -4,8 +4,9 @@ namespace Lea\Core\Entity;
 
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Reflection\ReflectionProperty;
+use Lea\Core\Validator\AnnotationValidator;
 
-trait Getter
+trait EntityGetter
 {
     use Parser;
 
@@ -69,7 +70,7 @@ trait Getter
     public function getGetters(): array
     {
         foreach (get_class_methods($this) as $method) {
-            if ($this->hasPropertyCorrespondingToMethod($method))
+            if (AnnotationValidator::hasPropertyCorrespondingToMethod($method))
                 $getters[] = $method;
         }
 

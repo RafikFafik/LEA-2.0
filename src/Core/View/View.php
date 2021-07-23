@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Lea\Core\View;
 
-use Lea\Core\Entity\Getter;
+use Lea\Core\Entity\EntityGetter;
+use Lea\Core\Entity\EntitySetter;
 use Lea\Core\Entity\NamespaceProvider;
-use Lea\Core\Entity\Setter;
 
 abstract class View
 {
-    use NamespaceProvider, Getter, Setter;
+    use NamespaceProvider, EntityGetter, EntitySetter;
 
     /**
      * @var int

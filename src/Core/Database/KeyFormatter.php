@@ -8,6 +8,7 @@ use Lea\Core\Type\Date;
 use Lea\Core\Type\Currency;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Type\DateTime;
+use Lea\Core\Validator\AnnotationValidator;
 
 final class KeyFormatter
 {
@@ -80,7 +81,7 @@ final class KeyFormatter
         /* TODO - Probably contains mistakes, include columns that are objects */
         $res = "";
         foreach (get_class_methods($object) as $method) {
-            if ($object->hasPropertyCorrespondingToMethod($method)) {
+            if (AnnotationValidator::hasPropertyCorrespondingToMethod($method)) {
                 $key = str_replace('get', '', $method);
                 $fld_Key = self::convertKeyToColumn($key);
                 $res .= $fld_Key . ", ";

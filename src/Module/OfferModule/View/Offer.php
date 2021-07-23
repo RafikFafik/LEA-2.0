@@ -10,32 +10,37 @@ class Offer extends View
 {
     /**
      * @from Offer
-     * @psalm-var
+     * @var string
      */
     private $title;
 
     /**
      * @from Offer
+     * @var Date
      */
     private $issue_date;
 
     /**
      * @from Offer
+     * @var Date
      */
     private $expiration_date;
 
     /**
      * @from Contractor
+     * @var string
      */
     private $fullname;
 
     /**
      * @from ContractorEmployee
+     * @var string
      */
     private $contact_person_name;
 
     /**
      * @from Offer
+     * @var int
      */
     private $price_netto;
 

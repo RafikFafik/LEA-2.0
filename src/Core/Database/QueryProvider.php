@@ -9,13 +9,13 @@ use Lea\Core\Reflection\ReflectionClass;
 final class QueryProvider
 {
     /**
-     * @var object
+     * @var string
      */
-    private $object;
+    private $tableName;
 
-    public function __construct(object $object)
+    public function __construct(string $tableName)
     {
-        $this->object = $object;
+        $this->tableName = $tableName;
     }
 
     public function getSelectRecordDataQuery(string $tableName, string $columns, $where_val = null, $where_column = "id"): string
@@ -36,13 +36,12 @@ final class QueryProvider
         return $query;
     }
 
-    public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null, $reflector = null): string
+    public function getQueryWithConstraints(object $object, string $columns, array $constraints, array $pagination = null, $reflector = null, $tableName): string
     {
         $constraints = $this->matchCurrencyFields($constraints, $reflector);
         if (isset($constraints['order']))
             unset($constraints['order']);
-        $table_name = KeyFormatter::getTableNameByObject($object);
-        $query = $this->getSelectRecordDataQuery($table_name, $columns, null, null);
+        $query = $this->getSelectRecordDataQuery($tableName, $columns, null, null);
         foreach ($constraints as $key => $val) {
             if (str_contains($key, "_IN") && $object->hasKey(substr($key, 0, strpos($key, "_IN")))) {
                 $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
@@ -179,7 +178,7 @@ final class QueryProvider
         $query = "";
         if ($object->hasKey($params['sortby']))
             $query .= ' ORDER BY ' . KeyFormatter::convertKeyToColumn($params['sortby']) . " " . $params['order'];
-        if($params['limit'])
+        if ($params['limit'])
             $query .= ' LIMIT ' . ($params['page'] * $params['limit']) . ', ' . $params['limit'];
 
         return $query;

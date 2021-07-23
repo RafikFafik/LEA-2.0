@@ -10,9 +10,9 @@ use Lea\Core\View\View;
 class Project extends View
 {
   /**
-   * @var int
+   * @var string
    */
-  private $contractor_id;
+  private $name;
 
   /**
    * @var int
@@ -22,53 +22,33 @@ class Project extends View
   /**
    * @var string
    */
-  private $description;
-
-  /**
-   * @var Date
-   */
-  private $issue_date;
-
-  /**
-   * @var Date
-   */
-  private $expiration_date;
-
-  /**
-   * @var string
-   */
   private $status;
 
   /**
    * @var string
    */
-  private $name;
+  private $description;
 
   /**
-   * @var int
-   */
-  private $worth;
-
-  /**
-   * Get the value of contractor_id
+   * Get the value of name
    *
-   * @return  int
+   * @return  string
    */ 
-  public function getContractorId()
+  public function getName()
   {
-    return $this->contractor_id;
+    return $this->name;
   }
 
   /**
-   * Set the value of contractor_id
+   * Set the value of name
    *
-   * @param  int  $contractor_id
+   * @param  string  $name
    *
    * @return  self
    */ 
-  public function setContractorId(int $contractor_id)
+  public function setName(string $name)
   {
-    $this->contractor_id = $contractor_id;
+    $this->name = $name;
 
     return $this;
   }
@@ -98,78 +78,6 @@ class Project extends View
   }
 
   /**
-   * Get the value of description
-   *
-   * @return  string
-   */ 
-  public function getDescription()
-  {
-    return $this->description;
-  }
-
-  /**
-   * Set the value of description
-   *
-   * @param  string  $description
-   *
-   * @return  self
-   */ 
-  public function setDescription(string $description)
-  {
-    $this->description = $description;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of issue_date
-   *
-   * @return  Date
-   */ 
-  public function getIssueDate()
-  {
-    return $this->issue_date;
-  }
-
-  /**
-   * Set the value of issue_date
-   *
-   * @param  Date  $issue_date
-   *
-   * @return  self
-   */ 
-  public function setIssueDate(Date $issue_date)
-  {
-    $this->issue_date = $issue_date;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of expiration_date
-   *
-   * @return  Date
-   */ 
-  public function getExpirationDate()
-  {
-    return $this->expiration_date;
-  }
-
-  /**
-   * Set the value of expiration_date
-   *
-   * @param  Date  $expiration_date
-   *
-   * @return  self
-   */ 
-  public function setExpirationDate(Date $expiration_date)
-  {
-    $this->expiration_date = $expiration_date;
-
-    return $this;
-  }
-
-  /**
    * Get the value of status
    *
    * @return  string
@@ -194,104 +102,25 @@ class Project extends View
   }
 
   /**
-   * Get the value of name
+   * Get the value of description
    *
    * @return  string
    */ 
-  public function getName()
+  public function getDescription()
   {
-    return $this->name;
+    return $this->description;
   }
 
   /**
-   * Set the value of name
+   * Set the value of description
    *
-   * @param  string  $name
+   * @param  string  $description
    *
    * @return  self
    */ 
-  public function setName(string $name)
+  public function setDescription(string $description)
   {
-    $this->name = $name;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of worth
-   *
-   * @return  int
-   */ 
-  public function getWorth()
-  {
-    return $this->worth;
-  }
-
-  /**
-   * Set the value of worth
-   *
-   * @param  int  $worth
-   *
-   * @return  self
-   */ 
-  public function setWorth(int $worth)
-  {
-    $this->worth = $worth;
-
-    return $this;
-  }
-
-  /**
-   * Get the value of project_files
-   *
-   * @return  iterable<ProjectFile>
-   */ 
-  public function getProjectFiles()
-  {
-    return $this->project_files;
-  }
-
-  /**
-   * Set the value of project_files
-   *
-   * @param  iterable<ProjectFile>  $project_files
-   *
-   * @return  self
-   */ 
-  public function setProjectFiles($project_files)
-  {
-    $this->project_files = $project_files;
-
-    return $this;
-  }
-
-  public function getCalendarEvents()
-  {
-    return $this->calendar_events;
-  }
-
-  /**
-   * Set the value of project_files
-   *
-   * @param  iterable<ProjectFile>  $project_files
-   *
-   * @return  self
-   */ 
-  public function setCalendarEvents($calendar_events)
-  {
-    $this->calendar_events = $calendar_events;
-
-    return $this;
-  }
-
-  public function getOffers()
-  {
-    return $this->offers;
-  }
-
-  public function setOffers($offers)
-  {
-    $this->offers = $offers;
+    $this->description = $description;
 
     return $this;
   }

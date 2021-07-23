@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Reflection\ReflectionClass;
+use Lea\Core\Validator\NamespaceValidator;
+use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
-use Lea\Core\Reflection\ReflectionProperty;
 
 abstract class DatabaseManager
 {
@@ -25,10 +26,10 @@ abstract class DatabaseManager
 
     protected function __construct(object $object, $user_id = null)
     {
-        $this->query_provider = new QueryProvider($object);
+        $this->tableName = NamespaceValidator::isViewEntity($object) ? KeyFormatter::getViewNameByClass($object->getClassName()) : KeyFormatter::getTableNameByObject($object);
+        $this->query_provider = new QueryProvider($this->tableName);
         $this->root_object = $object;
         $this->root_reflector = new ReflectionClass($object);
-        $this->tableName = KeyFormatter::getTableNameByObject($object);
         if ($user_id)
             $this->user_id = $user_id;
     }
@@ -89,10 +90,10 @@ abstract class DatabaseManager
 
     protected function getListDataByConstraints(object $object, $constraints = [], $pagination = null, $nested = true)
     {
-        $tableName = KeyFormatter::getTableNameByObject($object);
         $reflector = new ReflectionClass($object);
+        $tableName = NamespaceValidator::isViewEntity($object) ? KeyFormatter::getViewNameByClass($object->getClassName()) : KeyFormatter::getTableNameByObject($object);
         $columns = KeyFormatter::getTableColumnsByReflector($reflector);
-        $query = $this->query_provider->getQueryWithConstraints($object, $columns, $constraints, $pagination, $reflector);
+        $query = $this->query_provider->getQueryWithConstraints($object, $columns, $constraints, $pagination, $reflector, $tableName);
 
         $result = DatabaseConnection::executeQuery($query, $tableName, $columns, $object);
         if ($result) {
