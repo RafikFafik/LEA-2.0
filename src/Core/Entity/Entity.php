@@ -12,6 +12,7 @@ use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
 use Lea\Core\Type\Currency;
 use Lea\Core\Security\Service\AuthorizedUserService;
+use Lea\Core\Type\DateTime;
 
 trait Parser
 {
@@ -146,12 +147,18 @@ trait Setter
                     $val = AuthorizedUserService::getAuthorizedUserId();
                 else
                     $val = self::castVariable($data[$key], $property->getType2(), $key);
-                $this->$setValue($val);
+
+                $this->strictSet($setValue, $val, $property);
             }
         }
     }
 
-    
+    private function strictSet(string $setValue, $value, ReflectionPropertyExtended $property): void
+    {
+        // if($property->getType2() != gettype($value) && (!($property->getName() != 'id' || $property->getName() != 'active' || $property->getName() != 'deleted')))
+            // throw new TypeError($property->getName());
+        $this->$setValue($value);
+    }
 
     public function getSetters(): array
     {
@@ -318,6 +325,15 @@ abstract class Entity implements EntityInterface
                     throw new TypeError($key . " - expected string");
                 try {
                     $type = new Date($variable);
+                } catch (Exception $e) {
+                    throw new InvalidDateFormatException($key);
+                }
+                return $type;
+            case "DATETIME":
+                if (!is_string($variable))
+                    throw new TypeError($key . " - expected string");
+                try {
+                    $type = new DateTime($variable);
                 } catch (Exception $e) {
                     throw new InvalidDateFormatException($key);
                 }

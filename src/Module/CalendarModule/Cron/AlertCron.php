@@ -26,12 +26,17 @@ class AlertCron
                 if ($alert->getLaunchDateTime()->format('Y-m-d H:i') != date('Y-m-d H:i'))
                     continue;
 
+                $user = $user_repository->findById($event->getUserId());
+                $organizer = $user->getName() . ' ' . $user->getSurname();
                 foreach ($event->getEmployees() as $employee) {
                     $user = $user_repository->findById($employee->getUserId());
+                    $time_info = $event->getDateStart() . ' ' . $event->getTimeStart() . ' - ' . $event->getTimeEnd();
                     Mailer::sendMail(
                         $user->getEmail(),
-                        'Nadchodzące spotkanie',
-                        'Spotkanie ' . $event->getTitle() . ' rozpocznie się za ' . $alert->getTime() . ' minut'
+                        'Powiadomienie: ' .  $event->getTitle() . ' - ' . $time_info,
+                        '<p><strong>' . $event->getTitle() . '</strong><p>' .
+                            "<p>Kiedy: $time_info</p>" .
+                            "<p>Organizator: $organizer</p>"
                     );
                 }
                 Logger::save("Alert about event " . $event->getId() . ": " .  $event->getTitle() . " was sent");

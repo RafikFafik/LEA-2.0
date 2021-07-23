@@ -105,7 +105,7 @@ class Alert extends Entity
      * Get the value of launch_date_time
      *
      * @return  DateTime
-     */ 
+     */
     public function getLaunchDateTime()
     {
         return $this->launch_date_time;
@@ -117,8 +117,8 @@ class Alert extends Entity
      * @param  DateTime  $launch_date_time
      *
      * @return  self
-     */ 
-    public function setLaunchDateTime(DateTime $launch_date_time)
+     */
+    public function setLaunchDateTime(?DateTime $launch_date_time)
     {
         $this->launch_date_time = $launch_date_time;
 
