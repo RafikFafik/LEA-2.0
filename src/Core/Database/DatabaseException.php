@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
+use Lea\Core\Logger\Logger;
 use mysqli_sql_exception;
 use Lea\Core\Reflection\Reflection;
 use Lea\Core\Reflection\ReflectionPropertyExtended;
@@ -21,6 +22,7 @@ final class DatabaseException
     private const SQL_OUT_OF_RANGE = 1264;
     private const SQL_FOREIGN_KEY_CONSTRAINTS_FAIL = 1452;
     private const SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE = 1005;
+    private const SQL_DUPLICATE_COLUMN_NAME = 1060;
 
     public static function handleSqlException(mysqli_sql_exception $e, $connection, object $object, string $query, $parent_class = null)
     {
@@ -41,7 +43,7 @@ final class DatabaseException
                 $field = KeyFormatter::convertToKey($field);
                 Response::badRequest("Invalid value of field that has reference: " . $field);
             case self::SQL_INCORRECT_DATE_VALUE:
-                Response::internalServerError("Incorrect date value: " . $e->getCode() . "\n" . $e->getMessage());
+                Response::internalServerError($e->getMessage());
             case self::SQL_SYMTAMX_ERRORM:
                 Response::internalServerError("Symtamx error \n $query");
             case self::SQL_OUT_OF_RANGE:
@@ -50,6 +52,9 @@ final class DatabaseException
                 Response::badRequest("Passed value of ``" . $field . "`` out of range - Contact with Administrator to increase it");
             case self::SQL_CREATING_REFERENCE_TO_NON_EXISTING_TABLE:
                 return self::getCreateTableQueryRecursive($object);
+            case self::SQL_DUPLICATE_COLUMN_NAME:
+                Logger::save($e);
+                return Response::notImplemented("SQL_ExceptionNotImplemented");
             default:
                 Response::internalServerError("Error not handled yet: " . $e->getCode() . "\n" . $e->getMessage());
         }

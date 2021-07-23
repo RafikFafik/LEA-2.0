@@ -48,7 +48,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         }
     }
 
-    public function save(object &$object)
+    public function save(object &$object): int
     {
         $object->saveFiles();
         if ($object->hasId())
@@ -56,7 +56,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         else
             $id = $this->insertRecordData($object);
 
-        return $id;
+        return (int)$id;
     }
 
     public function findById(int $id)

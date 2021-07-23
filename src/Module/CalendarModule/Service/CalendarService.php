@@ -12,7 +12,7 @@ class CalendarService
     public function getDailyEvents(string $date, int $user_id): iterable
     {
         $repository = new CalendarEventRepository();
-        $list = $repository->findCalendarEventListByStartDate($date, $user_id);
+        $list = $repository->findCalendarEventListByStartDateAndUserId($date, $user_id);
         
         return $list;
     }

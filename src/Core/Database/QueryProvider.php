@@ -92,7 +92,7 @@ final class QueryProvider
                 continue;
             $columns .= KeyFormatter::convertKeyToColumn($var) . ', ';
 
-            if (gettype($value) == "string" || $property->getType2() == "Date")
+            if (gettype($value) == "string" || $property->getType2() == "Date" || $property->getType2() == "DateTime")
                 $value = "'" . $value . "'";
             elseif (gettype($value) == "boolean")
                 $value = (int)$value;
@@ -126,7 +126,7 @@ final class QueryProvider
                 continue;
             if ($value === NULL)
                 continue;
-            if (gettype($value) == "string" || $property->getType2() == "Date")
+            if (gettype($value) == "string" || $property->getType2() == "Date" || $property->getType2() == "DateTime")
                 $value = "'" . $value . "'";
             elseif (gettype($value) == "int" || $property->getType2() == "Currency")
                 $value = "'" . $value . "'";

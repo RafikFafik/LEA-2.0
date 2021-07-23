@@ -7,6 +7,7 @@ namespace Lea\Core\Database;
 use Lea\Core\Type\Date;
 use Lea\Core\Type\Currency;
 use Lea\Core\Reflection\Reflection;
+use Lea\Core\Type\DateTime;
 
 final class KeyFormatter
 {
@@ -170,6 +171,8 @@ final class KeyFormatter
                 break;
             case "DATE":
                 return new Date($variable);
+            case "DATETIME":
+                return new DateTime($variable);
             case "CURRENCY":
                 return new Currency($variable, true);
             default:

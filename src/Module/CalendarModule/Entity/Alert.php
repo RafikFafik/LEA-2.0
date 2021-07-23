@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Module\CalendarModule\Entity;
 
 use Lea\Core\Entity\Entity;
+use Lea\Core\Type\DateTime;
 
 class Alert extends Entity
 {
@@ -17,6 +18,11 @@ class Alert extends Entity
      * @var integer
      */
     private $time;
+
+    /**
+     * @var DateTime
+     */
+    private $launch_date_time;
 
     /**
      * @var integer
@@ -91,6 +97,30 @@ class Alert extends Entity
     public function setKind(string $kind)
     {
         $this->kind = $kind;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of launch_date_time
+     *
+     * @return  DateTime
+     */ 
+    public function getLaunchDateTime()
+    {
+        return $this->launch_date_time;
+    }
+
+    /**
+     * Set the value of launch_date_time
+     *
+     * @param  DateTime  $launch_date_time
+     *
+     * @return  self
+     */ 
+    public function setLaunchDateTime(DateTime $launch_date_time)
+    {
+        $this->launch_date_time = $launch_date_time;
 
         return $this;
     }

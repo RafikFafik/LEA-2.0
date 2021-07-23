@@ -79,7 +79,7 @@ trait Getter
                 }
             } else {
                 $type = $reflection->getType2();
-                $res[$key] = (($type == "Date" || $type =="Currency") && $val !== null) ? $val->__get() : $res[$key] = $val;
+                $res[$key] = (($type == "Date" || $type =="Currency" || $type =="DateTime") && $val !== null) ? $val->__get() : $res[$key] = $val;
             }
         }
         /* Get fields that are not in entity */

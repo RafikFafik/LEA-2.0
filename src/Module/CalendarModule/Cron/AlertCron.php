@@ -1,6 +1,6 @@
 <?php
 
-
+declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Cron;
 
@@ -9,34 +9,33 @@ use Lea\Core\Mailer\Mailer;
 use Lea\Core\Security\Repository\UserRepository;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
-class AlertCron {
+class AlertCron
+{
+    public static function sendAlerts()
+    {
+        $cer = new CalendarEventRepository();
+        $user_repository = new UserRepository();
 
-  public static function sendAlerts() {
-    $cer = new CalendarEventRepository();
-    $user_repository = new UserRepository();
-    
-    $events = $cer->findCalendarEventListByStartDate(date('Y-m-d'));
-    
-    foreach ($events as $event) {
-      foreach ($event->getAlerts() as $alert) {
-        if ($alert->getKind() != 'email') 
-        continue;
-        
-        if ($event->getTimeStart() != date('H:i', strtotime('+'.$alert->getTime().' minutes')))
-        continue;
-        
-        
-        foreach(array_merge($event->getEmployees(), [$event->getUserId()]) as $employee) {
-          $user = $user_repository->findById($employee);
-          Mailer::sendMail($user->getEmail(),
-          'Nadchodzące spotkanie',
-          'Spotkanie '. $event->getTitle() .' rozpocznie się za ' . $alert->getTime() . ' minut');
-          
-          
-          
+        $events = $cer->findTodayCalendarEventList();
+
+        foreach ($events as $event) {
+            foreach ($event->getAlerts() as $alert) {
+                if ($alert->getKind() != 'email' || $alert->getLaunchDateTime() === null)
+                    continue;
+
+                if ($alert->getLaunchDateTime()->format('Y-m-d H:i') != date('Y-m-d H:i'))
+                    continue;
+
+                foreach ($event->getEmployees() as $employee) {
+                    $user = $user_repository->findById($employee->getUserId());
+                    Mailer::sendMail(
+                        $user->getEmail(),
+                        'Nadchodzące spotkanie',
+                        'Spotkanie ' . $event->getTitle() . ' rozpocznie się za ' . $alert->getTime() . ' minut'
+                    );
+                }
+                Logger::save("Alert about event " . $event->getId() . ": " .  $event->getTitle() . " was sent");
+            }
         }
-      }
     }
-    Logger::save("Alert was sent");
-  }
 }

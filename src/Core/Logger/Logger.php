@@ -20,11 +20,11 @@ final class Logger
     {
         $headers = getallheaders();
         $req_dump = file_get_contents('php://input');
-        $fp = file_put_contents(__DIR__ . '/../../logs/' . $filename . '.log', "======================" . "\n", FILE_APPEND);
-        $fp = file_put_contents(__DIR__ . '/../../logs/' . $filename . '.log', date('Y-M-D H:i:s') . "\n", FILE_APPEND);
-        $fp = file_put_contents(__DIR__ . '/../../logs/' . $filename . '.log', json_encode($headers, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
-        $fp = file_put_contents(__DIR__ . '/../../logs/' . $filename . '.log', json_encode($_POST, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
-        $fp = file_put_contents(__DIR__ . '/../../logs/' . $filename . '.log', $req_dump . "\n", FILE_APPEND);
-        $fp = file_put_contents(__DIR__ . '/../../logs/' . $filename . '.log', "======================" . "\n", FILE_APPEND);
+        $fp = file_put_contents(__DIR__ . '/../../../logs/' . $filename . '.log', "======================" . "\n", FILE_APPEND);
+        $fp = file_put_contents(__DIR__ . '/../../../logs/' . $filename . '.log', date('Y-M-D H:i:s') . "\n", FILE_APPEND);
+        $fp = file_put_contents(__DIR__ . '/../../../logs/' . $filename . '.log', json_encode($headers, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
+        $fp = file_put_contents(__DIR__ . '/../../../logs/' . $filename . '.log', json_encode($_POST, JSON_PRETTY_PRINT) . "\n", FILE_APPEND);
+        $fp = file_put_contents(__DIR__ . '/../../../logs/' . $filename . '.log', $req_dump . "\n", FILE_APPEND);
+        $fp = file_put_contents(__DIR__ . '/../../../logs/' . $filename . '.log', "======================" . "\n", FILE_APPEND);
     }
 }
