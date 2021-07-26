@@ -104,6 +104,10 @@ class CalendarEvent extends Entity
      */
     private $employees;
 
+    /**
+     * @var iterable<CalendarEventFile>
+     */
+    private $calendar_event_files;
 
     /**
      * Get the value of type
@@ -521,6 +525,30 @@ class CalendarEvent extends Entity
     public function setProjectId(int $project_id)
     {
         $this->project_id = $project_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of calendar_event_files
+     *
+     * @return  iterable<CalendarEventFile>
+     */ 
+    public function getCalendarEventFiles()
+    {
+        return $this->calendar_event_files;
+    }
+
+    /**
+     * Set the value of calendar_event_files
+     *
+     * @param  iterable<CalendarEventFile>  $calendar_event_files
+     *
+     * @return  self
+     */ 
+    public function setCalendarEventFiles($calendar_event_files)
+    {
+        $this->calendar_event_files = $calendar_event_files;
 
         return $this;
     }
