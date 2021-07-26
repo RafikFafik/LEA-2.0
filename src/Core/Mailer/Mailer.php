@@ -22,7 +22,7 @@ class Mailer
     $mail->Port = $_ENV['MAIL_PORT'];
 
     // Recipients
-    $tenant = $_ENV['tenant'];
+    $tenant = $_ENV['TENANT'];
     $mail->setFrom(strtolower($tenant) . '@lea24.pl', $tenant);
     $mail->clearAddresses();
     $mail->addAddress($recipitient);
