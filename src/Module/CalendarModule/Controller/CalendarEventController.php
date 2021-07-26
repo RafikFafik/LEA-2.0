@@ -14,8 +14,6 @@ use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
 class CalendarEventController extends Controller implements ControllerInterface
 {
-    private $params;
-
     public function init(): void
     {
         switch ($this->request->method()) {
