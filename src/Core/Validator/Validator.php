@@ -70,7 +70,7 @@ class Validator implements ValidatorInterface
         if ($month < 10)
             $month = "0" . $month;
 
-        return $month;
+        return (string)$month;
     }
 
     public static function validateRegisterParams(array $params): void
