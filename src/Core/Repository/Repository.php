@@ -12,6 +12,11 @@ use Lea\Core\Security\Service\AuthorizedUserService;
 
 abstract class Repository extends DatabaseManager implements RepositoryInterface
 {
+    /**
+     * @var object
+     */
+    protected $object;
+
     public function __construct($is_view = false)
     {
         $this->object = $is_view ? $this->getViewInstance() :  $this->getObjectInstance();

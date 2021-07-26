@@ -8,8 +8,9 @@ use DateInterval;
 use Lea\Core\Type\DateTime;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Serializer\Converter;
-use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Repository\Repository;
+use Lea\Core\Type\DateTimeImmutable;
+use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Security\Service\AuthorizedUserService;
 
 final class CalendarEventRepository extends Repository
@@ -75,6 +76,16 @@ final class CalendarEventRepository extends Repository
             $constraints['id_IN'] = $ids;
         }
 
+        return $this->getListDataByConstraints($this->object, $constraints);
+    }
+    
+    public function findCalendarEventListByYearAndWeek(int $year, int $week): iterable
+    {
+        $date = new DateTimeImmutable();
+        $from = $date->setISODate($year, $week);
+        $to = $date->setISODate($year, $week, 7);
+        $constraints = ['date_start_>=' => $from, 'date_end_<=' => $to];
+        
         return $this->getListDataByConstraints($this->object, $constraints);
     }
 }

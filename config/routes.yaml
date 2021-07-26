@@ -93,8 +93,12 @@ CalendarModule:
             controller: "DailyScheduleController"
         monthly:
             url: "/calendar/monthly"
-            params: ["month", "year"]
+            params: ["month", "year", "user_id"]
             controller: "MonthlyScheduleController"
+        weekly:
+            url: "/calendar/weekly"
+            params: ["year", "week"]
+            controller: "WeeklyScheduleController"
         send-alerts:
             url: "/calendar/send-alert"
             controller: CalendarAlertController

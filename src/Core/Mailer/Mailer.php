@@ -22,7 +22,8 @@ class Mailer
     $mail->Port = $_ENV['MAIL_PORT'];
 
     // Recipients
-    $mail->setFrom('sempre@lea24.pl', 'Sempre');
+    $tenant = $_ENV['tenant'];
+    $mail->setFrom(strtolower($tenant) . '@lea24.pl', $tenant);
     $mail->clearAddresses();
     $mail->addAddress($recipitient);
 
