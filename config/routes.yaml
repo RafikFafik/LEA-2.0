@@ -30,7 +30,7 @@ ProductModule:
             url: "/products"
             controller: ProductCollectionController
             filters:
-                match: [product_name, product_model, unit_of_measure, producent]
+                match: [product_code, producent, unit_of_measure, product_model, product_name]
                 range: [price]
 
 ProjectModule:
