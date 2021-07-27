@@ -66,6 +66,8 @@ ContractorModule:
         collection:
             url: "/contractors"
             controller: ContractorCollectionController
+            filters:
+                match: [register_number, fullname, city, voivodeship, address, email, nip, guardian]
         library-administrative-division:
             url: "/contractors/libraries"
             controller: LibraryAdministrativeDivisionController

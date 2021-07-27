@@ -101,6 +101,11 @@ final class DatabaseException
 
     private static function getCreateTableQueryRecursive(object $object, string $parent_table = null): array
     {
+        if(str_contains($object->getNamespace(), "View")) {
+            $message = 'View not exists for: ' . $object->getNamespace();
+            Logger::save($message);
+            Response::notImplemented($message);
+        }
         $table_name = KeyFormatter::getTableNameByObject($object);
         $ddl = 'CREATE TABLE IF NOT EXISTS ' . $table_name . ' (';
         try {
@@ -156,7 +161,7 @@ final class DatabaseException
         return rtrim($columns, ", ");
     }
 
-    private static function parseReflectProperty(ReflectionProperty $property): string /* TODO - Change to ExtendedProperty */
+    private static function parseReflectProperty(ReflectionProperty $property): string
     {
         $comment = $property->getDocComment();
         /* TODO - DefaultValue */
