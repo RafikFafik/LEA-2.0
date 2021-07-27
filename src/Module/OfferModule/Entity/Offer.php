@@ -64,6 +64,31 @@ class Offer extends Entity
      */
     protected $offer_files;
 
+    /**
+     * @var Date
+     */
+    private $offer_validity_period;
+
+    /**
+     * @var Date
+     */
+    private $delivery_date;
+
+    /**
+     * @var string
+     */
+    private $warranty;
+
+    /**
+     * @var string
+     */
+    private $assembly;
+
+    /**
+     * @var string
+     */
+    private $transport;
+
 
     /**
      * Get the value of offer_number
@@ -323,6 +348,126 @@ class Offer extends Entity
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of offer_validity_period
+     *
+     * @return  Date
+     */ 
+    public function getOfferValidityPeriod()
+    {
+        return $this->offer_validity_period;
+    }
+
+    /**
+     * Set the value of offer_validity_period
+     *
+     * @param  Date  $offer_validity_period
+     *
+     * @return  self
+     */ 
+    public function setOfferValidityPeriod(Date $offer_validity_period)
+    {
+        $this->offer_validity_period = $offer_validity_period;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of delivery_date
+     *
+     * @return  Date
+     */ 
+    public function getDeliveryDate()
+    {
+        return $this->delivery_date;
+    }
+
+    /**
+     * Set the value of delivery_date
+     *
+     * @param  Date  $delivery_date
+     *
+     * @return  self
+     */ 
+    public function setDeliveryDate(Date $delivery_date)
+    {
+        $this->delivery_date = $delivery_date;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of warranty
+     *
+     * @return  string
+     */ 
+    public function getWarranty()
+    {
+        return $this->warranty;
+    }
+
+    /**
+     * Set the value of warranty
+     *
+     * @param  string  $warranty
+     *
+     * @return  self
+     */ 
+    public function setWarranty(string $warranty)
+    {
+        $this->warranty = $warranty;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of assembly
+     *
+     * @return  string
+     */ 
+    public function getAssembly()
+    {
+        return $this->assembly;
+    }
+
+    /**
+     * Set the value of assembly
+     *
+     * @param  string  $assembly
+     *
+     * @return  self
+     */ 
+    public function setAssembly(string $assembly)
+    {
+        $this->assembly = $assembly;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of transport
+     *
+     * @return  string
+     */ 
+    public function getTransport()
+    {
+        return $this->transport;
+    }
+
+    /**
+     * Set the value of transport
+     *
+     * @param  string  $transport
+     *
+     * @return  self
+     */ 
+    public function setTransport(string $transport)
+    {
+        $this->transport = $transport;
 
         return $this;
     }

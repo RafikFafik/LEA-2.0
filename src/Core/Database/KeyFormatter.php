@@ -81,7 +81,7 @@ final class KeyFormatter
         /* TODO - Probably contains mistakes, include columns that are objects */
         $res = "";
         foreach (get_class_methods($object) as $method) {
-            if (AnnotationValidator::hasPropertyCorrespondingToMethod($method)) {
+            if (AnnotationValidator::hasPropertyCorrespondingToMethod($object, $method)) {
                 $key = str_replace('get', '', $method);
                 $fld_Key = self::convertKeyToColumn($key);
                 $res .= $fld_Key . ", ";

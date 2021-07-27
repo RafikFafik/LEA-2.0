@@ -53,7 +53,7 @@ trait EntitySetter
     public function getSetters(): array
     {
         foreach (get_class_methods($this) as $method) {
-            if (AnnotationValidator::hasPropertyCorrespondingToMethod($method, TRUE))
+            if (AnnotationValidator::hasPropertyCorrespondingToMethod($this, $method, true))
                 $setters[] = $method;
         }
 

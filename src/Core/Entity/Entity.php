@@ -12,23 +12,14 @@ use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Type\Currency;
 use Lea\Core\Type\DateTime;
 
-abstract class Entity implements EntityInterface
+/** Generic Entity that contains all functionalities connected with  */
+abstract class Entity 
 {
-    use NamespaceProvider, EntityGetter, EntitySetter;
+    use Active, Deleted, NamespaceProvider, EntityGetter, EntitySetter;
     /**
      * @var int
      */
     protected $id;
-
-    /**
-     * @var bool
-     */
-    protected $active = 1;
-
-    /**
-     * @var bool
-     */
-    protected $deleted = 0;
 
     public function __construct(array $data = NULL)
     {
@@ -87,46 +78,6 @@ abstract class Entity implements EntityInterface
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of active
-     */
-    public function getActive()
-    {
-        return $this->active;
-    }
-
-    /**
-     * Set the value of active
-     *
-     * @return  self
-     */
-    public function setActive($active)
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of deleted
-     */
-    public function getDeleted()
-    {
-        return $this->deleted;
-    }
-
-    /**
-     * Set the value of deleted
-     *
-     * @return  self
-     */
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
 
         return $this;
     }

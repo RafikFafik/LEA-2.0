@@ -70,7 +70,7 @@ trait EntityGetter
     public function getGetters(): array
     {
         foreach (get_class_methods($this) as $method) {
-            if (AnnotationValidator::hasPropertyCorrespondingToMethod($method))
+            if (AnnotationValidator::hasPropertyCorrespondingToMethod($this, $method))
                 $getters[] = $method;
         }
 
