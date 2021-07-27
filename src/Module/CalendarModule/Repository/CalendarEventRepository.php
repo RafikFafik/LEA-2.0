@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Module\CalendarModule\Repository;
 
 use DateInterval;
+use Lea\Core\Database\QueryProvider;
 use Lea\Core\Type\DateTime;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Serializer\Converter;
@@ -12,6 +13,7 @@ use Lea\Core\Repository\Repository;
 use Lea\Core\Type\DateTimeImmutable;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Security\Service\AuthorizedUserService;
+use Lea\Module\CalendarModule\Entity\CalendarEventUser;
 
 final class CalendarEventRepository extends Repository
 {
@@ -76,6 +78,21 @@ final class CalendarEventRepository extends Repository
             $constraints['id_IN'] = $ids;
         }
 
+        return $this->getListDataByConstraints($this->object, $constraints);
+    }
+
+    public function findCalendarEventListByYearAndWeekAndUserId(int $year, int $week, $user_id): iterable
+    {
+        $query_provider = new QueryProvider("xd");
+        $date = new DateTimeImmutable();
+        $from = $date->setISODate($year, $week);
+        $to = $date->setISODate($year, $week, 7);
+        $constraints = [
+            'date_start_>=' => $from,
+            'date_end_<=' => $to,
+            'id_IN' => $query_provider->getSelectIdsQuery($this->object, 'user_id', $user_id)
+        ];
+        
         return $this->getListDataByConstraints($this->object, $constraints);
     }
     

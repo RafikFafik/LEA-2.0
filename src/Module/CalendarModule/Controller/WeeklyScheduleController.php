@@ -19,7 +19,7 @@ class WeeklyScheduleController extends Controller implements ControllerInterface
         switch ($this->request->method()) {
             case "GET":
                 $repository = new CalendarEventRepository();
-                $list = $repository->findCalendarEventListByYearAndWeek($this->params['year'], $this->params['week']);
+                $list = $repository->findCalendarEventListByYearAndWeekAndUserId($this->params['year'], $this->params['week'], $this->params['user_id']);
                 Response::ok(Normalizer::denormalizeList($list));
                 break;
             default:

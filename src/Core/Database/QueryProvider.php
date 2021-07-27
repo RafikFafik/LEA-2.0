@@ -183,4 +183,12 @@ final class QueryProvider
 
         return $query;
     }
+
+    public function getSelectIdsQuery(object $object, $where_column, $where_value): string
+    {
+        return 'SELECT `fld_Id` 
+                  FROM ' . KeyFormatter::getTableNameByObject($object) . 
+                ' WHERE ' . KeyFormatter::convertKeyToColumn($where_column) . ' = ' . $where_value .
+                ' AND `fld_Deleted` = 0 AND `fld_Active` = 1';
+    }
 }

@@ -63,6 +63,11 @@ ContractorModule:
             url: "/contractors/{id}"
             controller: ContractorController
             allow: [""]
+        activate:
+            url: "/contractors/{id}/activate"
+            controller: ContractorActivationController
+            allow: [""]
+
         collection:
             url: "/contractors"
             controller: ContractorCollectionController
@@ -99,7 +104,7 @@ CalendarModule:
             controller: "MonthlyScheduleController"
         weekly:
             url: "/calendar/weekly"
-            params: ["year", "week"]
+            params: ["year", "week", "user_id"]
             controller: "WeeklyScheduleController"
         send-alerts:
             url: "/calendar/send-alert"
