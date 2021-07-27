@@ -160,4 +160,28 @@ class Product extends View
 
     return $this;
   }
+
+  /**
+   * Get the value of price
+   *
+   * @return  Currency
+   */ 
+  public function getPrice()
+  {
+    return $this->price;
+  }
+
+  /**
+   * Set the value of price
+   *
+   * @param  Currency  $price
+   *
+   * @return  self
+   */ 
+  public function setPrice(Currency $price)
+  {
+    $this->price = $price;
+
+    return $this;
+  }
 }
