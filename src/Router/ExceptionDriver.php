@@ -69,24 +69,25 @@ abstract class ExceptionDriver
             Response::internalServerError($e->getMessage());
         } catch (TypeError $e) {
             Logger::save($e);
-            $NamespaceClass = $e->getTrace()[0]['class'];
-            $property = $e->getTrace()[0]['function'];
-            $property = self::pascalToSnake(str_replace("set", "", $property));
-            if (str_starts_with($property, "get")) {
-                Response::internalServerError("Getter failure of: " . str_replace("get_", "", $property));
-            }
-            $arg = $e->getTrace()[0]['args'][0];
-            try {
-                $reflector = new ReflectionProperty($NamespaceClass, $property);
-            } catch (Exception $f) {
-                Response::internalServerError("Reflector error");
-            }
-            $obj = new $NamespaceClass;
-            $Class = $obj->getClassName();
-            $message = "$property in $Class | ";
-            $message .= "Given: " . ($arg === null ? "null" : $arg);
-            $message .= ", Expected: " . $reflector->getType2();
-            Response::badRequest("Invalid typeof: " . $message);
+            // $NamespaceClass = $e->getTrace()[0]['class'];
+            // $property = $e->getTrace()[0]['function'];
+            // $property = self::pascalToSnake(str_replace("set", "", $property));
+            // if (str_starts_with($property, "get")) {
+            //     Response::internalServerError("Getter failure of: " . str_replace("get_", "", $property));
+            // }
+            // $arg = $e->getTrace()[0]['args'][0];
+            // try {
+            //     $reflector = new ReflectionProperty($NamespaceClass, $property);
+            // } catch (Exception $f) {
+            //     Response::internalServerError("Reflector error");
+            // }
+            // $obj = new $NamespaceClass;
+            // $Class = $obj->getClassName();
+            // $message = "$property in $Class | ";
+            // $message .= "Given: " . ($arg === null ? "null" : $arg);
+            // $message .= ", Expected: " . $reflector->getType2();
+            // Response::badRequest("Invalid typeof: " . $message);
+            Response::badRequest($e->getMessage());
         } catch (InvalidDateFormatException $e) {
             Response::badRequest("Invalid date format of: " . $e->getMessage());
         } catch (UserAlreadyAuthorizedException $e) {

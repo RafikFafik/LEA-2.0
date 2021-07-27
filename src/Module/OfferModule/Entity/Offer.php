@@ -393,7 +393,7 @@ class Offer extends Entity
      *
      * @return  self
      */ 
-    public function setDeliveryDate(Date $delivery_date)
+    public function setDeliveryDate(?Date $delivery_date)
     {
         $this->delivery_date = $delivery_date;
 
@@ -417,7 +417,7 @@ class Offer extends Entity
      *
      * @return  self
      */ 
-    public function setWarranty(string $warranty)
+    public function setWarranty(?string $warranty)
     {
         $this->warranty = $warranty;
 
@@ -441,7 +441,7 @@ class Offer extends Entity
      *
      * @return  self
      */ 
-    public function setAssembly(string $assembly)
+    public function setAssembly(?string $assembly)
     {
         $this->assembly = $assembly;
 
@@ -465,7 +465,7 @@ class Offer extends Entity
      *
      * @return  self
      */ 
-    public function setTransport(string $transport)
+    public function setTransport(?string $transport)
     {
         $this->transport = $transport;
 

@@ -102,7 +102,7 @@ abstract class Entity
                 break;
             case "DATE":
                 if (!is_string($variable))
-                    throw new TypeError($key . " - expected string");
+                    throw new TypeError($key . " - expected $type_to_cast");
                 try {
                     $type = new Date($variable);
                 } catch (Exception $e) {

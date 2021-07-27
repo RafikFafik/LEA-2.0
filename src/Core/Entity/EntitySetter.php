@@ -6,6 +6,7 @@ use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Core\Validator\AnnotationValidator;
+use TypeError;
 
 trait EntitySetter
 {
@@ -47,7 +48,12 @@ trait EntitySetter
     {
         // if($property->getType2() != gettype($value) && (!($property->getName() != 'id' || $property->getName() != 'active' || $property->getName() != 'deleted')))
         // throw new TypeError($property->getName());
-        $this->$setValue($value);
+        try {
+            $this->$setValue($value);
+        } catch(TypeError $e) {
+            $type = $property->getType2();
+            throw new TypeError($setValue . " - expected $type, got $value");
+        }
     }
 
     public function getSetters(): array
