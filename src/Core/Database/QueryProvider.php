@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lea\Core\Database;
 
 use Lea\Core\Reflection\ReflectionClass;
+use Lea\Core\Validator\NamespaceValidator;
 
 final class QueryProvider
 {
@@ -152,7 +153,7 @@ final class QueryProvider
 
     public function getCountQuery(object $object, $where_val = null, string $where_column = 'id'): string
     {
-        $table_name = KeyFormatter::getTableNameByObject($object);
+        $table_name = NamespaceValidator::isViewEntity($object) ? KeyFormatter::getViewNameByClass($object->getClassName()) : KeyFormatter::getTableNameByObject($object);
         $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE `fld_Deleted` = 0 AND `fld_Active` = 1';
         if ($where_val)
             $query .= ' AND ' . KeyFormatter::convertKeyToColumn($where_column) . ' = ' . $where_val;

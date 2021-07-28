@@ -81,7 +81,7 @@ final class CalendarEventRepository extends Repository
         return $this->getListDataByConstraints($this->object, $constraints);
     }
 
-    public function findCalendarEventListByYearAndWeekAndUserId(int $year, int $week, $user_id): iterable
+    public function findCalendarEventListByYearAndWeekAndUserId($year, $week, $user_id): iterable
     {
         $query_provider = new QueryProvider("xd");
         $date = new DateTimeImmutable();

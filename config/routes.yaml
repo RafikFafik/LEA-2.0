@@ -160,6 +160,10 @@ Security:
             controller: CommercialAdvisorController
             config: 
                 advisor-role-id: 5 # ID in DB
+        playground:
+            url: "/security/playground"
+            controller: ManualPushNotificationController
+            allow: [all]
 Gus:
     prefix: "/gus"
     endpoints:

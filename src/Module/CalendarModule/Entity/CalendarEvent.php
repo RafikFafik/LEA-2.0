@@ -109,6 +109,17 @@ class CalendarEvent extends Entity
      */
     private $calendar_event_files;
 
+
+    public function getUserIds(): array
+    {
+        foreach($this->employees as $employee) {
+            $ids[] = $employee->getUserId();
+        }
+
+        return $ids ?? [];
+    }
+
+
     /**
      * Get the value of type
      *
