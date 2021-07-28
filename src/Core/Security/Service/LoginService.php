@@ -10,7 +10,7 @@ use Lea\Core\Exception\InvalidCredentialsException;
 
 final class LoginService extends AuthenticationService implements ServiceInterface
 {
-    public function login(string $email, string $password): array
+    public function login(string $email, string $password, string $mobile_app_token = null): array
     {
         $repository = new UserRepository();
         $user = $repository->findByEmail($email);
@@ -29,6 +29,10 @@ final class LoginService extends AuthenticationService implements ServiceInterfa
                 NameDay::getNameDay()
             ]
         ];
+        if($mobile_app_token) {
+            $user->setMobileAppToken($mobile_app_token);
+            $repository->save($user);
+        }
 
         return $userdata;
     }

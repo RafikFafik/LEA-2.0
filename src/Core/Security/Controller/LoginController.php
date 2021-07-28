@@ -18,7 +18,7 @@ class LoginController extends Controller implements ControllerInterface
             case "POST":
                 try {
                     $auth = new LoginService;
-                    $userdata = $auth->login($this->request->payload['email'], $this->request->payload['password']);
+                    $userdata = $auth->login($this->request->payload['email'], $this->request->payload['password'], $this->request->payload['mobile_app_token'] ?? null);
                     Response::ok($userdata);
                 } catch (ResourceNotExistsException $e) {
                     Response::badRequest("Invalid credentials");

@@ -7,10 +7,12 @@ namespace Lea\Core\Entity;
 use Exception;
 use TypeError;
 use Lea\Core\Type\Date;
-use Lea\Core\Reflection\ReflectionClass;
-use Lea\Core\Exception\InvalidDateFormatException;
+use Lea\Core\Entity\Active;
 use Lea\Core\Type\Currency;
 use Lea\Core\Type\DateTime;
+use Lea\Core\Entity\Deleted;
+use Lea\Core\Reflection\ReflectionClass;
+use Lea\Core\Exception\InvalidDateFormatException;
 
 /** Generic Entity that contains all functionalities connected with  */
 abstract class Entity 

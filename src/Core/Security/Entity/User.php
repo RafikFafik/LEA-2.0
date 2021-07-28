@@ -45,6 +45,9 @@ class User extends Entity
      */
     private $phone;
 
+    /** @var string */
+    private $mobile_app_token;
+
     /**
      * Get the value of email
      *
@@ -209,6 +212,26 @@ class User extends Entity
     public function setPhone(string $phone)
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of mobile_app_token
+     */ 
+    public function getMobileAppToken()
+    {
+        return $this->mobile_app_token;
+    }
+
+    /**
+     * Set the value of mobile_app_token
+     *
+     * @return  self
+     */ 
+    public function setMobileAppToken(?string $mobile_app_token)
+    {
+        $this->mobile_app_token = $mobile_app_token;
 
         return $this;
     }
