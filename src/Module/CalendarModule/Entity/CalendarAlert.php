@@ -29,13 +29,13 @@ class CalendarAlert extends Entity
      */
     private $calendar_event_id;
 
-    /** @var bool */
-    private $sent = false;
+    // /** @var bool */
+    // private $sent = false;
 
-    public function hasBeenSent(): bool
-    {
-        return $this->sent;
-    }
+    // public function hasBeenSent(): bool
+    // {
+    //     return $this->sent;
+    // }
 
     /**
      * Get the value of time
