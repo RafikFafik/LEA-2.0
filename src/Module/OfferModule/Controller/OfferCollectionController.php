@@ -19,7 +19,11 @@ class OfferCollectionController extends Controller implements ControllerInterfac
         switch ($this->http_method) {
             case "GET":
                 $view = new ViewGenerator(new OfferRepository(true));
-                Response::ok($view->getView());
+                if (isset($this->params['state']))
+                    $result = $view->getView($this->params['state']);
+                else
+                    $result = $view->getView('active');
+                Response::ok($result);
                 // Response::ok($service->getView());
             case "POST":
                 $id = $service->saveOffer($this->request->getPayload());
