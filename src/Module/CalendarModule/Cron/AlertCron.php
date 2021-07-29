@@ -11,7 +11,7 @@ use Lea\Core\Exception\EmailNotSentException;
 use Lea\Core\PushNotification\PushNotification;
 use Lea\Core\Security\Repository\UserRepository;
 use Lea\Core\Exception\PushNotificationNotSentException;
-use Lea\Module\CalendarModule\Repository\AlertRepository;
+use Lea\Module\CalendarModule\Repository\CalendarAlertRepository;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 
@@ -22,8 +22,9 @@ class AlertCron
         $cer = new CalendarEventRepository();
         $user_repository = new UserRepository();
         $contractor_repository = new ContractorRepository();
-        $alert_repository = new AlertRepository();
-        $current_minute_alerts = $alert_repository->findNotSentListByLaunchDateTime(new DateTime());
+        $alert_repository = new CalendarAlertRepository();
+        // $current_minute_alerts = $alert_repository->findNotSentListByLaunchDateTime(new DateTime());
+        $current_minute_alerts = $alert_repository->findList();
 
         foreach ($current_minute_alerts as $alert) {
             if (!($alert->getKind() == 'email' || $alert->getKind() == 'push')) {
@@ -46,7 +47,7 @@ class AlertCron
             elseif ($alert->getKind() == 'push')
                 self::handlePushNotification($recipients, $subject, $body);
 
-            Logger::save("Alert about event " . $event->getId() . ": " .  $event->getTitle() . " was sent");
+            Logger::save("Alert about event " . $event->getId() . ": " .  $event->getTitle() . " was sent | Type : " . $alert->getKind());
         }
     }
 

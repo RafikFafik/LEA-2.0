@@ -7,7 +7,7 @@ namespace Lea\Module\CalendarModule\Repository;
 use Lea\Core\Repository\Repository;
 use Lea\Core\Type\DateTime;
 
-final class AlertRepository extends Repository
+final class CalendarAlertRepository extends Repository
 {
     public function findNotSentListByLaunchDateTime(DateTime $launch_date_time): iterable
     {

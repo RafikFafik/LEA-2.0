@@ -17,6 +17,7 @@ use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\InvalidCurrencyValueException;
+use Lea\Core\Exception\PushNotificationNotSentException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Core\Exception\ViewNotImplementedException;
 use Lea\Core\Logger\Logger;
@@ -104,6 +105,9 @@ abstract class ExceptionDriver
             Response::internalServerError("Invalid Currency Value: " . $e->getMessage());
         } catch (ViewNotImplementedException $e) {
             Response::notImplemented("View not available for: " . $e->getMessage());
+        } catch (PushNotificationNotSentException $e) {
+            Logger::save($e->getMessage());
+            Response::internalServerError($e->getMessage());
         } catch (Error $e) {
             Logger::save($e);
             Response::internalServerError($e->getMessage());

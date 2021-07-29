@@ -7,7 +7,7 @@ namespace Lea\Module\CalendarModule\Entity;
 use Lea\Core\Entity\Entity;
 use Lea\Core\Type\DateTime;
 
-class Alert extends Entity
+class CalendarAlert extends Entity
 {
     /**
      * @var string

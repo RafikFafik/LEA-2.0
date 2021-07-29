@@ -6,7 +6,7 @@ namespace Lea\Module\CalendarModule\Entity;
 
 use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
-use Lea\Module\CalendarModule\Entity\Alert;
+use Lea\Module\CalendarModule\Entity\CalendarAlert;
 
 /**
  * @dependency Lea\Module\CalendarModule\Entity\CalendarEventUser
@@ -94,7 +94,7 @@ class CalendarEvent extends Entity
     private $project_id;
 
     /**
-     * @var iterable<Alert>
+     * @var iterable<CalendarAlert>
      */
     private $alerts;
 
@@ -387,7 +387,7 @@ class CalendarEvent extends Entity
     /**
      * Get the value of alerts
      *
-     * @return  iterable<Alerts>
+     * @return  iterable<CalendarAlert>
      */
     public function getAlerts()
     {
@@ -397,7 +397,7 @@ class CalendarEvent extends Entity
     /**
      * Set the value of alerts
      *
-     * @param  iterable<Alerts>  $alerts
+     * @param  iterable<CalendarAlert>  $alerts
      *
      * @return  self
      */
