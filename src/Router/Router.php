@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Lea\Router;
 
-use DateTime;
 use ArrayIterator;
+use Lea\Core\QueryString\QueryString;
 use MultipleIterator;
 use Lea\Request\Request;
 use Lea\Response\Response;
@@ -16,63 +16,26 @@ final class Router extends ExceptionDriver
 {
     private $word_regex = "/{(\w+)}/";
     private $query_string_regex = "/\?(\w+)/";
+    private $module;
 
     function __construct()
     {
         $routes = Yaml::parseFile(__DIR__ . '/../../config/routes.yaml');
-        $request = new Request();
-        $module = $this->getEndpointByUrl($routes, $request->url());
-        $this->module = $module;
+        $this->url = (new Request())->url();
+        
+        $this->matchModule($routes, $request->url());
+        $this->matchEndpoint();
+        QueryString::init();
         $Controller = $this->getControllerNamespace($module['module_name'], $module['controller']);
-        $pagination = $this->getPaginationParams($module['params'] ?? []);
-        Request::setPaginationParams($pagination);
-        Request::setCustomParams($module['params']);
+
         if (isset($module['params']['filters'])) {
             $filters = $this->getFilterParams($module['params']['filters']);
-            Request::setFilterParams($filters);
+            QueryString::setFilterParams($filters);
         }
         if (isset($module['body-params']))
             Validator::validateBodyParams($module['body-params'], $request->getPayload());
         $this->instantiateController($Controller, $request, $module['params'], $module['allow'] ?? [], $module['config'] ?? []);
         $this->initializeController();
-    }
-
-    private function getPaginationParams(array $params): array
-    {
-        $pagination['order'] = isset($params['order']) && strtoupper($params['order']) == 'DESC' ? $params['order'] : "ASC";
-        $pagination['page'] = isset($params['page']) && $params['page'] > 0 ? $params['page'] - 1 : 0;
-        $pagination['limit'] = isset($params['limit']) && $params['limit'] > 0 ? $params['limit'] : null;
-        $pagination['sortby'] = isset($params['sortby']) ? $params['sortby'] : 'id';
-
-        return $pagination;
-    }
-
-    private function getFilterParams(array $filters): array
-    {
-        if(!isset($this->module['filters']))
-            return [];
-        $config = $this->module['filters'];
-        foreach ($filters as $key => $val) {
-            if (in_array($key, $config['match'])) {
-                $result[$key . '_LIKE'] = $val;
-            } elseif (in_array($key, $config['range']) && str_contains($val,  "-")) {
-                $tokens = explode("-", $val);
-                if (!empty($tokens[0])) {
-                    if ($date = DateTime::createFromFormat("d/m/Y", $tokens[0]))
-                        $result[$key . '_>='] = $date->format("Y-m-d");
-                    else
-                        $result[$key . '_>='] = $tokens[0];
-                }
-                if (!empty($tokens[1])) {
-                    if ($date = DateTime::createFromFormat("d/m/Y", $tokens[1]))
-                        $result[$key . '_<='] = $date->format("Y-m-d");
-                    else
-                        $result[$key . '_<='] = $tokens[1];
-                }
-            }
-        }
-
-        return $result ?? [];
     }
 
     private function getControllerNamespace($module_name, $class_name)
@@ -86,24 +49,25 @@ final class Router extends ExceptionDriver
         return $namespace;
     }
 
-    private function getEndpointByUrl(array $routes, string $url): array
+    private function matchModule(array $routes, string $url): void
     {
-        foreach ($routes as $module_name => $module) {
+        foreach ($routes as $module_name => $confs) {
             $prefix = "/" . explode("?", explode("/", $url)[1])[0];
-            if ($module['prefix'] == $prefix) {
-                $endpoint = $this->matchEndpoint($module, $url);
+            if ($confs['prefix'] == $prefix) {
+                $this->module = $confs;
+                return;
+                $endpoint = $this->matchEndpoint($confs, $url);
                 $endpoint['module_name'] = $module_name;
                 $endpoint['params'] = $this->getUrlParams($url, $endpoint['url'], $endpoint['params'] ?? null);
 
 
-                return $endpoint;
             }
         }
 
         Response::notFound();
     }
 
-    private function matchEndpoint(array $module, string $request_url): array
+    private function matchEndpoint(): array
     {
         /* Routing 2.0 */
         if ($index = strpos($request_url, "?"))
@@ -144,44 +108,7 @@ final class Router extends ExceptionDriver
                 $resource_params[str_replace(["{", "}"], "", $i[1])] = (int)$i[0];
         }
 
-        if ($index = strpos($request_url, "?")) {
-            $keyvals = explode("&", substr($request_url, $index + 1));
-            foreach ($keyvals as $keyval) {
-                if (!$index = strpos($keyval, "="))
-                    Response::badRequest("Incorrect parameter pair: $keyval");
-                $key = substr($keyval, 0, $index);
-                $val = substr($keyval, $index + 1);
-                $val_casted = (int)$val;
-                if ($key == 'filters')
-                    $query_string_params[$key] = $this->parseFilters($val);
-                elseif (strlen((string)$val_casted) == strlen($val))
-                    $query_string_params[$key] = $val_casted;
-                else
-                    $query_string_params[$key] = $val;
-            }
-            foreach ($required_params ?? [] as $param) {
-                if (!array_key_exists($param, $query_string_params))
-                    $not_delivered[] = $param;
-            }
-        } elseif ($required_params) {
-            Response::badRequest('Missed query string params: ' . json_encode($required_params));
-        }
-
-        if ($not_delivered ?? false)
-            Response::badRequest(['Missed query string params' => $not_delivered]);
-
         return array_merge($resource_params, $query_string_params ?? []);
-    }
-
-    private function parseFilters(string $filters): array
-    {
-        $filters = explode(",", $filters);
-        foreach ($filters as $pair) {
-            $keyval = urldecode($pair);
-            $keyval = explode("=", $keyval);
-            $result[$keyval[0]] = $keyval[1];
-        }
-        return $result;
     }
 
     private function getIteratorByUrlPair(string $request_url, string $config_url): ?MultipleIterator
