@@ -63,10 +63,12 @@ ContractorModule:
             url: "/contractors/{id}"
             controller: ContractorController
             allow: [""]
-        activate:
+        activation:
             url: "/contractors/{id}/activate"
             controller: ContractorActivationController
-            allow: [""]
+        deactivation:
+            url: "/contractors/{id}/deactivate"
+            controller: ContractorDeactivationController
 
         collection:
             url: "/contractors"

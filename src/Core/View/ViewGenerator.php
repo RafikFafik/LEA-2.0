@@ -25,9 +25,13 @@ final class ViewGenerator implements ViewInterface
         $this->pagination = Request::getPaginationParams();
     }
     
-    public function getView(): iterable
+    public function getView(string $state): iterable
     {
-        $list = $this->repository->findList();
+        if($state !== null && $state == 'inactive')
+            $list = $this->repository->findList(['active' => false]);
+        else
+            $list = $this->repository->findList();
+            
         $list = Normalizer::denormalizeList($list);
         $result['data'] = $list;
         $result['pagination'] = $this->getPaginationData();

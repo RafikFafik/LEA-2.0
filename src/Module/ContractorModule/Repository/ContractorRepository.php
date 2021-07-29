@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Lea\Module\ContractorModule\Repository;
 
-use Lea\Core\Exception\ResourceNotExistsException;
+use Lea\Request\Request;
 use Lea\Core\Repository\Repository;
 use Lea\Core\Security\Repository\UserRepository;
-use Lea\Request\Request;
+use Lea\Core\Exception\ResourceNotExistsException;
+use Lea\Core\Exception\ResourceAlreadyActiveException;
+use Lea\Core\Exception\ResourceAlreadyInactiveException;
 
 final class ContractorRepository extends Repository
 {
@@ -38,5 +40,25 @@ final class ContractorRepository extends Repository
         }
 
         return $list;
+    }
+
+    public function activate(int $id): void
+    {
+        $dbstate = $this->findById($id);
+        if((bool)$dbstate->getActive() === true)
+            throw new ResourceAlreadyActiveException($this->object->getClassName());
+        $this->object->setId($id);
+        $this->object->setActive(true);
+        $this->save($this->object);
+    }
+
+    public function deactivate(int $id): void
+    {
+        $dbstate = $this->findById($id);
+        if((bool)$dbstate->getActive() === false)
+            throw new ResourceAlreadyInactiveException($this->object->getClassName());
+        $this->object->setId($id);
+        $this->object->setActive(false);
+        $this->save($this->object);
     }
 }

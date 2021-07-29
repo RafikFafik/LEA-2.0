@@ -53,7 +53,10 @@ abstract class Controller implements ControllerInterface
                     $Repository = $this->getRepositoryClass();
                     $repository = new $Repository(true);
                     $view = new ViewGenerator($repository);
-                    $result = $view->getView();
+                    if (isset($this->params['state']))
+                        $result = $view->getView($this->params['state']);
+                    else
+                        $result = $view->getView('active');
                     Response::ok($result);
                 } else {
                     $Repository = $this->getRepositoryClass();
