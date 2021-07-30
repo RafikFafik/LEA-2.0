@@ -51,7 +51,7 @@ abstract class DatabaseManager
 
         $result = DatabaseConnection::executeQuery($query, $this->tableName, $columns, $this->root_object);
         if ($result->num_rows == 0)
-            throw new ResourceNotExistsException($this->root_object->getClassName());
+            throw new ResourceNotExistsException($this->root_object->getClassName() . ": $where_value");
 
         $row = mysqli_fetch_assoc($result);
         foreach ($row as $key => $val) {

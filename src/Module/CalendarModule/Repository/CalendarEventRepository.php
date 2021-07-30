@@ -6,6 +6,8 @@ namespace Lea\Module\CalendarModule\Repository;
 
 use DateInterval;
 use Lea\Core\Database\QueryProvider;
+use Lea\Core\Exception\ResourceAlreadyInactiveException;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Type\DateTime;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Serializer\Converter;
@@ -14,6 +16,10 @@ use Lea\Core\Type\DateTimeImmutable;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Module\CalendarModule\Entity\CalendarEventUser;
+use Lea\Module\ContractorModule\Entity\ContractorEmployee;
+use Lea\Module\ContractorModule\Repository\ContractorEmployeeRepository;
+use Lea\Module\ContractorModule\Repository\ContractorRepository;
+use Lea\Response\Response;
 
 final class CalendarEventRepository extends Repository
 {
@@ -77,8 +83,18 @@ final class CalendarEventRepository extends Repository
             $ids = Converter::getValuesFromObjectListByKey($objs, 'calendar_event_id');
             $constraints['id_IN'] = $ids;
         }
-        
-        return $this->getListDataByConstraints($this->object, $constraints);
+        $cr = new ContractorRepository();
+        $events = $this->getListDataByConstraints($this->object, $constraints);
+        foreach($events as $event) {
+            try {
+                $contractor = $cr->findById($event->getContractorId());
+                $event->contractor_name = $contractor->getShortname();
+            } catch(ResourceNotExistsException $e) {
+                $event->contractor_name = "";
+            }
+        }
+
+        return $events;
     }
 
     public function findCalendarEventListByYearAndWeekAndUserId($year, $week, $user_id): iterable
