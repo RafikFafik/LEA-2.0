@@ -36,11 +36,6 @@ class Contractor extends Entity
     private $advisor;
 
     /**
-     * @var string
-     */
-    private $register_number;
-
-    /**
      * @var iterable<Address>
      */
     private $addresses;
@@ -230,30 +225,6 @@ class Contractor extends Entity
     public function setAdvisor(int $advisor)
     {
         $this->advisor = $advisor;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of register_number
-     *
-     * @return  string
-     */ 
-    public function getRegisterNumber()
-    {
-        return $this->register_number;
-    }
-
-    /**
-     * Set the value of register_number
-     *
-     * @param  int  $register_number
-     *
-     * @return  self
-     */ 
-    public function setRegisterNumber(string $register_number)
-    {
-        $this->register_number = $register_number;
 
         return $this;
     }

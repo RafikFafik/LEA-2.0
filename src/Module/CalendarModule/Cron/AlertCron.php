@@ -23,8 +23,8 @@ class AlertCron
         $user_repository = new UserRepository();
         $contractor_repository = new ContractorRepository();
         $alert_repository = new CalendarAlertRepository();
-        // $current_minute_alerts = $alert_repository->findNotSentListByLaunchDateTime(new DateTime());
-        $current_minute_alerts = $alert_repository->findList();
+        $current_minute_alerts = $alert_repository->findNotSentListByLaunchDateTime(new DateTime());
+        // $current_minute_alerts = $alert_repository->findList();
 
         foreach ($current_minute_alerts as $alert) {
             if (!($alert->getKind() == 'email' || $alert->getKind() == 'push')) {

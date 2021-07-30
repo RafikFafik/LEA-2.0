@@ -50,6 +50,8 @@ final class ViewGenerator implements ViewInterface
     private function getPaginationData(): array
     {
         $count_data = $this->repository->findCountData();
+        if($count_data == 0)
+            $count_data = 1;
         $page = (int)$this->pagination['page'] + 1;
         if (!$this->pagination['limit'])
             $this->pagination['limit'] = $count_data;
