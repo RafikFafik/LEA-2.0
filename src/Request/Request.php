@@ -111,4 +111,40 @@ final class Request
                 $this->payload[$key] = $val;
         }
     }
+
+    public static function setPaginationParams(array $params): void
+    {
+        if (self::$pagination !== null)
+            Response::internalServerError("Redefining of pagination params is not allowed");
+        self::$pagination = $params;
+    }
+
+    public static function getPaginationParams(): array
+    {
+        return self::$pagination;
+    }
+
+    public static function setFilterParams(array $filters): void
+    {
+        if (self::$filters !== null)
+            Response::internalServerError("Redefining of pagination params is not allowed");
+        self::$filters = $filters;
+    }
+
+    public static function getFilterParams(): array
+    {
+        return self::$filters ?? [];
+    }
+
+    public static function setCustomParams(array $params): void
+    {
+        if (self::$custom_params !== null)
+            Response::internalServerError("Redefining of custom params is not allowed");
+        self::$custom_params = $params;
+    }
+
+    public static function getCustomParams(): array
+    {
+        return self::$custom_params;
+    }
 }
