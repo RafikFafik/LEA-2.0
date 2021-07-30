@@ -77,7 +77,7 @@ final class CalendarEventRepository extends Repository
             $ids = Converter::getValuesFromObjectListByKey($objs, 'calendar_event_id');
             $constraints['id_IN'] = $ids;
         }
-
+        
         return $this->getListDataByConstraints($this->object, $constraints);
     }
 
@@ -87,10 +87,13 @@ final class CalendarEventRepository extends Repository
         $date = new DateTimeImmutable();
         $from = $date->setISODate($year, $week);
         $to = $date->setISODate($year, $week, 7);
+        $objs = $this->getListDataByConstraints(new CalendarEventUser, ['user_id' => $user_id]);
+        $ids = Converter::getValuesFromObjectListByKey($objs, 'calendar_event_id');
         $constraints = [
             'date_start_>=' => $from,
             'date_end_<=' => $to,
-            'id_IN' => $query_provider->getSelectIdsQuery($this->object, 'user_id', $user_id)
+            // 'id_IN' => $query_provider->getSelectIdsQuery($this->object, 'user_id', $user_id)
+            'id_IN' => $ids
         ];
         
         return $this->getListDataByConstraints($this->object, $constraints);
