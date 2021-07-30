@@ -60,20 +60,6 @@ class CalendarEvent extends Entity
     private $time_end;
 
     /**
-     * @var bool
-     */
-    private $periodicity;
-    /**
-     * @var string
-     */
-    private $periodicity_value;
-
-    /**
-     * @var string
-     */
-    private $location;
-
-    /**
      * @var string
      */
     private $description;
@@ -260,78 +246,6 @@ class CalendarEvent extends Entity
     public function setTimeStart(string $time_start)
     {
         $this->time_start = $time_start;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of periodicity
-     *
-     * @return  bool
-     */
-    public function getPeriodicity()
-    {
-        return $this->periodicity;
-    }
-
-    /**
-     * Set the value of periodicity
-     *
-     * @param  bool  $periodicity
-     *
-     * @return  self
-     */
-    public function setPeriodicity($periodicity)
-    {
-        $this->periodicity = $periodicity;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of periodicity_value
-     *
-     * @return  string
-     */
-    public function getPeriodicityValue()
-    {
-        return $this->periodicity_value;
-    }
-
-    /**
-     * Set the value of periodicity_value
-     *
-     * @param  string  $periodicity_value
-     *
-     * @return  self
-     */
-    public function setPeriodicityValue(string $periodicity_value)
-    {
-        $this->periodicity_value = $periodicity_value;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of location
-     *
-     * @return  string
-     */
-    public function getLocation()
-    {
-        return $this->location;
-    }
-
-    /**
-     * Set the value of location
-     *
-     * @param  string  $location
-     *
-     * @return  self
-     */
-    public function setLocation($location)
-    {
-        $this->location = $location;
 
         return $this;
     }

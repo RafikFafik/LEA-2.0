@@ -6,7 +6,6 @@ namespace Lea\Module\CalendarModule\Repository;
 
 use DateInterval;
 use Lea\Core\Database\QueryProvider;
-use Lea\Core\Exception\ResourceAlreadyInactiveException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Type\DateTime;
 use Lea\Core\Validator\Validator;
@@ -16,10 +15,7 @@ use Lea\Core\Type\DateTimeImmutable;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Module\CalendarModule\Entity\CalendarEventUser;
-use Lea\Module\ContractorModule\Entity\ContractorEmployee;
-use Lea\Module\ContractorModule\Repository\ContractorEmployeeRepository;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
-use Lea\Response\Response;
 
 final class CalendarEventRepository extends Repository
 {
