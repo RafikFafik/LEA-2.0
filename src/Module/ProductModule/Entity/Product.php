@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Module\ProductModule\Entity;
 
-use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
 use Lea\Core\Type\Currency;
 
@@ -13,12 +12,12 @@ class Product extends Entity
   /**
    * @var string
    */
-  private $product_name;
+  private $name;
 
   /**
    * @var string
    */
-  private $product_model;
+  private $model;
 
   /**
    * @var string
@@ -28,7 +27,7 @@ class Product extends Entity
   /**
    * @var Currency
    */
-  private $price;
+  private $net_price;
 
   /**
    * @var int
@@ -38,17 +37,17 @@ class Product extends Entity
   /**
    * @var string
    */
-  private $producent;
+  private $producer;
 
   /**
    * @var string
    */
-  private $product_code;
+  private $code;
 
   /**
    * @var string
    */
-  private $product_categories;
+  private $categories;
 
   /**
    * @var string
@@ -63,16 +62,16 @@ class Product extends Entity
   /**
    * @var iterable<ProductFile>
    */
-  private $product_files;
+  private $files;
 
   /**
    * Get the value of product_name
    *
    * @return  string
    */ 
-  public function getProductName()
+  public function getName()
   {
-    return $this->product_name;
+    return $this->name;
   }
 
   /**
@@ -82,9 +81,9 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setProductName(string $product_name)
+  public function setName(string $name)
   {
-    $this->product_name = $product_name;
+    $this->name = $name;
 
     return $this;
   }
@@ -94,9 +93,9 @@ class Product extends Entity
    *
    * @return  string
    */ 
-  public function getProductModel()
+  public function getModel()
   {
-    return $this->product_model;
+    return $this->model;
   }
 
   /**
@@ -106,9 +105,9 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setProductModel(string $product_model)
+  public function setModel(string $model)
   {
-    $this->product_model = $product_model;
+    $this->model = $model;
 
     return $this;
   }
@@ -142,9 +141,9 @@ class Product extends Entity
    *
    * @return  string
    */ 
-  public function getProducent()
+  public function getProducer()
   {
-    return $this->producent;
+    return $this->producer;
   }
 
   /**
@@ -154,9 +153,9 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setProducent(string $producent)
+  public function setProducer(string $producer)
   {
-    $this->producent = $producent;
+    $this->producer = $producer;
 
     return $this;
   }
@@ -166,9 +165,9 @@ class Product extends Entity
    *
    * @return  string
    */ 
-  public function getProductCode()
+  public function getCode()
   {
-    return $this->product_code;
+    return $this->code;
   }
 
   /**
@@ -178,9 +177,9 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setProductCode(string $product_code)
+  public function setCode(string $code)
   {
-    $this->product_code = $product_code;
+    $this->code = $code;
 
     return $this;
   }
@@ -190,9 +189,9 @@ class Product extends Entity
    *
    * @return  string
    */ 
-  public function getProductCategories()
+  public function getCategories()
   {
-    return $this->product_categories;
+    return $this->categories;
   }
 
   /**
@@ -202,9 +201,9 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setProductCategories(string $product_categories)
+  public function setCategories(string $categories)
   {
-    $this->product_categories = $product_categories;
+    $this->categories = $categories;
 
     return $this;
   }
@@ -262,9 +261,9 @@ class Product extends Entity
    *
    * @return  iterable<ProductFile>
    */ 
-  public function getProductFiles()
+  public function getFiles()
   {
-    return $this->product_files;
+    return $this->files;
   }
 
   /**
@@ -274,9 +273,9 @@ class Product extends Entity
    *
    * @return  self
    */ 
-  public function setProductFiles($product_files)
+  public function setFiles($files)
   {
-    $this->product_files = $product_files;
+    $this->files = $files;
 
     return $this;
   }
@@ -325,6 +324,30 @@ public function setPrice(Currency $price)
   public function setVatRate(int $vat_rate)
   {
     $this->vat_rate = $vat_rate;
+
+    return $this;
+  }
+
+  /**
+   * Get the value of net_price
+   *
+   * @return  Currency
+   */ 
+  public function getNetPrice()
+  {
+    return $this->net_price;
+  }
+
+  /**
+   * Set the value of net_price
+   *
+   * @param  Currency  $net_price
+   *
+   * @return  self
+   */ 
+  public function setNetPrice(Currency $net_price)
+  {
+    $this->net_price = $net_price;
 
     return $this;
   }

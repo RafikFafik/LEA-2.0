@@ -36,9 +36,9 @@ class ProductOfferService extends Service
         $net_sum = 0;
         $gross_sum = 0;
         foreach ($products as $product) {
-            $price = $product->getNetPrice();
+            $net_price = $product->getUnitNetPrice();
             $tax = $product->getVatRate();
-            $net = $price->__get();
+            $net = $net_price->__get();
             $net_sum += $net;
             $gross_sum += ($net * ($tax / 100)) + $net;
         }

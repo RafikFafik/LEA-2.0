@@ -13,12 +13,12 @@ class Product extends View
   /**
    * @var string
    */
-  private $product_name;
+  private $name;
 
   /**
    * @var string
    */
-  private $product_model;
+  private $model;
 
   /**
    * @var string
@@ -28,63 +28,63 @@ class Product extends View
   /**
    * @var Currency
    */
-  private $price;
+  private $net_price;
 
   /**
    * @var string
    */
-  private $producent;
+  private $producer;
 
   /**
    * @var string
    */
-  private $product_code;
+  private $code;
   
 
   /**
-   * Get the value of product_name
+   * Get the value of name
    *
    * @return  string
    */ 
-  public function getProductName()
+  public function getName()
   {
-    return $this->product_name;
+    return $this->name;
   }
 
   /**
-   * Set the value of product_name
+   * Set the value of name
    *
-   * @param  string  $product_name
+   * @param  string  $name
    *
    * @return  self
    */ 
-  public function setProductName(string $product_name)
+  public function setName(string $name)
   {
-    $this->product_name = $product_name;
+    $this->name = $name;
 
     return $this;
   }
 
   /**
-   * Get the value of product_model
+   * Get the value of model
    *
    * @return  string
    */ 
-  public function getProductModel()
+  public function getModel()
   {
-    return $this->product_model;
+    return $this->model;
   }
 
   /**
-   * Set the value of product_model
+   * Set the value of model
    *
-   * @param  string  $product_model
+   * @param  string  $model
    *
    * @return  self
    */ 
-  public function setProductModel(string $product_model)
+  public function setModel(string $model)
   {
-    $this->product_model = $product_model;
+    $this->model = $model;
 
     return $this;
   }
@@ -114,73 +114,73 @@ class Product extends View
   }
 
   /**
-   * Get the value of producent
+   * Get the value of producer
    *
    * @return  string
    */ 
-  public function getProducent()
+  public function getProducer()
   {
-    return $this->producent;
+    return $this->producer;
   }
 
   /**
-   * Set the value of producent
+   * Set the value of producer
    *
-   * @param  string  $producent
+   * @param  string  $producer
    *
    * @return  self
    */ 
-  public function setProducent(string $producent)
+  public function setProducer(string $producer)
   {
-    $this->producent = $producent;
+    $this->producer = $producer;
 
     return $this;
   }
 
   /**
-   * Get the value of product_code
+   * Get the value of code
    *
    * @return  string
    */ 
-  public function getProductCode()
+  public function getCode()
   {
-    return $this->product_code;
+    return $this->code;
   }
 
   /**
-   * Set the value of product_code
+   * Set the value of code
    *
-   * @param  string  $product_code
+   * @param  string  $code
    *
    * @return  self
    */ 
-  public function setProductCode(string $product_code)
+  public function setCode(string $code)
   {
-    $this->product_code = $product_code;
+    $this->code = $code;
 
     return $this;
   }
 
   /**
-   * Get the value of price
+   * Get the value of net_price
    *
    * @return  Currency
    */ 
-  public function getPrice()
+  public function getNetPrice()
   {
-    return $this->price;
+    return $this->net_price;
   }
 
   /**
-   * Set the value of price
+   * Set the value of net_price
    *
-   * @param  Currency  $price
+   * @param  Currency  $net_price
    *
    * @return  self
    */ 
-  public function setPrice(Currency $price)
+  public function setNetPrice(Currency $net_price)
   {
-    $this->price = $price;
+    $this->net_price = $net_price;
 
     return $this;
   }

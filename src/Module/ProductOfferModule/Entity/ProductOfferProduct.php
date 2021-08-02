@@ -42,6 +42,12 @@ class ProductOfferProduct extends Entity
     /** @var Currency */
     private $sum_gross_price;
 
+    /** @var int */
+    private $product_offer_id;
+
+    /** @var int */
+    private $product_id;
+
 
     /**
      * Get the value of name
@@ -259,6 +265,46 @@ class ProductOfferProduct extends Entity
     public function setSumGrossPrice(Currency $sum_gross_price)
     {
         $this->sum_gross_price = $sum_gross_price;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of product_offer_id
+     */ 
+    public function getProductOfferId()
+    {
+        return $this->product_offer_id;
+    }
+
+    /**
+     * Set the value of product_offer_id
+     *
+     * @return  self
+     */ 
+    public function setProductOfferId(int $product_offer_id)
+    {
+        $this->product_offer_id = $product_offer_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of product_id
+     */ 
+    public function getProductId()
+    {
+        return $this->product_id;
+    }
+
+    /**
+     * Set the value of product_id
+     *
+     * @return  self
+     */ 
+    public function setProductId(?int $product_id)
+    {
+        $this->product_id = $product_id;
 
         return $this;
     }
