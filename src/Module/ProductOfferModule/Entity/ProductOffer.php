@@ -286,7 +286,7 @@ class ProductOffer extends Entity
    *
    * @return  self
    */ 
-  public function setProjectId(int $project_id)
+  public function setProjectId(?int $project_id)
   {
     $this->project_id = $project_id;
 
@@ -320,7 +320,7 @@ class ProductOffer extends Entity
    *
    * @return  int
    */ 
-  public function getCalc_mode()
+  public function getCalcMode()
   {
     return $this->calc_mode;
   }
@@ -332,7 +332,7 @@ class ProductOffer extends Entity
    *
    * @return  self
    */ 
-  public function setCalc_mode(int $calc_mode)
+  public function setCalcMode(int $calc_mode)
   {
     $this->calc_mode = $calc_mode;
 
