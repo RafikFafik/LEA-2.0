@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lea\Module\CalendarModule\Service;
 
-use Lea\Core\Type\Date;
 use Lea\Core\Serializer\Normalizer;
 use Lea\Module\CalendarModule\Repository\CalendarEventRepository;
 

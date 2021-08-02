@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Lea\Module\CalendarModule\Repository;
 
 use DateInterval;
-use Lea\Core\Database\QueryProvider;
-use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Type\DateTime;
+use Lea\Core\Type\DateImmutable;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Serializer\Converter;
 use Lea\Core\Repository\Repository;
+use Lea\Core\Database\QueryProvider;
 use Lea\Core\Type\DateTimeImmutable;
 use Lea\Core\Reflection\ReflectionClass;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Module\CalendarModule\Entity\CalendarEventUser;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
@@ -96,7 +97,7 @@ final class CalendarEventRepository extends Repository
     public function findCalendarEventListByYearAndWeekAndUserId($year, $week, $user_id): iterable
     {
         $query_provider = new QueryProvider("xd");
-        $date = new DateTimeImmutable();
+        $date = new DateTimeImmutable('today');
         $from = $date->setISODate($year, $week);
         $to = $date->setISODate($year, $week, 7);
         $objs = $this->getListDataByConstraints(new CalendarEventUser, ['user_id' => $user_id]);
