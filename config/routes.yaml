@@ -128,6 +128,7 @@ Security:
         login:
             url: "/security/login"
             controller: LoginController
+            body-params: [email, password]
             allow: ['all']
         register:
             url: "/security/register"
