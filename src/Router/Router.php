@@ -157,7 +157,7 @@ final class Router extends ExceptionDriver
                 elseif (strlen((string)$val_casted) == strlen($val))
                     $query_string_params[$key] = $val_casted;
                 else
-                    $query_string_params[$key] = $val;
+                    $query_string_params[$key] = urldecode($val);
             }
             foreach ($required_params ?? [] as $param) {
                 if (!array_key_exists($param, $query_string_params))
