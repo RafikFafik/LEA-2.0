@@ -160,7 +160,7 @@ class ProductOffer extends Entity
   /**
    * Get the value of state
    *
-   * @return  string
+   * @return  int
    */ 
   public function getState()
   {
@@ -172,9 +172,9 @@ class ProductOffer extends Entity
    *
    * @param  string  $state
    *
-   * @return  self
+   * @return  int
    */ 
-  public function setState(string $state)
+  public function setState(int $state)
   {
     $this->state = $state;
 

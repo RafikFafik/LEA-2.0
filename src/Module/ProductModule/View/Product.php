@@ -23,7 +23,7 @@ class Product extends View
   /**
    * @var string
    */
-  private $unit_of_measure;
+  private $unit;
 
   /**
    * @var Currency
@@ -90,25 +90,25 @@ class Product extends View
   }
 
   /**
-   * Get the value of unit_of_measure
+   * Get the value of unit
    *
    * @return  string
    */ 
-  public function getUnitOfMeasure()
+  public function getUnit()
   {
-    return $this->unit_of_measure;
+    return $this->unit;
   }
 
   /**
-   * Set the value of unit_of_measure
+   * Set the value of unit
    *
-   * @param  string  $unit_of_measure
+   * @param  string  $unit
    *
    * @return  self
    */ 
-  public function setUnitOfMeasure(string $unit_of_measure)
+  public function setUnit(string $unit)
   {
-    $this->unit_of_measure = $unit_of_measure;
+    $this->unit = $unit;
 
     return $this;
   }
