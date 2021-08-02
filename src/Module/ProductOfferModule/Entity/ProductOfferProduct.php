@@ -132,7 +132,7 @@ class ProductOfferProduct extends Entity
     /**
      * Get the value of unit_gross_price
      */ 
-    public function getUnit_gross_price()
+    public function getUnitGrossPrice()
     {
         return $this->unit_gross_price;
     }
