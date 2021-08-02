@@ -61,4 +61,9 @@ final class ContractorRepository extends Repository
         $this->object->setActive(false);
         $this->save($this->object);
     }
+
+    public function shortnameIsUnique(string $shorname): bool
+    {
+        return $this->isUnique(['shortname' => $shorname]);
+    }
 }

@@ -77,7 +77,7 @@ final class Request
 
     private function parseRequestPayload(): void
     {
-        if (strtoupper($this->server['REQUEST_METHOD']) == "GET") {
+        if (strtoupper($this->server['REQUEST_METHOD']) == "GET" || !isset($_SERVER['CONTENT_TYPE'])) {
             $this->payload = null;
             return;
         }

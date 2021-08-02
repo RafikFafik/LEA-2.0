@@ -7,6 +7,7 @@ namespace Lea\Core\Repository;
 use Error;
 use Lea\Request\Request;
 use Lea\Core\Database\DatabaseManager;
+use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\ViewNotImplementedException;
 use Lea\Core\Security\Service\AuthorizedUserService;
 
@@ -114,5 +115,16 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         $result = $this->getCountData();
 
         return $result;
+    }
+
+    public function isUnique($constraints): bool
+    {
+        try {
+            $this->getRecordData($constraints[array_key_first($constraints)], array_key_first($constraints));
+        } catch(ResourceNotExistsException $e) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -85,6 +85,10 @@ ContractorModule:
         projects:
             url: "/contractors/{id}/projects"
             controller: ContractorProjectController
+        unique:
+            url: "/contractors/unique"
+            controller: ContractorUniqueController
+
 
 CalendarModule:
     prefix: "/calendar"
