@@ -53,9 +53,9 @@ final class Router extends ExceptionDriver
             return [];
         $config = $this->module['filters'];
         foreach ($filters as $key => $val) {
-            if (in_array($key, $config['match'])) {
+            if (isset($config['match']) && in_array($key, $config['match'])) {
                 $result[$key . '_LIKE'] = $val;
-            } elseif (in_array($key, $config['range']) && str_contains($val,  "-")) {
+            } elseif (isset($config['range']) && in_array($key, $config['range']) && str_contains($val,  "-")) {
                 $tokens = explode("-", $val);
                 if (!empty($tokens[0])) {
                     if ($date = DateTime::createFromFormat("d/m/Y", $tokens[0]))

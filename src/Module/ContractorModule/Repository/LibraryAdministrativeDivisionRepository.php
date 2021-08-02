@@ -10,8 +10,6 @@ final class LibraryAdministrativeDivisionRepository extends Repository
 {
     public function findByPostcode(string $postcode): object
     {
-        $object = $this->getRecordData($postcode, 'postcode');
-
-        return $object;
+        return $this->getRecordData($postcode, 'postcode');
     }
 }

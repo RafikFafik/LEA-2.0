@@ -37,15 +37,17 @@ class AlertCron
             $organizer = $user->getName() . ' ' . $user->getSurname();
             $contractor = $contractor_repository->findById($event->getContractorId());
             $time_info = $event->getDateStart() . ' ' . $event->getTimeStart() . ' - ' . $event->getTimeEnd();
-            $subject = self::getSubject($event->getTitle(), $time_info);
-            $body = self::getBody($event->getTitle(), $time_info, $organizer, $contractor->getFullname());
+            $subject = self::getSubject($event->getTitle());
             $users = $user_repository->findListByIds($event->getUserIds());
             $recipients = self::getRecipients($users, $alert->getKind());
 
-            if ($alert->getKind() == 'email')
+            if ($alert->getKind() == 'email') {
+                $body = self::getMailBody($event->getTitle(), $time_info, $organizer, $contractor->getShortname());
                 self::handleEmail($recipients, $subject, $body);
-            elseif ($alert->getKind() == 'push')
+            } elseif ($alert->getKind() == 'push') {
+                $body = self::getPushNotificationBody($event->getTitle(), $time_info, $organizer, $contractor->getShortname());
                 self::handlePushNotification($recipients, $subject, $body);
+            }
 
             Logger::save("Alert about event " . $event->getId() . ": " .  $event->getTitle() . " was sent | Type : " . $alert->getKind());
         }
@@ -78,9 +80,9 @@ class AlertCron
         }
     }
 
-    private static function getSubject(string $title, $time_info): string
+    private static function getSubject(string $title): string
     {
-        return "Powiadomienie: $title - $time_info";
+        return "Powiadomienie: $title";
     }
 
     private static function getBody(string $title, $time_info, string $organizer, string $contractor): string
@@ -89,5 +91,41 @@ class AlertCron
             "<p>Kiedy: $time_info</p>" .
             "<p>Kontrahent: $contractor</p>" .
             "<p>Organizator: $organizer</p>";
+    }
+
+    private static function getPushNotificationBody(string $title, $time_info, string $organizer, string $contractor): string
+    {
+        return "\n" .
+            $title . "\n" .
+            'Kiedy: ' . $time_info . "\n" .
+            'Kontrahent: ' . $contractor . "\n" .
+            'Organizator: ' . $organizer;
+    }
+
+    private static function getMailBody(string $title, $time_info, string $organizer, string $contractor): string
+    {
+        return
+            '
+        <body style="background-color: rgb(17, 17, 17);">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Antic">
+            <table style="color: aliceblue;background-color: rgb(31, 31, 31); border: 1px solid rgb(192, 173, 173); width: 30rem; font-family: Antic; padding: 1.5rem; margin-left: auto; margin-right: auto; margin-top: 3rem;">
+                <tr">
+                    <td style="font-size: 1.5rem; padding: 10px;">' . $title . '</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;">Kiedy: </td>
+                    <td>' . $time_info . '</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;">Kontrahent: </td>
+                    <td>' . $contractor . '</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;">Organizator: </td>
+                    <td>' . $organizer . '</td>
+                </tr>
+            </table>
+        </body>
+        ';
     }
 }
