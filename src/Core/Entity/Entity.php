@@ -103,7 +103,7 @@ abstract class Entity
                 return filter_var($variable, FILTER_VALIDATE_BOOLEAN);
                 break;
             case "DATE":
-                if (!is_string($variable))
+                if (!is_string($variable) || strlen($variable) == 0)
                     throw new TypeError($key . " - expected $type_to_cast");
                 try {
                     $type = new Date($variable);
