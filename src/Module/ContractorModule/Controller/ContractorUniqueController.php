@@ -18,7 +18,7 @@ class ContractorUniqueController extends Controller implements ControllerInterfa
                 $repository = new ContractorRepository();
                 if(!isset($this->params['shortname']))
                     Response::badRequest("Missed `shortname` query string param");
-                Response::ok(['is_unique' => $repository->shortnameIsUnique($this->params['shortname'])]);
+                Response::ok(['is_unique' => $repository->shortnameIsUnique((string)$this->params['shortname'])]);
                 break;
             default:
                 Response::methodNotAllowed();

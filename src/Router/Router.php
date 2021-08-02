@@ -151,11 +151,10 @@ final class Router extends ExceptionDriver
                     Response::badRequest("Incorrect parameter pair: $keyval");
                 $key = substr($keyval, 0, $index);
                 $val = substr($keyval, $index + 1);
-                $val_casted = (int)$val;
                 if ($key == 'filters')
                     $query_string_params[$key] = $this->parseFilters($val);
-                elseif (strlen((string)$val_casted) == strlen($val))
-                    $query_string_params[$key] = $val_casted;
+                elseif (is_numeric($val))
+                    $query_string_params[$key] = (int)$val;
                 else
                     $query_string_params[$key] = urldecode($val);
             }
