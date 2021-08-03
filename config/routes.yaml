@@ -82,6 +82,8 @@ ContractorModule:
         nutshell:
             url: "/contractors/nutshell"
             controller: ContractorNutshellCollectionController
+            filters:
+                match: ['shortname']
         projects:
             url: "/contractors/{id}/projects"
             controller: ContractorProjectController

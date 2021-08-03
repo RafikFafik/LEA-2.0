@@ -18,8 +18,8 @@ class ContractorNutshellCollectionController extends Controller implements Contr
             case "GET":
                 $repository = new ContractorRepository;
                 $nested = isset($this->params['nested']) && filter_var($this->params['nested'], FILTER_VALIDATE_BOOLEAN);
-                $list = $repository->findList([], $nested);
-                $needles = ['fullname', 'employees', 'name', 'surname', 'id'];
+                $list = $repository->findList(['active' => true], $nested);
+                $needles = ['shortname', 'employees', 'name', 'surname', 'id'];
                 $result = Normalizer::denormalizeSpecificFieldsList($list, $needles);
                 // $result = Normalizer::filterSpecificFieldsFromArrayList($result, ['id', 'shortname']);
                 // $result = Normalizer::mapKeyOfArrayList();
