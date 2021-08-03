@@ -6,6 +6,7 @@ use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Security\Service\AuthorizedUserService;
 use Lea\Core\Validator\AnnotationValidator;
+use Lea\Core\Validator\TypeValidator;
 use TypeError;
 
 trait EntitySetter
@@ -37,7 +38,7 @@ trait EntitySetter
                 if ($setValue == 'setUserId' && !isset($data[$key]))
                     $val = AuthorizedUserService::getAuthorizedUserId();
                 else
-                    $val = self::castVariable($data[$key], $property->getType2(), $key);
+                    $val = TypeValidator::getTypedValue($data[$key], $property, TypeValidator::CLIENT);
 
                 $this->strictSet($setValue, $val, $property);
             }
@@ -50,7 +51,7 @@ trait EntitySetter
         // throw new TypeError($property->getName());
         try {
             $this->$setValue($value);
-        } catch(TypeError $e) {
+        } catch (TypeError $e) {
             $type = $property->getType2();
             throw new TypeError($setValue . " - expected $type, got $value");
         }

@@ -155,28 +155,4 @@ final class KeyFormatter
 
         return $keys ?? [];
     }
-
-    /**
-     * @throws \Exception
-     */
-    public static function castVariable($variable, string $type_to_cast)
-    {
-        switch (strtoupper($type_to_cast)) {
-            case "INT":
-                return (int)$variable;
-                break;
-            case "BOOL":
-                return (bool)$variable;
-                break;
-            case "DATE":
-                return new Date($variable);
-            case "DATETIME":
-                return new DateTime($variable);
-            case "CURRENCY":
-                return new Currency($variable, true);
-            default:
-                return $variable;
-                break;
-        }
-    }
 }

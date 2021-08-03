@@ -9,6 +9,7 @@ use Lea\Core\Validator\NamespaceValidator;
 use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
+use Lea\Core\Validator\TypeValidator;
 
 abstract class DatabaseManager
 {
@@ -63,8 +64,7 @@ abstract class DatabaseManager
             if (method_exists($this->root_object, $setVal) && $property->isObject()) {
                 $children[] = $setVal;
             } elseif (method_exists($this->root_object, $setVal)) {
-                $type = $property->getType2();
-                $this->root_object->$setVal(KeyFormatter::castVariable($val, $type));
+                $this->root_object->$setVal(TypeValidator::getTypedValue($val, $property, TypeValidator::DATABASE));
             }
         }
         if ($is_nested)
@@ -109,8 +109,7 @@ abstract class DatabaseManager
                     if (method_exists($object, $setVal) && $property->isObject() && $nested) {
                         $children[] = $setVal; /* TODO - Nested Objects */
                     } elseif (method_exists($object, $setVal)) {
-                        $type = $property->getType2();
-                        $object->$setVal(KeyFormatter::castVariable($val, $type));
+                        $object->$setVal(TypeValidator::getTypedValue($val, $property, TypeValidator::DATABASE));
                     }
                 }
                 if ($nested) {

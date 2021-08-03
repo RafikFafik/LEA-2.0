@@ -6,6 +6,7 @@ namespace Lea\Module\ProductOfferModule\Entity;
 
 use Lea\Core\Type\Date;
 use Lea\Core\Entity\Entity;
+use Lea\Core\Type\Currency;
 
 class ProductOffer extends Entity
 {
@@ -50,6 +51,13 @@ class ProductOffer extends Entity
 
   /** @var int */
   private $calc_mode;
+
+  /** @var Currency */
+  private $net_sum;
+
+  /** @var Currency */
+  private $gross_sum;
+
 
   /**
    * @var iterable<ProductOfferFile>
@@ -359,6 +367,46 @@ class ProductOffer extends Entity
   public function setOfferFiles($offer_files)
   {
     $this->offer_files = $offer_files;
+
+    return $this;
+  }
+
+  /**
+   * Get the value of net_sum
+   */ 
+  public function getNetSum()
+  {
+    return $this->net_sum;
+  }
+
+  /**
+   * Set the value of net_sum
+   *
+   * @return  self
+   */ 
+  public function setNetSum(Currency $net_sum)
+  {
+    $this->net_sum = $net_sum;
+
+    return $this;
+  }
+
+  /**
+   * Get the value of gross_sum
+   */ 
+  public function getGrossSum()
+  {
+    return $this->gross_sum;
+  }
+
+  /**
+   * Set the value of gross_sum
+   *
+   * @return  self
+   */ 
+  public function setGrossSum(Currency $gross_sum)
+  {
+    $this->gross_sum = $gross_sum;
 
     return $this;
   }

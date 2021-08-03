@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Lea\Module\ProductOfferModule\Service;
 
+use Lea\Core\Type\Currency;
 use Lea\Core\Service\Service;
-use Lea\Core\Serializer\Normalizer;
 use Lea\Core\View\ViewGenerator;
+use Lea\Core\Serializer\Normalizer;
+use Lea\Core\Validator\TypeValidator;
 use Lea\Module\ContractorModule\Repository\ContractorRepository;
 
 class ProductOfferService extends Service
@@ -18,8 +20,8 @@ class ProductOfferService extends Service
         foreach ($list as $obj) {
             $sums = $this->getProductsSums($obj->getProducts());
             $contractor = $contractor_repository->findById($obj->getContractorId());
-            $obj->net_sum = $sums['net_sum'];
-            $obj->gross_sum = $sums['gross_sum'];
+            $obj->setNetSum(new Currency($sums['net_sum'], TypeValidator::DATABASE));
+            $obj->setGrossSum(new Currency($sums['gross_sum'], TypeValidator::DATABASE));
             $obj->contractor_fullname = $contractor->getFullName();
         }
 

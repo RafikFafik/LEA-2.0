@@ -89,45 +89,6 @@ abstract class Entity
         return (bool)$this->id;
     }
 
-
-    /**
-     * @throws InvalidDateFormatException
-     */
-    protected static function castVariable($variable, string $type_to_cast, $key)
-    {
-        switch (strtoupper($type_to_cast)) {
-            case "INT":
-                return (int)$variable;
-                break;
-            case "BOOL":
-                return filter_var($variable, FILTER_VALIDATE_BOOLEAN);
-                break;
-            case "DATE":
-                if (!is_string($variable) || strlen($variable) == 0)
-                    throw new TypeError($key . " - expected $type_to_cast");
-                try {
-                    $type = new Date($variable);
-                } catch (Exception $e) {
-                    throw new InvalidDateFormatException($key);
-                }
-                return $type;
-            case "DATETIME":
-                if (!is_string($variable))
-                    throw new TypeError($key . " - expected string");
-                try {
-                    $type = new DateTime($variable);
-                } catch (Exception $e) {
-                    throw new InvalidDateFormatException($key);
-                }
-                return $type;
-            case "CURRENCY":
-                return new Currency($variable, false);
-            default:
-                return $variable;
-                break;
-        }
-    }
-
     public function saveFiles(): void
     {
         foreach ($this->getChildObjects() as $children) {
