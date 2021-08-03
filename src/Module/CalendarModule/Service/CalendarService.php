@@ -65,7 +65,8 @@ class CalendarService
                 "day_name" => self::DAY_L10N[$i],
                 "day_number" => $day->format("d"),
                 "month" => self::MONTH_L10N[$day->format('n') - self::SHIFT_MONTH_INDEX],
-                "year" => $day->format('Y')
+                "year" => $day->format('Y'),
+                "date" => $day->format('d/m/Y')
             ];
             $weekdays[$i]["events"] = [];
         }
