@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Lea\Core\Validator;
 
 use DateTime;
-use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Response\Response;
 use Lea\Core\Security\Repository\RoleRepository;
+use Lea\Core\Exception\InvalidParameterException;
+use Lea\Core\Exception\ResourceNotExistsException;
 
 class Validator implements ValidatorInterface
 {
+    const INTEGER_HAYSTACK = ['week', 'year', 'user_id'];
+
     public static function validateParams(array $params)
     {
         foreach ($params as $key => $val) {
@@ -27,6 +30,9 @@ class Validator implements ValidatorInterface
                 if (!$is_correct) {
                     Response::badRequest("Invalid postode format - expected [xx-xxx]");
                 }
+            } elseif(in_array($key, self::INTEGER_HAYSTACK)) {
+                if(!is_numeric($val))
+                    throw new InvalidParameterException(json_encode([$key => $val]));
             }
         }
     }

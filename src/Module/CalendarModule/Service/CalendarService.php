@@ -53,6 +53,7 @@ class CalendarService
     public function getWeekInfo($year, $week): array
     {
         $date = new DateTimeImmutable('today');
+        /* TODO - Implement localisation from lib */
         // $polishDateFormatter = new IntlDateFormatter(
         //     'pl_PL',
         //     IntlDateFormatter::LONG,

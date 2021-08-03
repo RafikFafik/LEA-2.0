@@ -17,6 +17,7 @@ use Lea\Core\Exception\InvalidDateFormatException;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\InvalidCurrencyValueException;
+use Lea\Core\Exception\InvalidParameterException;
 use Lea\Core\Exception\PushNotificationNotSentException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Core\Exception\ViewNotImplementedException;
@@ -33,19 +34,21 @@ abstract class ExceptionDriver
     {
         try {
             $this->controller = new $Controller($request, $params, $allow ?? [], $config);
+        } catch (InvalidParameterException $e) {
+            Response::badRequest("Wrong parameter format: " . $e->getMessage());
         } catch (Error $e) {
             $message = $e->getMessage();
             if (str_contains($message, "Call to undefined method"))
                 Response::internalServerError("Something went wrong - contact with Administrator");
-            elseif (str_contains($message, "Call to undefined method"))
+                elseif (str_contains($message, "Call to undefined method"))
                 Response::internalServerError("Controller not found - contact with Administrator");
-            elseif (str_contains($message, "syntax error"))
+                elseif (str_contains($message, "syntax error"))
                 Response::internalServerError("Symtamx Errorm in: " . $Controller);
             elseif (str_contains($message, "not found"))
-                Response::notImplemented($Controller);
+            Response::notImplemented($Controller);
             else
                 Response::internalServerError("Something went wrong - contact with Administrator");
-        }
+            }
     }
 
     protected function initializeController(): void
@@ -78,7 +81,7 @@ abstract class ExceptionDriver
             // }
             // $arg = $e->getTrace()[0]['args'][0];
             // try {
-            //     $reflector = new ReflectionProperty($NamespaceClass, $property);
+                //     $reflector = new ReflectionProperty($NamespaceClass, $property);
             // } catch (Exception $f) {
             //     Response::internalServerError("Reflector error");
             // }
@@ -93,6 +96,8 @@ abstract class ExceptionDriver
             Response::badRequest("Invalid date format of: " . $e->getMessage());
         } catch (UserAlreadyAuthorizedException $e) {
             Response::internalServerError("Re-setting user during one connection");
+        } catch (InvalidParameterException $e) {
+            Response::badRequest("Wrong parameter format: " . $e->getMessage());
         } catch (ResourceNotExistsException $e) {
             Response::badRequest("Tried to reach resource that not exists: " . $e->getMessage());
         } catch (FileNotExistsException $e) {
