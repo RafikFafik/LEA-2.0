@@ -204,23 +204,33 @@ abstract class DatabaseManager
         DatabaseConnection::executeQuery($query, $tableName, $columns, $object);
     }
 
-    private function checkExistingReferences(object $object_to_check, $id): void
+    /** Not finished - do not use */
+    private function checkExistingReferences(object $needle, $id): void
     {
-           
-    }
-
-    private static function getEntityClasses(object $object, $id): ?string
-    {
-        $needle = $object->getClassName();
-        // $needle = KeyFormatter::processSnakeToPascal($needle);
+        $needle = $needle->getClassName();
+        $entity_id = KeyFormatter::convertParentClassToForeignKey($needle);
         $classes = get_declared_classes();
+        $i = 0;
         foreach ($classes as $registered_class) {
-            if (!str_contains($registered_class, "Entity"))
+            echo $registered_class . "<br>\n";
+            continue;
+            $i++;
+            if (
+                !str_contains($registered_class, "Entity") ||
+                str_starts_with($registered_class, "DOM") ||
+                ($reflector = new ReflectionClass($registered_class))->isAbstract()
+            ) {
                 continue;
+            }
             $checked_object = new $registered_class;
-            // if($checked_object->hasKey($))
+            if ($checked_object->hasKey($entity_id) || $reflector->hasProperty(KeyFormatter::processPascalToSnake($needle) . 's'))
+                $this->updateProtection(
+                    $checked_object,
+                    $id,
+                    $entity_id,
+                    KeyFormatter::getTableNameByObject($checked_object),
+                    KeyFormatter::getTableColumnsByObject($checked_object)
+                );
         }
-
-        return null;
     }
 }
