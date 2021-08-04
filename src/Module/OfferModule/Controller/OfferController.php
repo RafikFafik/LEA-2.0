@@ -20,6 +20,7 @@ class OfferController extends Controller implements ControllerInterface
                 $result = $service->getOfferById($this->params['id']);
                 Response::ok($result);
             case "POST":
+            case "PUT":
                 $this->updateResource($this->repository);
                 break;
             case "DELETE":

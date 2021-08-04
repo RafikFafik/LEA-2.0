@@ -107,7 +107,7 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
 
     public function removeById(int $id): void
     {
-        $this->removeRecordData($this->object, $id);
+        $this->removeRecordData($this->object, ['id' => $id]);
     }
 
     public function findCountData(): int

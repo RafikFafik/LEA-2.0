@@ -43,6 +43,17 @@ final class QueryProvider
         if (isset($constraints['order']))
             unset($constraints['order']);
         $query = $this->getSelectRecordDataQuery($tableName, $columns, null, null);
+        $query .= $this->processConstraints($object, $constraints);
+        if ($pagination) {
+            $query .= $this->getPaginationQueryConstraints($object, $pagination);
+        }
+
+        return $query;
+    }
+
+    private function processConstraints($object, $constraints): string
+    {
+        $query = "";
         foreach ($constraints as $key => $val) {
             if (str_contains($key, "_IN") && $object->hasKey(substr($key, 0, strpos($key, "_IN")))) {
                 $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_IN"))) . " IN ('" . join("','", $val) . "')";
@@ -54,6 +65,10 @@ final class QueryProvider
                 $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_<="))) . " <= '" . $val . "'";
             } elseif (str_contains($key, "_>=") && $object->hasKey(substr($key, 0, strpos($key, "_>=")))) {
                 $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_>="))) . " >= '" . $val . "'";
+            } elseif (str_contains($key, "_NULL") && $object->hasKey(substr($key, 0, strpos($key, "_NULL")))) {
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_NULL"))) . " IS NULL";
+            } elseif (str_contains($key, "_NOTNULL") && $object->hasKey(substr($key, 0, strpos($key, "_NOTNULL")))) {
+                $query .= " AND " . KeyFormatter::convertKeyToColumn(substr($key, 0, strpos($key, "_NOTNULL"))) . " IS NOT NULL";
             } elseif ($key == "filters" && is_array($val)) {
                 foreach ($val as $k => $v) {
                     $query .= " AND " . KeyFormatter::convertKeyToColumn($k) . " LIKE '%" . $v . "%'";
@@ -61,9 +76,6 @@ final class QueryProvider
             } elseif ($object->hasKey($key)) {
                 $query .= " AND " . KeyFormatter::convertKeyToColumn($key) . "='" . $val . "'";
             }
-        }
-        if ($pagination) {
-            $query .= $this->getPaginationQueryConstraints($object, $pagination);
         }
 
         return $query;
@@ -151,12 +163,12 @@ final class QueryProvider
         return $query;
     }
 
-    public function getCountQuery(object $object, $where_val = null, string $where_column = 'id'): string
+    public function getCountQuery(object $object, array $constraints = null): string
     {
         $table_name = NamespaceValidator::isViewEntity($object) ? KeyFormatter::getViewNameByClass($object->getClassName()) : KeyFormatter::getTableNameByObject($object);
         $query = 'SELECT COUNT(*) AS `count` FROM ' . $table_name . ' WHERE `fld_Deleted` = 0';
-        if ($where_val)
-            $query .= ' AND ' . KeyFormatter::convertKeyToColumn($where_column) . ' = ' . $where_val;
+        if ($constraints)
+            $query .= $this->processConstraints($object, $constraints);
 
         return $query;
     }

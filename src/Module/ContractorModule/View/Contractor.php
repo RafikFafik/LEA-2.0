@@ -10,10 +10,17 @@ class Contractor extends View
 {
     /**
      * @from Contractor
-     * @property $shortname
+     * @property $fullname
      * @var string
      */
     private $fullname;
+    
+    /**
+     * @from Contractor
+     * @property $shortname
+     * @var string
+     */
+    private $shortname;
     
     /**
      * @from Contractor
@@ -217,6 +224,30 @@ class Contractor extends View
     public function setGuardian($guardian)
     {
         $this->guardian = $guardian;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of shortname
+     *
+     * @return  string
+     */ 
+    public function getShortname()
+    {
+        return $this->shortname;
+    }
+
+    /**
+     * Set the value of shortname
+     *
+     * @param  string  $shortname
+     *
+     * @return  self
+     */ 
+    public function setShortname(string $shortname)
+    {
+        $this->shortname = $shortname;
 
         return $this;
     }

@@ -74,7 +74,7 @@ ContractorModule:
             url: "/contractors"
             controller: ContractorCollectionController
             filters:
-                match: [id, fullname, city, voivodeship, address, email, nip, guardian]
+                match: [id, fullname, shortname, city, voivodeship, address, email, nip, guardian]
         library-administrative-division:
             url: "/contractors/libraries"
             controller: LibraryAdministrativeDivisionController

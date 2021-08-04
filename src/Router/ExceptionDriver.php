@@ -19,6 +19,7 @@ use Lea\Core\Exception\UpdatingNotExistingResource;
 use Lea\Core\Exception\InvalidCurrencyValueException;
 use Lea\Core\Exception\InvalidParameterException;
 use Lea\Core\Exception\PushNotificationNotSentException;
+use Lea\Core\Exception\RemovingResourceThatHasReferenceException;
 use Lea\Core\Exception\UserAlreadyAuthorizedException;
 use Lea\Core\Exception\ViewNotImplementedException;
 use Lea\Core\Logger\Logger;
@@ -71,6 +72,8 @@ abstract class ExceptionDriver
             }
         } catch (UpdatingNotExistingResource $e) {
             Response::badRequest("Attempt to edit a non-existent resource: " . nl2br($e->getMessage()));
+        } catch (RemovingResourceThatHasReferenceException $e) {
+            Response::badRequest("Attempt to remove resource that has references: " . $e->getMessage());
         } catch (ArgumentCountError $e) {
             Response::internalServerError($e->getMessage());
         } catch (TypeError $e) {

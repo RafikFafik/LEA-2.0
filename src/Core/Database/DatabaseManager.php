@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Lea\Core\Database;
 
+use RegexIterator;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use Lea\Core\Validator\TypeValidator;
 use Lea\Core\Reflection\ReflectionClass;
 use Lea\Core\Validator\NamespaceValidator;
 use Lea\Core\Reflection\ReflectionProperty;
 use Lea\Core\Exception\ResourceNotExistsException;
 use Lea\Core\Exception\UpdatingNotExistingResource;
-use Lea\Core\Validator\TypeValidator;
+use Lea\Core\Exception\RemovingResourceThatHasReferenceException;
 
 abstract class DatabaseManager
 {
@@ -159,7 +163,7 @@ abstract class DatabaseManager
         $query = $this->query_provider->getUpdateQuery($object, $where_value, $where_column, $parent_id, $parent_key);
         $tableName = KeyFormatter::getTableNameByObject($object);
         $columns = KeyFormatter::getTableColumnsByObject($object);
-        $this->updateProtection($object, $where_value, $where_column, $tableName, $columns);
+        $this->updateProtection($object, [$where_column => $where_value], $tableName, $columns);
         $result = DatabaseConnection::executeQuery($query, $tableName, $columns, $object);
         $affected_rows = DatabaseConnection::getAffectedRows();
         $child_objects = $object->getChildObjects();
@@ -183,54 +187,102 @@ abstract class DatabaseManager
             }
         }
     }
-
-    private function updateProtection(object $object, $where_value, $where_column, $tableName, $columns): void
+    public const NOT_EXISTS = 0;
+    public const EXISTS = 1;
+    private function updateProtection(object $object, array $constraints, $tableName, $columns, $check_for_empty = self::NOT_EXISTS): void
     {
-        $query = $this->query_provider->getCountQuery($object, $where_value, $where_column);
+        $query = $this->query_provider->getCountQuery($object, $constraints);
         $result = DatabaseConnection::executeQuery($query, $tableName, $columns, $object);
         $row = mysqli_fetch_assoc($result);
         $table = $object->getClassName();
-        if ($row['count'] == 0)
+        if ($check_for_empty == self::NOT_EXISTS && $row['count'] == 0)
             throw new UpdatingNotExistingResource("Table: $table");
+        elseif ($check_for_empty == self::EXISTS && $row['count'] > 0)
+            throw new RemovingResourceThatHasReferenceException("Main Table: $table, constraint failed: " .  json_encode($constraints, JSON_PRETTY_PRINT));
     }
 
-    protected function removeRecordData(object $object, $where_value)
+    protected function removeRecordData(object $object, $constraints)
     {
-        $query = $this->query_provider->getSoftDeleteQuery($object, $where_value);
+        $query = $this->query_provider->getSoftDeleteQuery($object, $constraints['id']);
         $tableName = KeyFormatter::getTableNameByObject($object);
         $columns = KeyFormatter::getTableColumnsByObject($object);
-        $this->updateProtection($object, $where_value, 'id', $tableName, $columns);
-        // $this->checkExistingReferences($object, $where_value);
+        $this->updateProtection($object, $constraints, $tableName, $columns, self::NOT_EXISTS);
+        $this->checkExistingReferences($object, $constraints);
         DatabaseConnection::executeQuery($query, $tableName, $columns, $object);
     }
 
     /** Not finished - do not use */
-    private function checkExistingReferences(object $needle, $id): void
+    private function checkExistingReferences(object $needle, $constraints): void
     {
-        $needle = $needle->getClassName();
-        $entity_id = KeyFormatter::convertParentClassToForeignKey($needle);
-        $classes = get_declared_classes();
-        $i = 0;
-        foreach ($classes as $registered_class) {
-            echo $registered_class . "<br>\n";
-            continue;
-            $i++;
+        $needle2 = $needle->getClassName();
+        $entity_id = KeyFormatter::convertParentClassToForeignKey($needle2);
+        $namespaces = $this->getNamespaces();
+        foreach ($namespaces as $registered_class) {
             if (
                 !str_contains($registered_class, "Entity") ||
-                str_starts_with($registered_class, "DOM") ||
                 ($reflector = new ReflectionClass($registered_class))->isAbstract()
             ) {
                 continue;
             }
             $checked_object = new $registered_class;
-            if ($checked_object->hasKey($entity_id) || $reflector->hasProperty(KeyFormatter::processPascalToSnake($needle) . 's'))
-                $this->updateProtection(
-                    $checked_object,
-                    $id,
-                    $entity_id,
-                    KeyFormatter::getTableNameByObject($checked_object),
-                    KeyFormatter::getTableColumnsByObject($checked_object)
-                );
+            if ($checked_object->hasKey($entity_id)) {
+                $current_constraints = $constraints;
+                try {
+                    $this->updateProtection(
+                        $checked_object,
+                        [$entity_id => $current_constraints['id']],
+                        KeyFormatter::getTableNameByObject($checked_object),
+                        KeyFormatter::getTableColumnsByObject($checked_object),
+                        self::EXISTS
+                    );
+                } catch (RemovingResourceThatHasReferenceException $e) {
+                    throw new RemovingResourceThatHasReferenceException("Tried to delete: $needle2, existed constraint: "  . $checked_object->getClassName());
+                }
+            } else if ($reflector->hasProperty(KeyFormatter::processPascalToSnake($needle2) . 's')) {
+                $current_constraints = $constraints;
+                $current_constraints[KeyFormatter::convertParentClassToForeignKey($checked_object->getClassName()) . "_NOTNULL"] = null;
+                $current_constraints[KeyFormatter::convertParentClassToForeignKey($checked_object->getClassName()) . "_>="] = 1;
+                try {
+                    $this->updateProtection($needle, $current_constraints, KeyFormatter::getTableNameByObject($checked_object), KeyFormatter::getTableColumnsByObject($checked_object), self::EXISTS);
+                } catch (RemovingResourceThatHasReferenceException $e) {
+                    throw new RemovingResourceThatHasReferenceException("Tried to delete: $needle2, existed constraint: "  . $checked_object->getClassName());
+                }
+            }
         }
+    }
+
+    private function getNamespaces()
+    {
+        $path = __DIR__ . '/../../';
+        $fqcns = array();
+
+        $allFiles = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+        $phpFiles = new RegexIterator($allFiles, '/\.php$/');
+        foreach ($phpFiles as $phpFile) {
+            $content = file_get_contents($phpFile->getRealPath());
+            $tokens = token_get_all($content);
+            $namespace = '';
+            for ($index = 0; isset($tokens[$index]); $index++) {
+                if (!isset($tokens[$index][0])) {
+                    continue;
+                }
+                if (T_NAMESPACE === $tokens[$index][0]) {
+                    $index += 2; // Skip namespace keyword and whitespace
+                    while (isset($tokens[$index]) && is_array($tokens[$index])) {
+                        $namespace .= $tokens[$index++][1];
+                    }
+                }
+                if (T_CLASS === $tokens[$index][0] && T_WHITESPACE === $tokens[$index + 1][0] && T_STRING === $tokens[$index + 2][0]) {
+                    $index += 2; // Skip class keyword and whitespace
+                    $fqcns[] = $namespace . '\\' . $tokens[$index][1];
+
+                    # break if you have one class per file (psr-4 compliant)
+                    # otherwise you'll need to handle class constants (Foo::class)
+                    break;
+                }
+            }
+        }
+
+        return $fqcns;
     }
 }
