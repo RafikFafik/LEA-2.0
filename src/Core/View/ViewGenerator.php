@@ -27,11 +27,15 @@ final class ViewGenerator implements ViewInterface
     
     public function getView(string $state): iterable
     {
-        if($state !== null && $state == 'inactive')
+        $constraints['active'] = $state !== null && $state == 'inactive' ? false : true;
+        $row_count = $this->repository->findCountData($constraints);
+        $pagination = Request::getPaginationParams();
+
+        if($state !== null && $state == 'inactive') {
             $list = $this->repository->findList(['active' => false]);
-        else
+         } else {
             $list = $this->repository->findList();
-            
+         }
         $list = Normalizer::denormalizeList($list);
         $result['data'] = $list;
         $result['pagination'] = $this->getPaginationData();
@@ -49,6 +53,7 @@ final class ViewGenerator implements ViewInterface
 
     private function getPaginationData(): array
     {
+        /* TODO - $ avtive / inactive */
         $count_data = $this->repository->findCountData();
         if($count_data == 0)
             $count_data = 1;

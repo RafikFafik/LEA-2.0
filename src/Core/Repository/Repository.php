@@ -101,20 +101,18 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         $pagination = Request::getPaginationParams();
         $constraints = array_merge($constraints, Request::getFilterParams());
         $res = $this->getListDataByConstraints($this->object, $constraints, $pagination, false);
-
+        
         return $res;
     }
-
+    
     public function removeById(int $id): void
     {
         $this->removeRecordData($this->object, ['id' => $id]);
     }
-
-    public function findCountData(): int
+    
+    public function findCountData(array $constraints = []): int
     {
-        $result = $this->getCountData();
-
-        return $result;
+        return $this->getCountData($constraints);
     }
 
     public function isUnique($constraints): bool

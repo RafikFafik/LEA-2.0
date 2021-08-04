@@ -134,9 +134,9 @@ abstract class DatabaseManager
         return $objects ?? [];
     }
 
-    public function getCountData(): int
+    public function getCountData($constraints): int
     {
-        $query = $this->query_provider->getCountQuery($this->object);
+        $query = $this->query_provider->getCountQuery($this->object, $constraints);
         $result = DatabaseConnection::executeQuery($query, $this->tableName);
         $row = mysqli_fetch_assoc($result);
 
