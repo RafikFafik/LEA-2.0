@@ -22,6 +22,9 @@ class OfferController extends Controller implements ControllerInterface
             case "POST":
                 $this->updateResource($this->repository);
                 break;
+            case "DELETE":
+                $this->repository->removeById($this->params['id']);
+                Response::noContent();
             default:
                 Response::methodNotAllowed();
         }

@@ -200,6 +200,27 @@ abstract class DatabaseManager
         $tableName = KeyFormatter::getTableNameByObject($object);
         $columns = KeyFormatter::getTableColumnsByObject($object);
         $this->updateProtection($object, $where_value, 'id', $tableName, $columns);
+        // $this->checkExistingReferences($object, $where_value);
         DatabaseConnection::executeQuery($query, $tableName, $columns, $object);
+    }
+
+    private function checkExistingReferences(object $object_to_check, $id): void
+    {
+           
+    }
+
+    private static function getEntityClasses(object $object, $id): ?string
+    {
+        $needle = $object->getClassName();
+        // $needle = KeyFormatter::processSnakeToPascal($needle);
+        $classes = get_declared_classes();
+        foreach ($classes as $registered_class) {
+            if (!str_contains($registered_class, "Entity"))
+                continue;
+            $checked_object = new $registered_class;
+            // if($checked_object->hasKey($))
+        }
+
+        return null;
     }
 }

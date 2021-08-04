@@ -85,7 +85,7 @@ class Validator implements ValidatorInterface
         self::validateEmail($params['email']);
         try {
             $repository = new RoleRepository();
-            $repository->findById($params['role_id']);
+            $repository->findById((int)$params['role_id']);
         } catch (ResourceNotExistsException $e) {
             Response::badRequest("Role with given ID does not exists");
         }
