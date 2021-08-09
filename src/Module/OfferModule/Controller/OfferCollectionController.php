@@ -26,9 +26,7 @@ class OfferCollectionController extends Controller implements ControllerInterfac
                 Response::ok($result);
                 // Response::ok($service->getView());
             case "POST":
-                $id = $service->saveOffer($this->request->getPayload());
-                $response = $service->getOfferById($id);
-                Response::ok($response);
+                $this->postResource($this->repository);
                 break;
             default:
                 Response::methodNotAllowed();

@@ -42,19 +42,4 @@ final class OfferService extends Service
     
         return $result;
     }
-
-    public function saveOffer(array $payload): int
-    {
-        $contractor_employee = new ContractorEmployee($payload['contractor_employee']);
-        $contractor_employee->setContractorId((int)$payload['contractor_id']);
-        $repository =  new ContractorEmployeeRepository();
-        $id = $repository->save($contractor_employee);
-        $payload['contact_person'] = $id;
-        unset($payload['contractor_employee']);
-        $object = Normalizer::normalize($payload, $this->repository->getEntityClass());
-
-        $id = $this->repository->save($object);
-
-        return $id;
-    }
 }
