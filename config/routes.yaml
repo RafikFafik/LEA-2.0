@@ -44,7 +44,7 @@ ProjectModule:
             url: "/projects"
             controller: ProjectCollectionController
             filters:
-                match: [description, name]
+                match: [description, name, guardian, contractor_shortname]
                 range: [issue_date, expiration_date]
 
 SettlementModule:
