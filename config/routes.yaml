@@ -31,8 +31,8 @@ ProductModule:
             controller: ProductCollectionController
             filters:
                 match:
-                    [product_code, producent, unit, product_model, product_name]
-                range: [price]
+                    [code, producer, unit, model, name]
+                range: [net_price]
 
 ProjectModule:
     prefix: "/projects"
