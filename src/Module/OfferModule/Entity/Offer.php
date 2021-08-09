@@ -89,6 +89,11 @@ class Offer extends Entity
      */
     private $transport;
 
+    /**
+     * @var string
+     */
+    private $currency;
+
 
     /**
      * Get the value of offer_number
@@ -468,6 +473,30 @@ class Offer extends Entity
     public function setTransport(?string $transport)
     {
         $this->transport = $transport;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of currency
+     *
+     * @return  string
+     */ 
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Set the value of currency
+     *
+     * @param  string  $currency
+     *
+     * @return  self
+     */ 
+    public function setCurrency(string $currency)
+    {
+        $this->currency = $currency;
 
         return $this;
     }
