@@ -94,6 +94,11 @@ class Offer extends Entity
      */
     private $currency;
 
+    /**
+     * @var int
+     */
+    private $vat_rate;
+
 
     /**
      * Get the value of offer_number
@@ -497,6 +502,30 @@ class Offer extends Entity
     public function setCurrency(string $currency)
     {
         $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of vat_rate
+     *
+     * @return  int
+     */ 
+    public function getVatRate()
+    {
+        return $this->vat_rate;
+    }
+
+    /**
+     * Set the value of vat_rate
+     *
+     * @param  int  $vat_rate
+     *
+     * @return  self
+     */ 
+    public function setVatRate(int $vat_rate)
+    {
+        $this->vat_rate = $vat_rate;
 
         return $this;
     }
