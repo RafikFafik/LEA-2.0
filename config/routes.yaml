@@ -46,6 +46,16 @@ ProjectModule:
                 match: [description, name]
                 range: [issue_date, expiration_date]
 
+SettlementModule:
+    prefix: "/settlements"
+    endpoints:
+        by-id:
+            url: "/settlements/{id}"
+            controller: SettlementController
+        collection:
+            url: "/settlements"
+            controller: SettlementCollectionController
+
 ProductOfferModule:
     prefix: "/product-offers"
     endpoints:
