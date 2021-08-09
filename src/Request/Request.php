@@ -119,6 +119,14 @@ final class Request
         self::$pagination = $params;
     }
 
+    /** 
+     * Overwrite requested page number if greater than in database
+     */
+    public static function setPaginationPage(int $page): void
+    {
+        self::$pagination['page'] = $page;
+    }
+
     public static function getPaginationParams(): array
     {
         return self::$pagination;
