@@ -30,8 +30,7 @@ ProductModule:
             url: "/products"
             controller: ProductCollectionController
             filters:
-                match:
-                    [code, producer, unit, model, name]
+                match: [code, producer, unit, model, name]
                 range: [net_price]
 
 ProjectModule:
@@ -58,7 +57,15 @@ SettlementModule:
             controller: SettlementCollectionController
             filters:
                 match: [document_number, contractor, payment_days_number]
-                range: [issue_date, unsettled_value, payment_deadline, net_value, gross_value, vate_rate]
+                range:
+                    [
+                        issue_date,
+                        unsettled_value,
+                        payment_deadline,
+                        net_value,
+                        gross_value,
+                        vate_rate,
+                    ]
 
 ProductOfferModule:
     prefix: "/product-offers"
