@@ -4,7 +4,7 @@ HomepageModule:
         homepage:
             url: "/"
             controller: HomepageController
-            allow: ['all']
+            allow: ["all"]
 
 #modules
 OfferModule:
@@ -30,7 +30,8 @@ ProductModule:
             url: "/products"
             controller: ProductCollectionController
             filters:
-                match: [product_code, producent, unit, product_model, product_name]
+                match:
+                    [product_code, producent, unit, product_model, product_name]
                 range: [price]
 
 ProjectModule:
@@ -55,6 +56,9 @@ SettlementModule:
         collection:
             url: "/settlements"
             controller: SettlementCollectionController
+            filters:
+                match: [document_number, contractor, payment_days_number]
+                range: [issue_date, unsettled_value, payment_deadline, net_value, gross_value, vate_rate]
 
 ProductOfferModule:
     prefix: "/product-offers"
@@ -84,7 +88,18 @@ ContractorModule:
             url: "/contractors"
             controller: ContractorCollectionController
             filters:
-                match: [id, fullname, shortname, city, voivodeship, address, email, nip, guardian]
+                match:
+                    [
+                        id,
+                        fullname,
+                        shortname,
+                        city,
+                        voivodeship,
+                        address,
+                        email,
+                        nip,
+                        guardian,
+                    ]
         library-administrative-division:
             url: "/contractors/libraries"
             controller: LibraryAdministrativeDivisionController
@@ -93,7 +108,7 @@ ContractorModule:
             url: "/contractors/nutshell"
             controller: ContractorNutshellCollectionController
             filters:
-                match: ['shortname']
+                match: ["shortname"]
         projects:
             url: "/contractors/{id}/projects"
             controller: ContractorProjectController
@@ -101,7 +116,6 @@ ContractorModule:
             url: "/contractors/unique"
             controller: ContractorUniqueController
             params: [shortname]
-
 
 CalendarModule:
     prefix: "/calendar"
@@ -128,11 +142,11 @@ CalendarModule:
         send-alerts:
             url: "/calendar/send-alert"
             controller: CalendarAlertController
-            allow: ['all']
+            allow: ["all"]
         playground:
             url: "/calendar/playground"
             controller: CalendarPlaygroundController
-            allow: ['all']
+            allow: ["all"]
 
 Security:
     prefix: "/security"
@@ -141,22 +155,22 @@ Security:
             url: "/security/login"
             controller: LoginController
             body-params: [email, password]
-            allow: ['all']
+            allow: ["all"]
         register:
             url: "/security/register"
             controller: RegisterController
-            body-params: ['email', 'name', 'surname', 'role_id']
-            allow: ['admin']
+            body-params: ["email", "name", "surname", "role_id"]
+            allow: ["admin"]
         activate-account:
             url: "/security/account-activation"
             controller: AccountActivationController
-            body-params: ['token', 'password']
-            allow: ['all']
+            body-params: ["token", "password"]
+            allow: ["all"]
         email-resend:
             url: "/security/account-activation-email-resend"
             controller: AccountActivationEmailResendController
-            params: ['email']
-            allow: ['all']
+            params: ["email"]
+            allow: ["all"]
         roles:
             url: "/security/roles"
             controller: RoleCollectionController
@@ -178,7 +192,7 @@ Security:
         commercial-advisor:
             url: "/security/users/commercial-advisors"
             controller: CommercialAdvisorController
-            config: 
+            config:
                 advisor-role-id: 5 # ID in DB
         playground:
             url: "/security/playground"
@@ -190,12 +204,12 @@ Gus:
         gus-nip:
             url: "/gus"
             controller: "GusController"
-            params: ['nip']
+            params: ["nip"]
 File:
     prefix: "/file"
     endpoints:
         preview-file:
             url: "/file"
             controller: "FileController"
-            params: ['hash']
-            allow: ['all']
+            params: ["hash"]
+            allow: ["all"]
