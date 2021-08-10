@@ -199,10 +199,10 @@ final class QueryProvider
     private function getPaginationQueryConstraints(object $object, array $params): ?string
     {
         $query = "";
-        if ($object->hasKey($params['sortby']))
+        if (isset($params['sortby']) && $object->hasKey($params['sortby']))
             $query .= ' ORDER BY ' . KeyFormatter::convertKeyToColumn($params['sortby']) . " " . $params['order'];
         if ($params['limit'])
-            $query .= ' LIMIT ' . ($params['page'] * $params['limit']) . ', ' . $params['limit'];
+            $query .= ' LIMIT ' . (($params['page'] - 1) * $params['limit']) . ', ' . $params['limit'];
 
         return $query;
     }
