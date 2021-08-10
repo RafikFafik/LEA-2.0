@@ -13,6 +13,6 @@ final class CalendarAlertRepository extends Repository
     {
         $constraints = ['launch_date_time' => $launch_date_time->__toString()];
 
-        return $this->findList($constraints, false);
+        return $this->findList($constraints, [], false);
     }
 }

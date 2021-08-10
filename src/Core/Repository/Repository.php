@@ -86,9 +86,10 @@ abstract class Repository extends DatabaseManager implements RepositoryInterface
         return $affected_rows;
     }
 
-    public function findList(array $constraints = ['active' => true], bool $nested = true)
+    public function findList(array $constraints = ['active' => true], array $pagination = [], bool $nested = true)
     {
-        $pagination = Request::getPaginationParams();
+        if(empty($pagination))
+            $pagination = Request::getPaginationParams();
         $constraints = array_merge(Request::getFilterParams(), $constraints);
         if (isset($this))
             $result = $this->getListDataByConstraints($this->object, $constraints, $pagination, $nested);

@@ -24,14 +24,7 @@ final class ViewGenerator implements ViewInterface
     {
         $constraints['active'] = $state !== null && $state == 'inactive' ? false : true;
         $pagination = $this->getPaginationData(Request::getPaginationParams(), $constraints);
-        $existed_pages = ceil($this->repository->findCountData($constraints) / $pagination['limit']);
-        Request::setPaginationPage((int)$existed_pages);
-        
-        if($state !== null && $state == 'inactive') {
-            $list = $this->repository->findList(['active' => false]);
-        } else {
-            $list = $this->repository->findList();
-        }
+        $list = $this->repository->findList($constraints, $pagination);
         $list = Normalizer::denormalizeList($list);
         $result['data'] = $list;
         $result['pagination'] = $pagination;
@@ -42,7 +35,7 @@ final class ViewGenerator implements ViewInterface
     public function formatPagination(array $data): array
     {
         $result['data'] = $data;
-        $result['pagination'] = $this->getPaginationData(Request::getPaginationParams());
+        $result['pagination'] = $this->getPaginationData(Request::getPaginationParams(), ['active' => true]);
 
         return $result;
     }
@@ -53,14 +46,16 @@ final class ViewGenerator implements ViewInterface
         $count_data = $this->repository->findCountData($constraints);
         if($count_data == 0)
             $count_data = 1;
-        $page = (int)$pagination['page'] + 1;
+        $requested_page = (int)$pagination['page'] + 1;
         if (!$pagination['limit'])
             $pagination['limit'] = $count_data;
-        $all_pages = ceil(($count_data / $pagination['limit']));
+        $available_pages = ceil(($count_data / $pagination['limit']));
+        if($available_pages < $requested_page)
+            $requested_page = $available_pages;
 
-        $data['page'] = $page;
+        $data['page'] = $requested_page;
         $data['limit'] = $pagination['limit'];
-        $data['pages'] = $all_pages;
+        $data['pages'] = $available_pages;
 
         return $data;
     }
