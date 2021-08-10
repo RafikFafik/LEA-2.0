@@ -40,7 +40,7 @@ final class ViewGenerator implements ViewInterface
         return $result;
     }
 
-    private function getPaginationData(array $pagination, $constraints): array
+    public function getPaginationData(array $pagination, array $constraints = []): array
     {
         /* TODO - $ avtive / inactive */
         $count_data = $this->repository->findCountData($constraints);

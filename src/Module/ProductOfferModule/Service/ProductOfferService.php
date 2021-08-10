@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lea\Module\ProductOfferModule\Service;
 
+use Lea\Request\Request;
 use Lea\Core\Type\Currency;
 use Lea\Core\Service\Service;
 use Lea\Core\View\ViewGenerator;
@@ -15,7 +16,9 @@ class ProductOfferService extends Service
 {
     public function getView(): iterable
     {
-        $list = $this->repository->findList();
+        $view = new ViewGenerator($this->repository);
+        $pagination = $view->getPaginationData(Request::getPaginationParams());
+        $list = $this->repository->findList([], $pagination);
         $contractor_repository = new ContractorRepository();
         foreach ($list as $obj) {
             $sums = $this->getProductsSums($obj->getProducts());
