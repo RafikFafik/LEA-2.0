@@ -26,6 +26,7 @@ class ProductOfferService extends Service
             $obj->setNetSum(new Currency($sums['net_sum'], TypeValidator::DATABASE));
             $obj->setGrossSum(new Currency($sums['gross_sum'], TypeValidator::DATABASE));
             $obj->contractor_fullname = $contractor->getFullName();
+            $obj->contractor_shortname = $contractor->getShortname();
         }
 
         $list = Normalizer::denormalizeList($list);
