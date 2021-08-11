@@ -56,6 +56,8 @@ final class ViewGenerator implements ViewInterface
         $data['page'] = $requested_page;
         $data['limit'] = $pagination['limit'];
         $data['pages'] = $available_pages;
+        $data['order'] = $pagination['order'];
+        $data['sortby'] = $pagination['sortby'];
 
         return $data;
     }
