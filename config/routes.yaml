@@ -1,0 +1,222 @@
+HomepageModule:
+    prefix: "/"
+    endpoints:
+        homepage:
+            url: "/"
+            controller: HomepageController
+            allow: ["all"]
+
+#modules
+OfferModule:
+    prefix: "/offers"
+    endpoints:
+        by-id:
+            url: "/offers/{id}"
+            controller: OfferController
+        collection:
+            url: "/offers"
+            controller: OfferCollectionController
+            filters:
+                match: [offer_number, fullname, title]
+                range: [issue_date, expiration_date, price_netto, price_brutto]
+
+ProductModule:
+    prefix: "/products"
+    endpoints:
+        by-id:
+            url: "/products/{id}"
+            controller: ProductController
+        collection:
+            url: "/products"
+            controller: ProductCollectionController
+            filters:
+                match: [code, producer, unit, model, name]
+                range: [net_price]
+
+ProjectModule:
+    prefix: "/projects"
+    endpoints:
+        by-id:
+            url: "/projects/{id}"
+            controller: ProjectController
+        collection:
+            url: "/projects"
+            controller: ProjectCollectionController
+            filters:
+                match: [description, name, guardian, contractor_shortname]
+                range: [issue_date, expiration_date]
+
+SettlementModule:
+    prefix: "/settlements"
+    endpoints:
+        by-id:
+            url: "/settlements/{id}"
+            controller: SettlementController
+        collection:
+            url: "/settlements"
+            controller: SettlementCollectionController
+            filters:
+                match: [document_number, contractor, payment_days_number]
+                range:
+                    [
+                        issue_date,
+                        unsettled_value,
+                        payment_deadline,
+                        net_value,
+                        gross_value,
+                        vate_rate,
+                    ]
+
+ProductOfferModule:
+    prefix: "/product-offers"
+    endpoints:
+        by-id:
+            url: "/product-offers/{id}"
+            controller: ProductOfferController
+        collection:
+            url: "/product-offers"
+            controller: ProductOfferCollectionController
+
+ContractorModule:
+    prefix: "/contractors"
+    endpoints:
+        by-id:
+            url: "/contractors/{id}"
+            controller: ContractorController
+            allow: [""]
+        activation:
+            url: "/contractors/{id}/activate"
+            controller: ContractorActivationController
+        deactivation:
+            url: "/contractors/{id}/deactivate"
+            controller: ContractorDeactivationController
+
+        collection:
+            url: "/contractors"
+            controller: ContractorCollectionController
+            filters:
+                match:
+                    [
+                        id,
+                        fullname,
+                        shortname,
+                        city,
+                        voivodeship,
+                        address,
+                        email,
+                        nip,
+                        guardian,
+                    ]
+        library-administrative-division:
+            url: "/contractors/libraries"
+            controller: LibraryAdministrativeDivisionController
+            params: ["postcode"]
+        nutshell:
+            url: "/contractors/nutshell"
+            controller: ContractorNutshellCollectionController
+            filters:
+                match: ["shortname"]
+        projects:
+            url: "/contractors/{id}/projects"
+            controller: ContractorProjectController
+        unique:
+            url: "/contractors/unique"
+            controller: ContractorUniqueController
+            params: [shortname]
+
+CalendarModule:
+    prefix: "/calendar"
+    endpoints:
+        event:
+            url: "/calendar/events/{id}"
+            controller: CalendarEventController
+            allow: [user, admin]
+        events:
+            url: "/calendar/events"
+            controller: CalendarEventCollectionController
+        daily:
+            url: "/calendar/daily"
+            params: ["date"]
+            controller: "DailyScheduleController"
+        monthly:
+            url: "/calendar/monthly"
+            params: ["month", "year", "user_id"]
+            controller: "MonthlyScheduleController"
+        weekly:
+            url: "/calendar/weekly"
+            params: ["year", "week", "user_id"]
+            controller: "WeeklyScheduleController"
+        send-alerts:
+            url: "/calendar/send-alert"
+            controller: CalendarAlertController
+            allow: ["all"]
+        playground:
+            url: "/calendar/playground"
+            controller: CalendarPlaygroundController
+            allow: ["all"]
+
+Security:
+    prefix: "/security"
+    endpoints:
+        login:
+            url: "/security/login"
+            controller: LoginController
+            body-params: [email, password]
+            allow: ["all"]
+        register:
+            url: "/security/register"
+            controller: RegisterController
+            body-params: ["email", "name", "surname", "role_id"]
+            allow: ["admin"]
+        activate-account:
+            url: "/security/account-activation"
+            controller: AccountActivationController
+            body-params: ["token", "password"]
+            allow: ["all"]
+        email-resend:
+            url: "/security/account-activation-email-resend"
+            controller: AccountActivationEmailResendController
+            params: ["email"]
+            allow: ["all"]
+        roles:
+            url: "/security/roles"
+            controller: RoleCollectionController
+        role:
+            url: "/security/roles/{id}"
+            controller: RoleController
+        role-hierarchy:
+            url: "/security/role-hierarchy"
+            controller: RoleHierarchyController
+        users:
+            url: "/security/users"
+            controller: UserCollectionController
+        user:
+            url: "/security/users/{id}"
+            controller: UserController
+        users-subordinates:
+            url: "/security/users/subordinates"
+            controller: UserSubordinateController
+        commercial-advisor:
+            url: "/security/users/commercial-advisors"
+            controller: CommercialAdvisorController
+            config:
+                advisor-role-id: 5 # ID in DB
+        playground:
+            url: "/security/playground"
+            controller: ManualPushNotificationController
+            allow: [all]
+Gus:
+    prefix: "/gus"
+    endpoints:
+        gus-nip:
+            url: "/gus"
+            controller: "GusController"
+            params: ["nip"]
+File:
+    prefix: "/file"
+    endpoints:
+        preview-file:
+            url: "/file"
+            controller: "FileController"
+            params: ["hash"]
+            allow: ["all"]

@@ -23,4 +23,5 @@ RUN apt-get update -y \
     && echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "max_execution_time = 600"  >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo '[PHP]\ndate.timezone = "Europe/Warsaw"\n' >> /usr/local/etc/php/conf.d/tzone.ini \
-    && echo 'alias dbg="vim /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"' >> ~/.bashrc
+    && echo 'alias dbg="vim /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini"' >> ~/.bashrc \
+    && echo 'alias rld="service apache2 reload"' >> ~/.bashrc
