@@ -6,7 +6,7 @@ use Lea\Core\Service\ServiceInterface;
 use Lea\Core\Security\Repository\UserRepository;
 use Lea\Response\Response;
 
-final class AccountActivationService extends AuthenticationService implements ServiceInterface
+class AccountActivationService extends AuthenticationService implements ServiceInterface
 {
     public function activateAccount(string $token, string $password): void
     {
@@ -19,5 +19,10 @@ final class AccountActivationService extends AuthenticationService implements Se
         $user->setActive(true);
         $user->setToken("");
         $repository->save($user);
+    }
+
+    public function getActivationToken(): string
+    {
+        return sha1($this->getRandomString(64) . microtime());
     }
 }
