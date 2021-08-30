@@ -6,9 +6,9 @@ use Lea\Response\Response;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
-use Lea\Core\Security\Service\PasswordResetService;
+use Lea\Core\Security\Service\PasswordService;
 
-class PasswordResetController extends Controller implements ControllerInterface
+class ResetPasswordController extends Controller implements ControllerInterface
 {
     public function init(): void
     {
@@ -16,8 +16,9 @@ class PasswordResetController extends Controller implements ControllerInterface
             case "POST":
                 $data = $this->request->getPayload();
                 Validator::validateEmail($data['email']);
-                $service = new PasswordResetService;
-                $service->resetPassword($data['email']);
+                $service = new PasswordService;
+                $service->sendPasswordResetEmail($data['email']);
+
 
                 Response::accepted();
             default:

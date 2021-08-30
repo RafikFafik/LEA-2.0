@@ -6,27 +6,29 @@ use Lea\Response\Response;
 use Lea\Core\Validator\Validator;
 use Lea\Core\Controller\Controller;
 use Lea\Core\Controller\ControllerInterface;
+use Lea\Core\Exception\InactiveAccountException;
 use Lea\Core\Exception\ResourceNotExistsException;
-use Lea\Core\Security\Service\AccountActivationService;
+use Lea\Core\Security\Service\PasswordService;
 
-class AccountActivationController extends Controller implements ControllerInterface
+class NewPasswordController extends Controller implements ControllerInterface
 {
     public function init(): void
     {
         switch ($this->request->method()) {
             case "POST":
+                $service = new PasswordService;
                 $data = $this->request->getPayload();
-                Validator::validateAccountActivationParams($data);
                 Validator::validatePasswordStrength($data['password']);
-                $service = new AccountActivationService;
                 try {
-                    $service->activateAccount($data['token'], $data['password']);
+                    $service->resetPassword($data['token'], $data['password']);
                 } catch (ResourceNotExistsException $e) {
-                    Response::badRequest("Invalid Token");
+                    Response::badRequest("Invalid token");
+                } catch(InactiveAccountException $e) {
+                    Response::badRequest("Inactive account");
                 }
                 Response::noContent();
             default:
                 Response::methodNotAllowed();
-        }Response::accepted();
+        }
     }
 }

@@ -205,11 +205,17 @@ Security:
             url: "/security/playground"
             controller: ManualPushNotificationController
             allow: [all]
-        password-reminder:
+        password-reset:
             url: "/security/password-reset"
-            controller: PasswordResetController
+            controller: ResetPasswordController
             allow: [all]
             body-params: [email]
+        password-new:
+            url: "/security/password-new"
+            controller: NewPasswordController
+            allow: [all]
+            body-params: [password, token]
+
         
         
 Gus:
